@@ -1,0 +1,139 @@
+.dashboard-content-main {
+    position: relative;
+    top: 0;
+    padding: 40px;
+    padding-left: 60px;
+    margin-top: 20px;
+    background-color: #fff;
+    font-family: "Outfit", sans-serif;
+  }
+  
+  .card-div {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding-top: 20px;
+  }
+  
+  .main-div-card {
+    background-color: #1a4257; 
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+   
+    margin: 10px;
+    width: 230px;
+    padding: 20px;
+    color: #fff; 
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .main-div-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .main-div-card .left-div {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .main-div-card .left-div .heading-div h1 {
+    font-size: 1.7rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .main-div-card .left-div .heading-div p {
+    font-size: 1.5rem;
+    color: #bbb; 
+  }
+  
+  .main-div-card .right-div {
+    margin-top: 10px;
+    text-align: right;
+  }
+  
+  .main-div-card .view-all-div {
+    border-top: 1px solid #444;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    margin-top: 15px;
+  }
+  
+  .main-div-card .view-all-div a {
+    color: #85a2e9; 
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+  
+  .main-div-card .view-all-div a:hover {
+    color: #fff; 
+  }
+  
+  .dash-board-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 30px;
+  }
+  
+  .dash-board-bottom-main {
+    background-color: #444; 
+    border-radius: 8px;
+    padding: 20px;
+    width: 335px;
+    color: #fff;
+    transition: background-color 0.3s ease;
+  }
+  
+  .dash-board-bottom-main:hover {
+    background-color: #333;
+  }
+  
+  .dash-board-bottom-main .heading-div p {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding-left: 20px;
+  }
+  
+  .dash-board-bottom-main .list-div {
+    background: #555; 
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 2;
+    padding: 20px;
+    margin-top: 15px;
+  }
+  
+  .dash-board-bottom-main .list-div p {
+    margin: 10px 0;
+  }
+  
+  .dash-board-bottom-main .data-fetching {
+    height: 340px;
+    overflow-y: scroll;
+    padding: 10px;
+    margin-top: 20px;
+  }
+  
+  .dash-board-bottom-main .data-fetching .data-div {
+    line-height: 2;
+    position: relative;
+    right: 22px;
+  }
+  
+  .dash-board-bottom-main .data-fetching .data-div ul {
+    border-bottom: 1px solid #666;
+    list-style: none;
+  }
+  
+  .dash-board-bottom-main .data-fetching .data-div ul li {
+    color: #bbb;
+    font-size: 14px;
+  }
+  

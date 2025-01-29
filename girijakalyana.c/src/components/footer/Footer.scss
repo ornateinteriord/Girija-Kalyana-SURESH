@@ -1,0 +1,155 @@
+
+.footer {
+  background: linear-gradient(to right, #182848 , #4d75d4);
+  color: #fff;
+  padding: 40px 0;
+  text-align: center;
+  font-family: "Outfit sans-serif";
+  
+}
+
+.footer .container {
+  display: flex;
+  // flex-wrap: wrap;
+  // justify-content: space-around;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+  
+}
+
+.footer .section {
+  flex: 1;
+  min-width: 200px;
+  margin: 10px;
+margin-left: 20px;
+}
+.about{
+  margin-left: 50px;
+}
+.contact{
+  margin-right: 40px;
+}
+
+.footer .heading {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+h2{
+  margin-top: 5px;
+  color:#fff;
+}
+.footer .subheading {
+  font-size: 18px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-direction: row;
+}
+.text{
+  display: flex;
+  align-items: flex-start;
+  color:#fff;
+}
+
+.footer .text {
+  font-size: 17px;
+  margin-bottom: 8px;
+}
+
+.footer .list {
+  list-style: none;
+
+  padding: 0;
+
+}
+
+.footer .list li {
+  font-size: 16px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.footer .input {
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: 4px;
+  margin-right: 60px;
+  border: none;
+  width: 80%;
+  height: 40px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.footer .button {
+  margin-top: 10px;
+  background-color: #27ae60;
+  color: rgb(19, 13, 13);
+  padding: 13px 25px;
+  border: none;
+  font-weight: 700;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+justify-content: center; 
+  margin-right: 40%;
+}
+
+.footer .button:hover {
+  background-color: #1e8449;
+}
+
+.social-media {
+  margin-top: 20px;
+}
+
+.social-media h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.social-media .icons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.social-media .icon {
+  color: #fff;
+  font-size: 20px;
+  padding: 10px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.social-media .icon.facebook:hover {
+  background-color: #3b5998;
+}
+
+.social-media .icon.twitter:hover {
+  background-color: #00acee;
+}
+
+.social-media .icon.linkedin:hover {
+  background-color: #0077b5;
+}
+
+.social-media .icon.youtube:hover {
+  background-color: #ff0000;
+}
+
+.copyright {
+  margin-top: 20px;
+  font-size: 14px;
+  border-top: 1px solid #444;
+  padding-top: 10px;
+}

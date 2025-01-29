@@ -1,0 +1,73 @@
+.servicebody {
+    margin-top: 40px;
+    text-align: center;
+    padding: 2rem;
+  
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      margin-top: 1.0rem;
+      color: #2c3e50;
+       font-family: "Outfit sans-serif";
+    }
+  
+    .service-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+     font-family: "Outfit sans-serif";
+    }
+  
+    .service-card {
+      background: #2c3e50;
+      color: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+      .icon-wrapper {
+        margin-bottom: 1rem;
+      }
+  
+      h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+      font-family: "Outfit sans-serif";
+        
+      }
+  
+      p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+        font-family: "Outfit sans-serif";
+      }
+  
+      .arrow-icon {
+        margin-top: 1rem;
+        width: 60px;
+        height: 40px;
+        // background-color: #fff;
+        
+      }
+    }
+  
+    .happydiv {
+      margin-top: 2rem;
+  
+      #happy {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+        font-family: "Outfit sans-serif";
+      }
+  
+      p {
+        font-size: 1.5rem;
+        font-family: "Outfit sans-serif";
+        color: #2c3e50;
+      }
+    }
+  }
+  

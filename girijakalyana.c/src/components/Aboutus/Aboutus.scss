@@ -1,0 +1,115 @@
+.about-us-container {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    margin: 0 auto;
+    padding: 50px;
+    max-width: 1200px;
+    margin-top: 80px;
+    font-family: "Outfit sans-serif";
+    /* Section 1: Intro About Us */
+    .about-us-intro {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+  
+      .about-us-text {
+        flex: 1;
+  
+        .highlight-text {
+          font-size: 22px;
+          color: #2a9d8f;
+          font-weight: bold;
+          text-transform: uppercase;
+        }
+  
+        .main-heading {
+          font-size: 36px;
+          font-weight: 700;
+          margin: 10px 0;
+          color: #264653;
+        }
+        .headingh3{
+          color: rgb(105, 44, 44);
+        }
+  
+        p {
+          font-size: 16px;
+          margin-bottom: 20px;
+          color: #6c757d;
+        }
+  
+        .learn-more-btn {
+          padding: 10px 20px;
+          font-size: 14px;
+          font-weight: bold;
+          color: #fff;
+          background-color: #e76f51;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+  
+          &:hover {
+            background-color: #d1493f;
+          }
+        }
+      }
+  
+      .about-us-image {
+        flex: 1;
+        text-align: center;
+  
+        img {
+          width: 100%;
+          max-width: 400px;
+          border-radius: 10px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+  
+    /* Section 2: What We Do */
+    .about-us-services {
+      text-align: center;
+  
+      .section-title {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 30px;
+        color: #264653;
+      }
+  
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+  
+        .service-card {
+          background: #f4f4f4;
+          padding: 20px;
+          border-radius: 8px;
+          text-align: center;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+          h4 {
+            font-size: 18px;
+            color: #264653;
+            margin-bottom: 10px;
+          }
+  
+          p {
+            font-size: 14px;
+            color: #6c757d;
+          }
+  
+          &:hover {
+            background: #e9ecef;
+            transform: translateY(-5px);
+            transition: 0.3s;
+          }
+        }
+      }
+    }
+  }
+  

@@ -1,0 +1,119 @@
+.contact-container {
+  padding: 20px;
+  padding-top: 80px;
+  font-family: "Outfit sans-serif";
+  .contact-header {
+    text-align: center;
+    margin-bottom: 30px;
+    font-family: "Outfit sans-serif";
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: #0a97b4;
+      font-family: "Outfit sans-serif";
+    }
+
+    p {
+      font-size: 1rem;
+      color: #555;
+      font-family: "Outfit sans-serif";
+    }
+  }
+
+  .contact-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-left: 20px;
+    gap: 20px;
+    font-family: "Outfit sans-serif";
+    // Left Section (Contact Details)
+    .contact-details {
+      flex: 1;
+      max-width: 45%;
+
+      .contact-card {
+        background: #f9f9f9;
+        width: 450px;
+        padding: 20px;
+        
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+        h3 {
+          font-size: 1.25rem;
+          margin-bottom: 10px;
+          color: #0a97b4;
+          font-family: "Outfit sans-serif";
+        }
+
+        p {
+          font-size: 1rem;
+          color: #555;
+          margin: 5px 0;
+          font-family: "Outfit sans-serif";
+        }
+      }
+    }
+
+    // Right Section (Contact Form)
+    .contact-form {
+      flex: 1;
+      max-width: 45%;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+      h3 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        color: #09add2;
+        font-family: "Outfit sans-serif";
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+
+        input,
+        textarea {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-size: 1rem;
+          color: #333;
+
+          &:focus {
+            border-color: #137107;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+          }
+        }
+
+        textarea {
+          resize: none;
+        }
+
+        button {
+          padding: 12px 20px;
+          background-color: #219009;
+          width: 200px;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 1rem;
+
+          &:hover {
+            background-color: #13c60a;
+          }
+        }
+      }
+    }
+  }
+}

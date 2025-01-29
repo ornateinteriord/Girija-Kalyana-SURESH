@@ -1,0 +1,26 @@
+
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+   
+}
+body{
+    background-color: #fff;
+    color: #fff;
+   
+}
+button:hover{
+    background-color:transparent ;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* Hides the scrollbar */
+  }
+  
+  ::-webkit-scrollbar {
+    display: none; /* Hide the scrollbar */
+  }

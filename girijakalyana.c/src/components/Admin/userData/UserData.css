@@ -1,0 +1,130 @@
+.upgrade-user {
+    font-family: "Outfit sans-serif";
+    padding: 20px;
+    background-color: #f4f7fc;
+    padding-left: 40px;
+    margin-top: 80px;
+  }
+  /* .search-div{
+    display: flex;
+    justify-self: end;
+    align-items: center;
+    margin-right: 10px;
+  } */
+  /* .serachLabel{
+    font-size: 20px;
+    margin-right: 10px;
+  } */
+   #search{
+    width: 320px;
+    height: 25px;
+    font-size: 18px;
+    padding-left: 20px; 
+  } 
+ .fist-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+ }
+  
+  /* .fist-head h4 {
+   
+      color:#34495e;
+  
+  } */
+  
+  .second-head {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+  }
+  
+  /* .rows-per-page select {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  } */
+  
+  /* .search-div input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+   */
+  /* .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  } */
+  
+  /* .table th, .table td {
+    padding: 12px 20px;
+    border: 1px solid #ddd;
+    text-align: left;
+  } */
+  
+  .status-column {
+    display: flex;
+    align-items: center;
+  }
+  
+  .active-status {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 12px;
+    border-radius: 6px;
+  }
+  
+  .pending-status {
+    background-color: #dc3545;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+  }
+  
+  .upgrade-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 7px 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .upgrade-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .pagination-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 0 5px;
+  }
+  
+  .pagination-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .pagination-btn.active {
+    background-color: #0056b3;
+    font-weight: bold;
+  }
+  
+  .dots {
+    margin: 0 5px;
+    color: #007bff;
+  }
+  

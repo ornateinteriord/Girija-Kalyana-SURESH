@@ -1,0 +1,95 @@
+.members-container {
+  text-align: center;
+  margin-top: 40px;
+  
+
+  h4 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #606c88;
+  
+  }
+
+  h5 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #555;
+  }
+
+  .members-slider {
+    position: relative;
+    overflow: hidden;
+    margin: 0 auto;
+    max-width: 1200px;
+
+    .swiper-slide {
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .member-card {
+      text-align: center;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+
+      &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+      }
+
+      .member-details {
+        padding: 10px;
+        background-color: #fff;
+        transition: background-color 0.3s;
+
+        h6 {
+          font-size: 1rem;
+          font-weight: bold;
+          margin: 5px 0;
+        }
+
+        p {
+          font-size: 0.9rem;
+          color: #555;
+        }
+
+        &:hover {
+          background-color: #f9f9f9;
+        }
+      }
+    }
+
+    .MuiIconButton-root {
+      position: absolute;
+      top: 50%;
+      z-index: 10;
+      transform: translateY(-50%);
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      padding: 10px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s ease-in-out;
+
+      &:hover {
+        background: #f0f0f0;
+        transform: scale(1.1);
+      }
+    }
+
+    .prev-button {
+      left: -50px;
+    }
+
+    .next-button {
+      right: -50px;
+    }
+  }
+}
