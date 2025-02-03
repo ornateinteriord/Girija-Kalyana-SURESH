@@ -11,39 +11,45 @@ import {
   CardMedia,
   CardContent,
   Button,
-  Pagination
+  Pagination,
+  Link
 } from "@mui/material";
+import { MdWorkspacePremium} from "react-icons/md";
 import { FaHeart } from "react-icons/fa";
-import { MdWorkspacePremium } from "react-icons/md";
-
 // Importing Popups for different sections
 import AboutPop from "./popupContent/abouPop/AboutPop"; 
 import EducationPop from "./popupContent/educationPop/EducationPop"; 
 import FamilyPop from "./popupContent/familyPop/FamilyPop"; 
 import LifeStylePop from "./popupContent/lifeStylePop/LifeStylePop"; 
 import PreferencePop from "./popupContent/preferencePop/PreferencePop"; 
+import premium8 from "../../../assets/wallpaper/premium8.avif"
 
 const ViewAll = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [userCard, setUserCard] = useState([]);
   const [selectedCardDetails, setSelectedCardDetails] = useState({ details: 0 });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(8);
-  const [totalPages, setTotalPages] = useState(0);
-  const [likedCards, setLikedCards] = useState(false); // To store the like status of each card
+ const [currentPage, setCurrentPage] = useState(1);
+   const [totalItems, setTotalItems] = useState(0);
+   const itemsPerPage = 9;
 
-  // Handles tab changes
-  const handleChange = (event, newValue) => {
-    setSelectedCardDetails((prevState) => ({ ...prevState, details: newValue }));
+  const [userDetails , setUserDetails] = useState()
+
+  const handleChange = async (event, newValue) => {
+    setSelectedCardDetails((prevState) => ({
+      ...prevState,
+      details: newValue,
+    }));
+
+    await getCardUserDeatils(selectedCardDetails._id, newValue);
   };
-
+  
   // Opens the dialog for a specific card
   const handleCardClick = (index) => {
     const selectedCard = userCard[index];
-    console.log("Selected Card Details:", selectedCard);
     setSelectedCardDetails({
       ...selectedCard,
-      familyDetails: selectedCard.familyDetails || {}, // Ensure it's always an object
+      familyDetails: selectedCard.familyDetails || {}, 
+      details: 0,
     });
     setOpenDialog(true);
   };
@@ -52,89 +58,97 @@ const ViewAll = () => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
-
-    // Fetches data from the backend using useEffect when the component mounts
-    const getData = async (page) => {
-      try {
-        // Get userId from localStorage
-        const userId = localStorage.getItem("userId");
-    
-        // Check if the userId exists in localStorage
-        if (!userId) {
-          console.error("User ID is not available in localStorage.");
-          return;
-        }
-    
-        // Make the request to fetch data with userId
-        const response = await axios.get(`http://localhost:5000/api/users?page=${page}&limit=${itemsPerPage}&userId=${userId}`);
-        
-        const { users, totalItems } = response.data; // Assuming API returns users and totalItems
-        setUserCard(users);
-        setTotalPages(Math.ceil(totalItems / itemsPerPage)); // Dynamically calculate total pages
-    
-        // Initialize likedCards with the liked status from the backend
-        setLikedCards(users.map((user) => ({ userId: user.userId, liked: user.liked })));
-      } catch (error) {
-        console.error("Error fetching data: ", error);
+  const getData = async (page) => {
+    try {
+      const userData = sessionStorage.getItem("userData");
+      if (!userData) {
+        console.error("No user data found in session storage");
+        return;
       }
-    };
   
+      const parsedUserData = JSON.parse(userData);
+      const loggedInUserId = parsedUserData._id; // Get logged-in user's ID
+      
+      const response = await axios.get(
+        `http://localhost:5000/api/users?page=${page}&limit=${itemsPerPage}`
+      );
+      const { users, totalUsers } = response.data;
   
-    // Handles like button click
-    const handleLikeClick = async (userId, isLiked) => {
-      try {
-        // Update the like status on the backend
-        await axios.post('http://localhost:5000/api/updateLike', { userId, liked: isLiked });
+      // Filter out the logged-in user from the list of users
+      const filteredUsers = users.filter(user => user._id !== loggedInUserId);
   
-        // Update the local state with the new like status
-        setUserCard((prevUserCards) =>
-          prevUserCards.map((card) =>
-            card.userId === userId ? { ...card, liked: isLiked } : card
-          )
-        );
-  
-        // Update the likedCards state as well
-        setLikedCards((prevLikedCards) =>
-          prevLikedCards.map((card) =>
-            card.userId === userId ? { ...card, liked: isLiked } : card
-          )
-        );
-      } catch (error) {
-        console.error("Error updating like status: ", error);
-      }
-    };
-  
-
-  // Handles pagination changes
-  const handlePageChange = (event, page) => {
-    setCurrentPage(page);
-    getData(page);
+      setUserCard(filteredUsers); // Set the filtered list of users
+      setTotalItems(totalUsers);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
   };
-
+  
   useEffect(() => {
     getData(currentPage);
   }, [currentPage]);
 
   // Renders content based on the selected tab
   const renderContent = () => {
+    if (!userDetails) return null; // Prevent errors when userDetails is undefined
+
     switch (selectedCardDetails.details) {
       case 0:
-        return <AboutPop details={selectedCardDetails} />;
+        return <AboutPop   userDetails={userDetails} />;
       case 1:
-        return <FamilyPop details={selectedCardDetails.familyDetails} />;
+        return <FamilyPop userDetails={userDetails} />;
       case 2:
-        return <EducationPop details={selectedCardDetails} />;
+        return <EducationPop userDetails={userDetails} />;
       case 3:
-        return <LifeStylePop details={selectedCardDetails} />;
+        return <LifeStylePop  userDetails={userDetails} />;
       case 4:
-        return <PreferencePop details={selectedCardDetails} />;
+        return <PreferencePop userDetails={userDetails} />;
       default:
         return null;
     }
   };
+  
+  const getCardUserDeatils = async (userId, tabIndex) => {
+    try {
+      let response;
+  
+      if (tabIndex === 1) {
+        response = await axios.get(`http://localhost:5000/api/familyReligious/${userId}`);
+      } else if (tabIndex === 0) {
+        response = await axios.get(`http://localhost:5000/api/about/${userId}`);
+      } else if (tabIndex === 2) {
+        response = await axios.get(`http://localhost:5000/api/user/${userId}`);
+      }
+      else if (tabIndex === 3) {
+        response = await axios.get( `http://localhost:5000/api/lifeStyle/${userId}`);
+      }
+      else if (tabIndex === 4) {
+        response = await axios.get(`http://localhost:5000/api/parentsPrefer/${userId}`);
+      }
+      if (response?.data && response.status === 200) {
+        setUserDetails(response?.data); 
+        setSelectedCardDetails(prev => ({
+          ...prev,
+          familyDetails: response.data.familyDetails || {}, 
+        }));
+      }
+    } catch (error) {
+      console.log("Error while fetching user data", error);
+    }
+  };
 
+  const handleClick = async (userId, index) => {
+    await getCardUserDeatils(userId, selectedCardDetails.details); // Fetch details based on the selected tab
+    handleCardClick(index);
+  };
+
+  
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page); // No need to check page bounds; MUI Pagination handles this
+  };
+  
   return (
-    <Box sx={{ padding: 2, backgroundColor: "#f9f9f9" }}>
+    <Box sx={{ padding: 0.5, backgroundColor: "#f9f9f9" }}>
       {/* Header Section */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
         <Typography variant="h5" fontWeight="bold" color="#34495e">
@@ -144,78 +158,83 @@ const ViewAll = () => {
 
       {/* Cards Section */}
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "space-evenly", marginTop: 2 }}>
-        {userCard.map((card, index) => (
-          <Card
-            key={index}
-            sx={{
-              width: "270px",
-              height: "390px",
-              borderRadius: 1,
-              boxShadow: 3,
-              textAlign: "center",
-              padding: 1,
-              cursor: "pointer",
-              position: "relative",
-              background: 'black',
-              color: '#fff',
-            }}
-           
-          >
-            {/* Premium and Heart Icon */}
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "absolute", top: 15, left: 9, right: 13, zIndex: 2 }}>
-              <MdWorkspacePremium color="red" size={38} style={{ cursor: "pointer", color: 'gold' }} />
-            </Box>
-
-            <CardMedia
-              component="img"
-              height="230px"
-              image={card.profileImg || "/default-placeholder.png"}
-              onClick={() => handleCardClick(index)}
-              alt="user-dp"
-              sx={{ borderRadius: "1%" }}
-            />
-
-            <CardContent>
-              <Box display={'flex'} justifyContent={'space-between'}>
-                <Typography variant="h6" fontWeight="bold" sx={{ color: '#fff' }}>
-                  {card.firstName} {card.lastName}
-                </Typography>
+        {userCard.map((card, index) => {
+          return (
+            <Card
+              key={index}
+              sx={{
+                width: "270px",
+                height: "400px",
+                borderRadius: 1,
+                boxShadow: 3,
+                textAlign: "center",
+                // padding: 1,
+                cursor: "pointer",
+                position: "relative",
+                background: 'black',
+                color: '#fff',
+              }}
+            >
+              {/* Premium Icon */}
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "absolute", top: 15, left: 9, right: 13, zIndex: 2 }}>
+                <MdWorkspacePremium color="red" size={38} style={{ cursor: "pointer", color: 'gold' }} />
+                {/* <Typography  size={38} style={{ cursor: "pointer", color: 'gold' }}></Typography> */}
+              
+              </Box>
+  
+              <CardMedia
+                component="img"
+                height="230px"
+                image={card.profileImg || "/default-placeholder.png"}
+                alt="user-dp"
+                sx={{ borderRadius: "1%" }}
+              />
+  
+              <CardContent>
+                <Box display={'flex'} justifyContent={'space-between'}>
+                  <Typography variant="h6" fontWeight="bold" sx={{ color: '#fff' }}>
+                    {card.firstName} {card.lastName}
+                  </Typography>  
                 <FaHeart
-                 onClick={() => handleLikeClick(card.userId, card.like)}
-                  size={36}
-                  style={{ cursor: "pointer",color: card.like?"red":"#fff"}}
-                />
-              </Box>
-              <Typography fontWeight={550} sx={{ color: '#fff' }}>{card.address}</Typography>
-              <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
-                <Box>
-                  <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>
-                    {card.parentPrefer?.toAge || "N/A"}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "#fff" }}>
-                    Age
-                  </Typography>
+                  // onClick={() => handleLikeClick(card.userId, card.like)}
+                      size={36}
+                    style={{ cursor: "pointer",color: card.like?"red":"#fff"}}
+                    /> 
+                </Box>
+                <Typography fontWeight={550} sx={{ color: '#fff' }}>{card.address || "N/A"}</Typography>
+                <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 1 }}>
+                  <Box>
+                    <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>
+                      {card.parentPrefer?.toAge || "N/A"}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "#fff" }}>
+                      Age
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>
+                      {card.parentPrefer?.toHeight || "N/A"}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "#fff" }}>
+                      Height
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>
+                      {index + 1}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "#fff" }}>
+                      Reg No
+                    </Typography>
+                  </Box>
                 </Box>
                 <Box>
-                  <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>
-                    {card.parentPrefer?.toHeight || "N/A"}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "#fff" }}>
-                    Height
-                  </Typography>
+                  <Typography onClick={ () => handleClick(card?._id, index)} sx={{color:'aqua'}} justifySelf={'end'}>View All</Typography>
                 </Box>
-                <Box>
-                  <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>
-                  {index + 1}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "#fff" }}>
-                    Reg No
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          )
+        })}
       </Box>
 
       {/* Dialog Popup */}
@@ -234,7 +253,7 @@ const ViewAll = () => {
             {/* Tabs and Content */}
             <Box sx={{ flex: 2, minWidth: "300px" }}>
               <Tabs
-                value={selectedCardDetails.details}
+                 value={selectedCardDetails.details}
                 onChange={handleChange}
                 centered
                 textColor="primary"
@@ -271,12 +290,28 @@ const ViewAll = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Pagination Section */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", margin: 2 }}>
-        <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} shape="rounded" color="primary" siblingCount={1} boundaryCount={1} />
+  <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          margin: 2,
+        }}
+      >
+        <Pagination
+          count={Math.ceil(totalItems / itemsPerPage)} 
+          page={currentPage}
+          onChange={handlePageChange}
+          shape="rounded"
+          color="primary"
+          siblingCount={1}
+          boundaryCount={1}
+        />
       </Box>
+
     </Box>
   );
 };
 
 export default ViewAll;
+

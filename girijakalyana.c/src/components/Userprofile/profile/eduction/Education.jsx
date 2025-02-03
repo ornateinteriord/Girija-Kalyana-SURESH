@@ -38,42 +38,51 @@ const Education = () => {
   const [user, setUser] = useState(null); // Store the entire user object
 
   useEffect(() => {
-      const fetchUserData = async () => {
-          try {
-              const userData = sessionStorage.getItem("userData");
-              if (userData) {
-                  const { _id: userId } = JSON.parse(userData);
-                  const response = await axios.get(`http://localhost:5000/api/user/${userId}`);
-                  setUser(response.data); // Store the entire user object
-                  if (response.data.education) {
-                      setDegree(response.data.education.degree || "");
-                      setOccupation(response.data.education.occupation || "");
-                      setIncome(response.data.education.income || "");
-                      setOccupationCountry(response.data.education.occupationCountry || "");
-                      setIsNewRecord(false);
-                  } else {
-                      setIsNewRecord(true);
-                  }
-              }
-          } catch (error) {
-              console.error("Error fetching user data:", error);
-              setIsNewRecord(true);
-          }
-      };
+    const fetchUserData = async () => {
+        try {
+            const userData = sessionStorage.getItem("userData");
+            if (userData) {
+                const { _id: userId } = JSON.parse(userData);
+                const response = await axios.get(`http://localhost:5000/api/user/${userId}`);
+                setUser(response.data); // Store the entire user object
+                if (response.data.education) {
+                    setDegree(response.data.education.degree || "");
+                    setOccupation(response.data.education.occupation || "");
+                    setIncome(response.data.education.income || "");
+                    setOccupationCountry(response.data.education.occupationCountry || "");
+                    
+                    // Determine if the checkbox should be checked based on whether values are custom (not in predefined options)
+                    setCustomDegree(response.data.education.degree && !qualificationOptions.includes(response.data.education.degree));
+                    setCustomOccupation(response.data.education.occupation && !occupationOptions.includes(response.data.education.occupation));
+                    setCustomIncome(response.data.education.income && !incomeOptions.includes(response.data.education.income));
+                    setCustomCountry(response.data.education.occupationCountry && !countryOptions.includes(response.data.education.occupationCountry));
 
-      fetchUserData();
-  }, []);
+                    setIsNewRecord(false);
+                } else {
+                    setIsNewRecord(true);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+            setIsNewRecord(true);
+        }
+    };
+
+    fetchUserData();
+}, []);
+
 
 
   const handleSave = async (e) => {
     e.preventDefault();
 
     const educationData = {
-      degree,
-      occupation,
-      income,
-      occupationCountry,
+      degree: customDegree ? degree : (degree || ""),
+      occupation: customOccupation ? occupation : (occupation || ""),
+      income: customIncome ? income : (income || ""),
+      occupationCountry: customCountry ? occupationCountry : (occupationCountry || ""),
     };
+    
 
     if (!degree || !occupation || !income || !occupationCountry) {
       toast.error("Please fill in all fields before saving.");

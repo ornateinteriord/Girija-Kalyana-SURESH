@@ -74,18 +74,9 @@ const Spinner = () => {
 };
 
 const App = () => {
-  // const [isAdmin, setIsAdmin] = useState(false);
-  // const [isLogged, setIsLogged] = useState(false);
-
-  // useEffect(() => {
-  //   const adminStatus = localStorage.getItem('isAdmin');
-  //   const loginStatus = localStorage.getItem('islogged');
-  //   setIsAdmin(adminStatus === 'true');
-  //   setIsLogged(loginStatus === 'true');
-  // }, []);
-
+ 
   return (
-    <Suspense fallback={<CircularProgress /> }>
+    <Suspense fallback={<CgSpinner /> }>
       <Router>
         <Routes>
           <Route path="/" element={<><HeroSlider /><Connect /><Members /></>} />

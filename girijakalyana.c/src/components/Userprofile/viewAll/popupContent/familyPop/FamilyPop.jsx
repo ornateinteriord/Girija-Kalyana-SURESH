@@ -1,14 +1,12 @@
 import React from "react";
 import { Box, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Typography } from "@mui/material";
 
-const FamilyPop = ({ details }) => {
-  console.log(" FamilyPop Received Details:", details);
+const FamilyPop = ({ userDetails }) => {
 
-  if (!details || typeof details !== "object" || Object.keys(details).length === 0) {
+
+  if (!userDetails || typeof userDetails !== "object" || Object.keys(userDetails).length === 0) {
     return <Typography>No family details available</Typography>;
   }
-
-  const { familyDetails } = details;
 
   return (
     <Box sx={{ padding: 2, backgroundColor: "#f5f5f5", borderRadius: 2 }}>
@@ -21,31 +19,31 @@ const FamilyPop = ({ details }) => {
             <TableBody>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Father's Name</TableCell>
-                <TableCell>{familyDetails?.fatherName || "N/A"}</TableCell>
+                <TableCell>{userDetails?.fatherName || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Mother's Name</TableCell>
-                <TableCell>{familyDetails?.motherName || "N/A"}</TableCell>
+                <TableCell>{userDetails?.motherName || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Siblings</TableCell>
-                <TableCell>{familyDetails?.siblings || "N/A"}</TableCell>
+                <TableCell>{userDetails?.Siblings || "N/A"}</TableCell>
               </TableRow>
-              <TableRow>
+              {/* <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Religion</TableCell>
-                <TableCell>{familyDetails?.religion || "N/A"}</TableCell>
-              </TableRow>
+                <TableCell>{userDetails?.religion || "N/A"}</TableCell>
+              </TableRow> */}
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Caste</TableCell>
-                <TableCell>{familyDetails?.caste || "N/A"}</TableCell>
+                <TableCell>{userDetails?.caste || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Rashi</TableCell>
-                <TableCell>{familyDetails?.rashi || "N/A"}</TableCell>
+                <TableCell>{userDetails?.rashi || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Gotra</TableCell>
-                <TableCell>{familyDetails?.gotra || "N/A"}</TableCell>
+                <TableCell>{userDetails?.gotra || "N/A"}</TableCell>
               </TableRow>
             </TableBody>
           </Table>

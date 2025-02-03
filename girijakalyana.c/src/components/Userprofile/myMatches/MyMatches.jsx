@@ -18,29 +18,34 @@ const MyMatches = () => {
   const [userCard, setUserCard] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const itemsPerPage = 8;
+  const itemsPerPage = 9;
 
   const handleModifyButton = () => {
     navigate("/user/profile");
   };
-
-  const loggedUserId = localStorage.getItem("userId");
-
   const getData = async (page) => {
     try {
+      const userData = sessionStorage.getItem("userData");
+      if (!userData) {
+        console.error("No user data found in session storage");
+        return;
+      }
+      const parsedUserData = JSON.parse(userData);
+      const loggedInUserId = parsedUserData._id; 
       const response = await axios.get("http://localhost:5000/api/users", {
         params: {
           page: page,
           limit: itemsPerPage,
         },
       });
-      setUserCard(response.data.users); // Assuming API returns { users: [...] }
-      setTotalItems(response.data.totalItems); // Assuming API returns totalItems
+      const filteredUsers = response.data.users.filter(user => user._id !== loggedInUserId); // Filter out logged-in user
+      setUserCard(filteredUsers); // Update the state with the filtered list
+      setTotalItems(response.data.totalItems); // Update the total items count
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-
+  
   const handlePageChange = (event, page) => {
     if (page >= 1 && page <= Math.ceil(totalItems / itemsPerPage)) {
       setCurrentPage(page);
@@ -53,7 +58,7 @@ const MyMatches = () => {
   }, [currentPage]);
 
   return (
-    <Box sx={{ padding: 3, backgroundColor: "#f9f9f9", marginBottom: "10px" }}>
+    <Box sx={{ padding: 1, backgroundColor: "#f9f9f9", marginBottom: "10px" }}>
       {/* Header Section */}
       <Box
         sx={{
@@ -87,7 +92,7 @@ const MyMatches = () => {
                    borderRadius: 1,
                    boxShadow: 3,
                    textAlign: "center",
-                   padding: 1,
+                  //  padding: 1,
                    cursor: "pointer",
                    position: "relative",
                    background: 'black',
@@ -113,7 +118,7 @@ const MyMatches = () => {
                      </Typography>
                     
                    </Box>
-                   <Typography fontWeight={550} sx={{ color: '#fff' }}>{card.address}</Typography>
+                   <Typography fontWeight={550} sx={{ color: '#fff' }}>{card.address || "N/A"}</Typography>
                    <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
                      <Box>
                        <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>

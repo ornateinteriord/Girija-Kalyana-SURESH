@@ -12,13 +12,13 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const LifeStyle = ({ render }) => {
-  const [drink, setDrink] = useState("No");
-  const [smoke, setSmoke] = useState("No");
-  const [diet, setDiet] = useState("Veg");
-  const [sunsign, setSunsign] = useState("Aries");
-  const [bloodgroup, setBloodgroup] = useState("A+");
-  const [bodyType, setBodyType] = useState("Average");
-  const [skinType, setSkinType] = useState("Fair");
+  const [drink, setDrink] = useState("");
+  const [smoke, setSmoke] = useState("");
+  const [diet, setDiet] = useState("");
+  const [sunsign, setSunsign] = useState("");
+  const [bloodgroup, setBloodgroup] = useState("");
+  const [bodyType, setBodyType] = useState("");
+  const [skinType, setSkinType] = useState("");
   // Fetch user data from localStorage and load their lifestyle
   useEffect(() => {
     const fetchData = async () => {

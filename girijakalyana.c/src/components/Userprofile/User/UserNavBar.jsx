@@ -294,7 +294,7 @@ const UserNavBar = () => {
             sx={{
               flexGrow: 1,
 
-              marginTop: 2,
+              marginTop: 1,
               paddingLeft: isSidebarOpen ? `30px` : "20px",
               transition: "padding-left 0.4s ease",
             }}

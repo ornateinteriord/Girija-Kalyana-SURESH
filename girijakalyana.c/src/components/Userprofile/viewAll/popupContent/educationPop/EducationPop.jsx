@@ -1,13 +1,28 @@
-import React from "react";
-import { Box, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 
-const EducationPop = () => {
+
+const EducationPop = ({userDetails}) => {
+ console.log("educatin POPPP",userDetails)
+  if (!userDetails || Object.keys(userDetails).length === 0) {
+    return <Typography>No user details available.</Typography>;
+  }
   const data = [
-    { label: "Qualification", value: "B.E/B.Tech" },
-    { label: "Occupation", value: "Software Professional (Others)" },
-    { label: "Income Per Annum", value: "4 Lakh - 5 Lakh" },
-    { label: "Occupation Country", value: "India" },
-    { label: "Other Info", value: "Not Specified" },
+    { label: "Qualification", value: userDetails?.education?.degree || "Not Available" },
+    { label: "Occupation", value: userDetails?.education?.occupation || "Not Available" },
+    { label: "Income Per Annum", value: userDetails?.education?.income || "Not Available" },
+    { label: "Occupation Country", value: userDetails?.education?.occupationCountry || "Not Available" },
   ];
 
   return (
@@ -16,16 +31,12 @@ const EducationPop = () => {
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
           Education & Occupation Information
         </Typography>
-        <TableContainer  sx={{ boxShadow: 3 }}>
+        <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
           <Table>
             <TableBody>
               {data.map((row, index) => (
                 <TableRow key={index}>
-                  <TableCell
-                    component="th"
-                    scope="row"
-                    sx={{ fontWeight: "bold", width: "40%", backgroundColor: "#f9f9f9" }}
-                  >
+                  <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f9f9f9", width: "40%" }}>
                     {row.label}
                   </TableCell>
                   <TableCell>{row.value}</TableCell>

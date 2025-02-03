@@ -1,14 +1,19 @@
 import React from "react";
 import { Box, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Typography } from "@mui/material";
 
-const PreferencePop = () => {
+const PreferencePop = ({userDetails}) => {
+
+  if (!userDetails || Object.keys(userDetails).length === 0) {
+    return <Typography>No user details available.</Typography>;
+  }
+  
   const data = [
-    { label: "Marital Status", value: "Unmarried" },
-    { label: "Age Preference", value: "36 to 63" },
-    { label: "Height Preference", value: "4' 11'' - 149cm to 4' 11'' - 149cm" },
-    { label: "Education Preference", value: "Any" },
-    { label: "Caste Preference", value: "Any Brahmin" },
-    { label: "Occupation Country", value: "India" },
+    { label: "Marital Status", value: userDetails?.parentPrefer?.maritalStatus || "N/A" },
+    { label: "Age Preference", value: userDetails?.parentPrefer?.toAge  || "N/A" },
+    { label: "Height Preference", value: userDetails?.parentPrefer?.fromHeight  || "N/A" },
+    { label: "Education Preference", value: userDetails?.parentPrefer?.education  || "N/A" },
+    { label: "Caste Preference", value:userDetails?.parentPrefer?.caste  },
+    { label: "Occupation Country", value: userDetails?.parentPrefer?.occupation  || "N/A" },
   ];
 
   return (

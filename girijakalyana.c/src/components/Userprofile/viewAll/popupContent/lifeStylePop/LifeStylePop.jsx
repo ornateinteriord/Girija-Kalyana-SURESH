@@ -1,15 +1,20 @@
 import React from "react";
 import { Box, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Typography } from "@mui/material";
 
-const LifeStylePop = () => {
+const LifeStylePop = ({userDetails}) => {
+  if (!userDetails || Object.keys(userDetails).length === 0) {
+    return <Typography>No user details available.</Typography>;
+  }
+
+
   const data = [
-    { label: "Skin Type", value: "Fair" },
-    { label: "Body Type", value: "Average" },
-    { label: "Diet", value: "Veg" },
-    { label: "Drink", value: "No" },
-    { label: "Smoke", value: "No" },
-    { label: "Sunsign", value: "Libra" },
-    { label: "Blood Group", value: "B+" },
+    { label: "Skin Type", value: userDetails?.lifestyle?.skinType  || "N/A" },
+    { label: "Body Type", value: userDetails?.lifestyle?.bodyType  || "N/A" },
+    { label: "Diet", value: userDetails?.lifestyle?.diet  || "N/A" },
+    { label: "Drink", value: userDetails?.lifestyle?.drink  || "N/A" },
+    { label: "Smoke", value: userDetails?.lifestyle?.smoke  || "N/A" },
+    { label: "Sunsign", value:  userDetails?.lifestyle?.sunsign  || "N/A" },
+    { label: "Blood Group", value: userDetails?.lifestyle?.bloodgroup  || "N/A" },
   ];
 
   return (

@@ -27,11 +27,13 @@ const About = () => {
 
         // Fetch user data from the backend
         const { data } = await axios.get(`http://localhost:5000/api/about/${userId}`);
+      
+        const formattedDob = data.dob ? new Date(data.dob).toISOString().split('T')[0] : "";
 
         // Set state with the fetched data
         setFirstName(data.firstName || "");
         setLastName(data.lastName || "");
-        setDob(data.dob || "");
+        setDob(formattedDob);
         setPincode(data.pincode || "");
         setAddress(data.address || "");
         setOccupationCountry(data.occupationCountry || "");
@@ -196,7 +198,7 @@ const About = () => {
                 label="State"
                 placeholder="State name"
                 value={state}
-                onChange={(e) => seState(e.target.value)}
+                onChange={(e) => setState(e.target.value)}
                 disabled={!isEditing}
                 sx={{ width: "500px" }}
               />
