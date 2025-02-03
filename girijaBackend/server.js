@@ -11,6 +11,7 @@ const lifeStyle = require("./routes/LifeStyle");
 const parentsPrefer = require("./routes/ParentPrefer");
 const others = require("./routes/Others");
 const mymatches = require("./routes/myMatches");
+const userRoutes = require("./routes/userRouters")
 
 const app = express();
 
@@ -36,6 +37,8 @@ app.use("/api", lifeStyle);
 app.use("/api", parentsPrefer);
 app.use("/api", others);
 app.use("/api", mymatches);
+app.use("/api/users", userRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
