@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { MdWorkspacePremium} from "react-icons/md";
 import { FaHeart } from "react-icons/fa";
-// Importing Popups for different sections
+
 import AboutPop from "./popupContent/abouPop/AboutPop"; 
 import EducationPop from "./popupContent/educationPop/EducationPop"; 
 import FamilyPop from "./popupContent/familyPop/FamilyPop"; 
@@ -43,7 +43,6 @@ const ViewAll = () => {
     await getCardUserDeatils(selectedCardDetails._id, newValue);
   };
   
-  // Opens the dialog for a specific card
   const handleCardClick = (index) => {
     const selectedCard = userCard[index];
     setSelectedCardDetails({
@@ -67,17 +66,16 @@ const ViewAll = () => {
       }
   
       const parsedUserData = JSON.parse(userData);
-      const loggedInUserId = parsedUserData._id; // Get logged-in user's ID
+      const loggedInUserId = parsedUserData._id;
       
       const response = await axios.get(
         `http://localhost:5000/api/users?page=${page}&limit=${itemsPerPage}`
       );
       const { users, totalUsers } = response.data;
   
-      // Filter out the logged-in user from the list of users
       const filteredUsers = users.filter(user => user._id !== loggedInUserId);
   
-      setUserCard(filteredUsers); // Set the filtered list of users
+      setUserCard(filteredUsers); 
       setTotalItems(totalUsers);
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -88,9 +86,9 @@ const ViewAll = () => {
     getData(currentPage);
   }, [currentPage]);
 
-  // Renders content based on the selected tab
+ 
   const renderContent = () => {
-    if (!userDetails) return null; // Prevent errors when userDetails is undefined
+    if (!userDetails) return null; 
 
     switch (selectedCardDetails.details) {
       case 0:
@@ -138,25 +136,23 @@ const ViewAll = () => {
   };
 
   const handleClick = async (userId, index) => {
-    await getCardUserDeatils(userId, selectedCardDetails.details); // Fetch details based on the selected tab
+    await getCardUserDeatils(userId, selectedCardDetails.details);
     handleCardClick(index);
   };
 
   
   const handlePageChange = (event, page) => {
-    setCurrentPage(page); // No need to check page bounds; MUI Pagination handles this
+    setCurrentPage(page); 
   };
   
   return (
     <Box sx={{ padding: 0.5, backgroundColor: "#f9f9f9" }}>
-      {/* Header Section */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
         <Typography variant="h5" fontWeight="bold" color="#34495e">
           View All
         </Typography>
       </Box>
 
-      {/* Cards Section */}
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "space-evenly", marginTop: 2 }}>
         {userCard.map((card, index) => {
           return (
@@ -175,13 +171,10 @@ const ViewAll = () => {
                 color: '#fff',
               }}
             >
-              {/* Premium Icon */}
+             
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "absolute", top: 15, left: 9, right: 13, zIndex: 2 }}>
                 <MdWorkspacePremium color="red" size={38} style={{ cursor: "pointer", color: 'gold' }} />
-                {/* <Typography  size={38} style={{ cursor: "pointer", color: 'gold' }}></Typography> */}
-              
               </Box>
-  
               <CardMedia
                 component="img"
                 height="230px"
@@ -196,7 +189,7 @@ const ViewAll = () => {
                     {card.firstName} {card.lastName}
                   </Typography>  
                 <FaHeart
-                  // onClick={() => handleLikeClick(card.userId, card.like)}
+             
                       size={36}
                     style={{ cursor: "pointer",color: card.like?"red":"#fff"}}
                     /> 
@@ -237,11 +230,11 @@ const ViewAll = () => {
         })}
       </Box>
 
-      {/* Dialog Popup */}
+
       <Dialog maxWidth="lg" open={openDialog} onClose={handleCloseDialog}>
         <DialogContent sx={{ padding: 0, backgroundColor: "#34495e", display: "flex", flexDirection: "column", overflowY: "auto", "::-webkit-scrollbar": { display: "none" } }}>
           <Box sx={{ width: "900px", display: "flex", gap: 3, flexWrap: "wrap", alignItems: "center", padding: 3 }}>
-            {/* Profile Image */}
+       
             <Box sx={{ flex: 1, maxWidth: "300px", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f9f9f9", borderRadius: "8px", boxShadow: 3, padding: 1 }}>
               <img
                 src={selectedCardDetails.profileImg || "/default-placeholder.png"}
@@ -250,7 +243,7 @@ const ViewAll = () => {
               />
             </Box>
 
-            {/* Tabs and Content */}
+           
             <Box sx={{ flex: 2, minWidth: "300px" }}>
               <Tabs
                  value={selectedCardDetails.details}
