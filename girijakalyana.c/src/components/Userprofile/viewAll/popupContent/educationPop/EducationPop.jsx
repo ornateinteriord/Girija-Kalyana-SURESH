@@ -14,11 +14,7 @@ import {
 
 
 const EducationPop = ({userDetails}) => {
-<<<<<<< HEAD
- console.log("educatin POPPP",userDetails)
-=======
  
->>>>>>> 90302d1 (my intrest updated)
   if (!userDetails || Object.keys(userDetails).length === 0) {
     return <Typography>No user details available.</Typography>;
   }

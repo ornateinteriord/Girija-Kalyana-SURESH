@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useState, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { CgSpinner,  CgSpinnerAlt } from 'react-icons/cg';
 import { CircularProgress } from '@mui/material';
@@ -7,6 +7,8 @@ import { CircularProgress } from '@mui/material';
 
 import "./App.css"
 import { InterestProvider } from './components/Userprofile/myIntrest/UserContext/IntrestProvider';
+import ProtectedRoute from './components/protectedRoute/ProtectedRouted';
+// import HomeUserTable from './components/userupgrade/HomeUserTable';
 
 // Lazy loading components
 const HeroSlider = lazy(() => import('./components/hero/HeroSlider'));
@@ -80,65 +82,66 @@ const Spinner = () => {
 const App = () => {
  
   return (
-
-    <InterestProvider>
-
-    <Suspense fallback={<CgSpinner /> }>
-      <Router>
-        <Routes>
-          <Route path="/" element={<><HeroSlider /><Connect /><Members /></>} />
-          <Route path="/service" element={<Servieces />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/privacy-policy" element={<Privacy />} />
-          <Route path="/contact" element={<ContactUs />} />
-
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminDashboard />}>
-            <Route path="user-table" element={<UserTable />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="userData" element={<UserData />} />
-            <Route path="renewals" element={<RenewalsData />} />
-            <Route path="resetpass" element={<ResetPassword />} />
-            <Route path="pendingdata" element={<PendingData />} />
-            <Route path="successdata" element={<SuccessData />} />
-            <Route path="promotersdata" element={<PromotersUsersData />} />
-            <Route path="paytopromoters" element={<PayToPromoterData />} />
-            <Route path="promoterearn" element={<PromotersEarningsData />} />
-            <Route path="imageverify" element={<ImageVerificationData />} />
-            <Route path="promoters" element={<PromotersData />} />
-            <Route path="promotersusers" element={<PromotersUsers />} />
-            <Route path="onlinetransaction" element={<OnlineTransactionData />} />
-            <Route path="assistance" element={<AssistanceOnlineTransactionData />} />
-            <Route path="receiptsvocher" element={<ReceiptVoucher />} />
-            <Route path="userreports" element={<UserReports />} />
-            <Route path="renewalreports" element={<RenewalsReportsData />} />
-            <Route path="receiptsreports" element={<ReceiptsReportsData />} />
-            <Route path="notification" element={<NotificationData />} />
-          </Route>
-
-          {/* User Routes */}
-          <Route path="/user" element={<UserNavBar />}>
-            <Route path="profile" element={<Profile />} />
-            <Route path="userdashboard" element={<UserDashboard />} />
-            <Route path="MyMatches" element={<MyMatches />} />
-            <Route path="myintrest" element={<MyInterest />} />
-            <Route path="viewAll" element={<ViewAll />} />
-            <Route path="search" element={<Search />} />
-          </Route>
-        </Routes>
-      </Router>
-      <Toaster
-        position="top-right"
-        reverseOrder={false}
-        
-        toastOptions={{
-          duration: 5000, // Default duration for all toasts
-        
-        }}
-      />
-    </Suspense>
-
-    </InterestProvider>
+      <InterestProvider>
+        <Suspense fallback={<Spinner />}>
+          <Router>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<><HeroSlider /><Connect /><Members /></>} />
+              <Route path="/service" element={<Servieces />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/privacy-policy" element={<Privacy />} />
+              <Route path="/contact" element={<ContactUs />} />
+  
+              {/* Admin Routes */}
+              <Route path="/admin" element={<ProtectedRoute allowedRoles={['Admin']} />}>
+                <Route element={<AdminDashboard />}>
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="user-table" element={<UserTable />} />
+                  <Route path="userData" element={<UserData />} />
+                  <Route path="renewals" element={<RenewalsData />} />
+                  <Route path="resetpass" element={<ResetPassword />} />
+                  <Route path="pendingdata" element={<PendingData />} />
+                  <Route path="successdata" element={<SuccessData />} />
+                  <Route path="promotersdata" element={<PromotersUsersData />} />
+                  <Route path="paytopromoters" element={<PayToPromoterData />} />
+                  <Route path="promoterearn" element={<PromotersEarningsData />} />
+                  <Route path="imageverify" element={<ImageVerificationData />} />
+                  <Route path="promoters" element={<PromotersData />} />
+                  <Route path="promotersusers" element={<PromotersUsers />} />
+                  <Route path="onlinetransaction" element={<OnlineTransactionData />} />
+                  <Route path="assistance" element={<AssistanceOnlineTransactionData />} />
+                  <Route path="receiptsvocher" element={<ReceiptVoucher />} />
+                  <Route path="userreports" element={<UserReports />} />
+                  <Route path="renewalreports" element={<RenewalsReportsData />} />
+                  <Route path="receiptsreports" element={<ReceiptsReportsData />} />
+                  <Route path="notification" element={<NotificationData />} />
+                </Route>
+              </Route>
+  
+              {/* User Routes */}
+              <Route path="/user" element={<ProtectedRoute allowedRoles={['PremiumUser', 'FreeUser']} />}>
+                <Route element={<UserNavBar />}>
+                  <Route path="dashboard" element={<UserDashboard />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="my-matches" element={<MyMatches />} />
+                  <Route path="my-interest" element={<MyInterest />} />
+                  <Route path="view-all" element={<ViewAll />} />
+                  <Route path="search" element={<Search />} />
+                </Route>
+              </Route>
+  
+              {/* Fallback route */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Router>
+          <Toaster
+            position="top-right"
+            reverseOrder={false}
+            toastOptions={{ duration: 5000 }}
+          />
+        </Suspense>
+      </InterestProvider>
 
   );
 };

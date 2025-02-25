@@ -61,10 +61,9 @@ const HeroSlider = () => {
   }));
 
   return (
-<<<<<<< HEAD
-=======
+
     <Box className="hero-main-container">
->>>>>>> 90302d1 (my intrest updated)
+
     <HeroWrapper>
       <Navbar />
       <Slider {...settings}>
@@ -85,10 +84,9 @@ const HeroSlider = () => {
         </Button>
       </Content>
     </HeroWrapper>
-<<<<<<< HEAD
-=======
+
     </Box>
->>>>>>> 90302d1 (my intrest updated)
+
   );
 };
 

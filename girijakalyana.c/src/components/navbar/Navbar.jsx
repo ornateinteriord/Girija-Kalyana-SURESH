@@ -93,63 +93,64 @@ const Navbar = () => {
 
   const handleAdminLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/admin/login', { email: enterUsername, password: enterPassword });
-      const { token, user } = response.data;
-      if (user.isAdmin) {
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        username: enterUsername,
+        password: enterPassword
+      });
+      
+      const { token, user, dashboardPath } = response.data;
+      
+      if (user.user_role === 'Admin') {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
         toast.success('Admin Login successful!');
-        navigate('/admin');
+        navigate('/admin/dashboard'); // Explicit path
         handleCloseAdminDialog();
       } else {
-        alert('Access Denied');
+        toast.error('Access Denied: Admin privileges required');
       }
     } catch (error) {
-      toast.error('Invalid admin credentials');
+      toast.error(error.response?.data?.message || 'Invalid credentials');
     }
   };
-
+  
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', loginData);
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        username: loginData.email,
+        password: loginData.password
+      });
+      
       const { token, user } = response.data;
+      
       localStorage.setItem('token', token);
-      localStorage.setItem('userId', user._id);
-      sessionStorage.setItem('firstName', user.firstName);
-      localStorage.setItem('lastName', user.lastName);
-      localStorage.setItem('email', user.email);
-      localStorage.setItem('mobile', user.mobile);
-      localStorage.setItem('profileImg', JSON.stringify(user.profileImg));
-      sessionStorage.setItem('userData', JSON.stringify(user));
-
+      localStorage.setItem('user', JSON.stringify({
+        user_id: user.user_id,
+        username: user.username,
+        user_role: user.user_role,
+        ref_no: user.ref_no,
+        mobile_no: user.mobile_no,
+        status: user.status
+      }));
+      
       toast.success('Login successful!');
-      navigate('/user/userdashboard');
-    } catch (error) {
-      console.error(error.message);
-      toast.error('Invalid email or password!');
-    }
-  };
-
-  const handleRegister = async () => {
-    try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', registerData);
-      const { userId, email } = response.data.user;
-
-      if (userId) {
-        localStorage.setItem('userId', userId);
-        localStorage.setItem('email', email);
-        toast.success('Registration successful!');
+      
+      // Navigate based on user role
+      if (user.user_role === 'Admin') {
+        navigate('/admin/dashboard');
+      } else if (user.user_role === 'PremiumUser' || user.user_role === 'FreeUser') {
+        navigate('/user/dashboard');
       } else {
-        toast.error('User ID not received from backend.');
+        navigate('/');
       }
-
+      
       handleClose();
-      navigate('/');
     } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.message || 'Error registering user');
+      console.error('Login error:', error);
+      toast.error(error.response?.data?.message || 'Login failed');
     }
   };
+
 
   const handleChangeLogin = (e) => {
     const { name, value } = e.target;

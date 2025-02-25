@@ -8,124 +8,57 @@ import {
   Link as MuiLink,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import { FaUser, FaHeart, FaRegEnvelope } from "react-icons/fa";
+import { FaHeart, FaRegEnvelope } from "react-icons/fa";
 import { MdOutlineChatBubble } from "react-icons/md";
-import mathes from '../../../assets/mathes.jpeg';
+import HomeUserTable from "../../userupgrade/HomeUserTable";
 
 const UserDashboard = () => {
-  const [isPopupOpen, setPopupOpen] = useState(false);
-  const [selectedCardDetails, setSelectedCardDetails] = useState({});
-  const [selectedCardIndex, setSelectedCardIndex] = useState(null);
-  const [userCard, setUserCard] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const cardsPerPage = 3;
-<<<<<<< HEAD
-=======
   const [interestedProfiles, setInterestedProfiles] = useState([]);
-
-
-useEffect(() => {
-  const storedProfiles = JSON.parse(sessionStorage.getItem("interestedProfiles")) || [];
-  setInterestedProfiles(storedProfiles);
-}, []);
->>>>>>> 90302d1 (my intrest updated)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const cardsPerPage = 3;
 
   useEffect(() => {
-    const storedFirstName = sessionStorage.getItem('firstName');
-    const storedLastName = localStorage.getItem('lastName');
-    const storedMobail = localStorage.getItem('mobail');
-   
+    const storedFirstName = sessionStorage.getItem("firstName");
+    const storedLastName = sessionStorage.getItem("lastName"); // Fixed storage retrieval
+
     if (storedFirstName) setFirstName(storedFirstName);
-    // if (storedLastName) setLastName(storedLastName);
+    if (storedLastName) setLastName(storedLastName);
   }, []);
-
-
-
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
-  };
 
   useEffect(() => {
-<<<<<<< HEAD
-    const getData = () => {
-      fetch("https://jsonplaceholder.typicode.com/users")
-        .then((response) => response.json())
-        .then((data) => setUserCard(data))
-        .catch((error) => console.log(error));
-    };
-
-    getData();
-  }, []);
-
-  const currentCards = userCard.slice(
-    (currentPage - 1) * cardsPerPage,
-    currentPage * cardsPerPage
-  );
-
-  const renderCards = () =>
-    currentCards.map((card, index) => (
-      <Box
-        key={index}
-        sx={{
-          backgroundColor: "#ffffff",
-          borderRadius: "8px",
-          width:'350px',
-          height:'200px',
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          padding: "16px",
-          marginBottom: "16px",
-          transition: "transform 0.2s ease-in-out",
-          cursor: "pointer",
-          "&:hover": {
-            transform: "translateY(-4px)",
-            boxShadow: "0 6px 12px rgba(0, 0, 0, 0.15)",
-          },
-        }}
-        // onClick={() => handleCardClick(index)}
-      >
-        <Box display="flex" alignItems="center">
-          <img 
-            src={mathes} 
-            alt="Matches" 
-            style={{
-              width: "100px",
-              height: "90px",
-              borderRadius: "10px",
-              objectFit: "cover",
-            }} 
-          />
-          <Box ml={2}>
-            <Typography variant="h6" fontWeight="bold" color="#34495e">
-              {card.name}
-            </Typography>
-            <Typography variant="body2" color="textprimary">
-              {card.address.street}
-            </Typography>
-=======
     const fetchInterestedUsers = async () => {
       try {
-        const storedUser = JSON.parse(sessionStorage.getItem("userData"));
-        if (!storedUser || !storedUser._id) {
-          console.warn("No user ID found in sessionStorage.");
+        const storedUser = sessionStorage.getItem("userData");
+  
+        if (!storedUser) {
+          console.warn("No user data found in sessionStorage.");
+          return;
+        }
+        
+  
+        const parsedUser = JSON.parse(storedUser);
+        if (!parsedUser || !parsedUser._id) {
+          console.warn("Invalid user data in sessionStorage.");
           return;
         }
   
-        const response = await fetch(`http://localhost:5000/api/user-dashboard/${storedUser._id}`);
+        const response = await fetch(
+          `http://localhost:5000/api/user-dashboard/${parsedUser._id}`
+        );
   
-        // ✅ Check if response is OK before parsing JSON
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
   
         const data = await response.json();
+        console.log("Fetched User Data:", data); // Debugging step
   
-        if (data.interestedUsers) {
-          // console.log("Fetched interested users:", data.interestedUsers);
+        if (data && data.interestedUsers) {
           setInterestedProfiles(data.interestedUsers);
         } else {
-          setInterestedProfiles([]);
+          console.warn("No interested users found in response.");
         }
       } catch (error) {
         console.error("Error fetching interested users:", error.message);
@@ -134,117 +67,89 @@ useEffect(() => {
   
     fetchInterestedUsers();
   }, []);
-  
+  ;
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
 
   const currentCards = interestedProfiles.slice(
     (currentPage - 1) * cardsPerPage,
     currentPage * cardsPerPage
   );
- 
- 
-
-  const renderCards = () =>
-    currentCards.map((profile, index) => (
-      <Box key={index} sx={{ backgroundColor: "#ffffff", borderRadius: "8px", padding: "16px", marginBottom: "16px",width:'350px' }}>
-        <Box display="flex" alignItems="center" >
-          <Box display={'flex'} justifyContent={'space-evenly'} alignItems={'center'}>
-          <img src={profile.profileImg || "/default-placeholder.png"} alt="Profile" style={{ width: "100px", height: "90px", borderRadius: "10px" }} />
-          <Box ml={2}>
-            <Typography variant="h6" fontWeight="bold">{profile.firstName} {profile.lastName}</Typography>
-            <Typography variant="body2" color="textprimary">{profile.address || "N/A"}</Typography>
-            </Box>
-            
->>>>>>> 90302d1 (my intrest updated)
-          </Box>
-        </Box>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          mt={2}
-          sx={{ fontSize: "14px", color: "gray" }}
-        >
-          <Box textAlign="center">
-<<<<<<< HEAD
-            <Typography fontWeight="bold">{card.id}</Typography>
-=======
-            <Typography fontWeight="bold">{profile.id}</Typography>
->>>>>>> 90302d1 (my intrest updated)
-            <Typography>Age</Typography>
-          </Box>
-          <Box textAlign="center">
-            <Typography fontWeight="bold">5.4</Typography>
-            <Typography>Height</Typography>
-          </Box>
-          <Box textAlign="center">
-            <Typography fontWeight="bold">SGM333</Typography>
-            <Typography>Reg No</Typography>
-          </Box>
-        </Box>
-      </Box>
-    ));
 
   return (
     <Box
       sx={{
         backgroundColor: "#f4f6f8",
-<<<<<<< HEAD
         minHeight: "100vh",
-=======
-        // minHeight: "100vh",
->>>>>>> 90302d1 (my intrest updated)
-        padding: "24px",
-        // paddingLeft:'260px'
+        padding: "10px 24px",
+        mt:'0'
       }}
     >
-      <Box sx={{ textAlign: "center", mb: 4 }}>
-        <Typography variant="h3" fontWeight="bold" color="#34495e" textTransform={'capitalize'}>
-        Welcome {firstName}
-         {/* {lastName} */}
+      <Box sx={{ textAlign: "center", mb: 1 }}>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          color="#34495e"
+          textTransform="capitalize"
+        >
+          Welcome {firstName} {lastName}
         </Typography>
-        <Divider sx={{ mt: 2 }} />
+        <Divider sx={{ mt: 0.5 }} />
       </Box>
 
       <Stack spacing={3}>
-        {/* Section 1: Dashboard Overview */}
-        <Stack
+        {/* Top Statistics Cards */}
+        {/* <Stack
           direction="row"
           spacing={3}
           justifyContent="space-around"
           sx={{ marginBottom: "24px" }}
         >
-          {[{ count: 1, label: "Interested Profiles", icon: FaHeart },
+          {[
+            {
+              count: interestedProfiles.length, // Dynamic count
+              label: "Interested Profiles",
+              icon: FaHeart,
+            },
             { count: 2, label: "Messages", icon: FaRegEnvelope },
-            { count: 3, label: "Chats", icon: MdOutlineChatBubble }].map(
-              (item, index) => (
-                
-               
-                <Box
-                  key={index}
-                  sx={{
-                    backgroundColor: "#ffffff",
-                    borderRadius: "8px",
-                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                    padding: "14px 50px",
-                    textAlign: "center",
-                    flex: 1,
-                    "&:hover": {
-                      backgroundColor: "#f0f4ff",
-                    },
-                  }}
-                >
-                  <Box display={'flex'} alignItems={'center'} justifyContent={'space-around'}>
-                   <Typography>
-                   <item.icon size={40} color="black" />
+            { count: 3, label: "Chats", icon: MdOutlineChatBubble },
+          ].map((item, index) => (
+            <Box
+              key={index}
+              sx={{
+                backgroundColor: "#ffffff",
+                borderRadius: "8px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                padding: "14px 50px",
+                textAlign: "center",
+                flex: 1,
+                "&:hover": {
+                  backgroundColor: "#f0f4ff",
+                },
+              }}
+            >
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-around"
+              >
+                <Typography>
+                  <item.icon size={40} color="black" />
                 </Typography>
-                 <Box display={'flex'} flexDirection={'column'}>
+                <Box display="flex" flexDirection="column">
                   <Typography variant="h5" fontWeight="bold" mt={1}>
                     {item.count}
                   </Typography>
-                  <Typography variant="subtitle1" 
-                  fontWeight={700}
-                  fontSize={20}
-                  sx={{color:'#34495e'}}
-                  >{item.label}</Typography>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={700}
+                    fontSize={20}
+                    sx={{ color: "#34495e" }}
+                  >
+                    {item.label}
+                  </Typography>
                   <MuiLink
                     component={Link}
                     to="#"
@@ -252,64 +157,117 @@ useEffect(() => {
                   >
                     View All
                   </MuiLink>
-                  </Box>
                 </Box>
-                </Box>
-              )
-            )}
-        </Stack>
+              </Box>
+            </Box>
+          ))}
+        </Stack> */}
 
-        {/* Section 2: Card Rendering with Pagination */}
+
+        <HomeUserTable/>
+
+        {/* Interested Profiles List */}
         <Box>
           <Typography
             variant="h4"
             fontWeight="bold"
             mb={2}
-            sx={{ color: "#34495e"}}
+            sx={{ color: "#34495e" }}
           >
             Interested Profiles
           </Typography>
-<<<<<<< HEAD
-          <Typography display={'flex'} justifyContent={'space-between'}>
-          {renderCards()}
-          </Typography>
-        
-          <Pagination
-            count={Math.ceil(userCard.length / cardsPerPage)}
-            page={currentPage}
-            onChange={handlePageChange}
-            variant="text"
-=======
-          <Box 
-  display="flex" 
-  flexWrap="wrap" 
-  justifyContent="flex-start"  // Align cards to the start
-  alignItems="flex-start"      // Ensure top alignment
-  gap={4}                      // Add spacing between cards
->
-  {interestedProfiles.length > 0 ? renderCards() : <Typography sx={{color:'black',fontSize:'17px',fontWeight:'bold',textAlign:'center'}}>No interested profiles yet.</Typography>}
-</Box>
-          {/* <Typography display={'flex'} justifyContent={'space-between'}>
-          {renderCards()}
-          </Typography> */}
-        
+
+          <Box display="flex" flexWrap="wrap" gap={4}>
+            {interestedProfiles.length > 0 ? (
+              currentCards.map((profile, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    backgroundColor: "#ffffff",
+                    borderRadius: "8px",
+                    padding: "16px",
+                    marginBottom: "16px",
+                    width: "350px",
+                  }}
+                >
+                  <Box display="flex" alignItems="center">
+                    <Box
+                      display="flex"
+                      justifyContent="space-evenly"
+                      alignItems="center"
+                    >
+                      <img
+                        src={profile.profileImg || "/default-placeholder.png"}
+                        alt="Profile"
+                        style={{
+                          width: "100px",
+                          height: "90px",
+                          borderRadius: "10px",
+                        }}
+                      />
+                      <Box ml={2}>
+                        <Typography variant="h6" fontWeight="bold">
+                          {profile.firstName || "N/A"} {profile.lastName || ""}
+                        </Typography>
+                        <Typography variant="body2" color="textprimary">
+                          {profile.address || "Not Available"}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    mt={2}
+                    sx={{ fontSize: "14px", color: "gray" }}
+                  >
+                    <Box textAlign="center">
+                      <Typography fontWeight="bold">
+                      {profile.dob ? new Date(profile.dob).toLocaleDateString("en-US", { day: '2-digit', month: 'short', year: 'numeric' }) : "N/A"}
+
+                      </Typography>
+                      <Typography>Dob</Typography>
+                    </Box>
+                    <Box textAlign="center">
+                      <Typography fontWeight="bold">
+                        {profile.height || "N/A"}
+                      </Typography>
+                      <Typography>Height</Typography>
+                    </Box>
+                    <Box textAlign="center">
+                      <Typography fontWeight="bold">
+                        {profile.regNo || "N/A"}
+                      </Typography>
+                      <Typography>Reg No</Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              ))
+            ) : (
+              <Typography
+                sx={{
+                  color: "black",
+                  fontSize: "17px",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                }}
+              >
+                No interested profiles yet.
+              </Typography>
+            )}
+          </Box>
+
+          {/* Pagination */}
           <Pagination
             count={Math.ceil(interestedProfiles.length / cardsPerPage)}
             page={currentPage}
             onChange={handlePageChange}
-            // variant="text"
->>>>>>> 90302d1 (my intrest updated)
             shape="rounded"
             color="primary"
             sx={{
               display: "flex",
-              justifySelf:'end',
-              mt: 3,
-<<<<<<< HEAD
-=======
-              mb:0
->>>>>>> 90302d1 (my intrest updated)
-            
+              justifyContent: "flex-end",
+              mt: 1,
             }}
           />
         </Box>

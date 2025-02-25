@@ -1,95 +1,94 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Pagination,
-  Stack,
-  InputAdornment,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
+  TextField, Pagination, Stack, InputAdornment, MenuItem, Select, FormControl, InputLabel,
   Typography,
+  Box
 } from "@mui/material";
 import axios from "axios";
 import { FaSearch } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const UserTable = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("All Users"); // For user type filtering
-  const [searchTerm, setSearchTerm] = useState(""); // State for search input
-  const [currentPage, setCurrentPage] = useState(1); // Current page
-  const [rowsPerPage, setRowsPerPage] = useState(6); // Rows per page
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedUserType, setSelectedUserType] = useState("all");
+ const [rowsPerPage, setRowsPerPage] = useState(6);
 
   useEffect(() => {
-    // Fetch data from API or use mock data
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("https://jsonplaceholder.typicode.com/users");
-        setUsers(response.data);
-        setFilteredUsers(response.data);
+        const response = await axios.get("http://localhost:5000/api/users");
+        if (Array.isArray(response.data)) {
+          setUsers(response.data);
+          setFilteredUsers(response.data);
+        } else {
+          console.error("Unexpected API response:", response.data);
+          setUsers([]);
+          setFilteredUsers([]);
+        }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        toast.error("Failed to fetch users");
+        console.error("Fetch error:", error);
       }
     };
-
     fetchUsers();
   }, []);
 
-  const handleSearchName = (e) => {
-    const term = e.target.value;
-    setSearchTerm(term);
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+    filterUsers(value, selectedUserType);
+  };
 
-    const filtered = users.filter((user) =>
-      user.name.toLowerCase().includes(term.toLowerCase())
+  const handleUserTypeChange = (event) => {
+    setSelectedUserType(event.target.value);
+    filterUsers(searchTerm, event.target.value);
+  };
+
+  const filterUsers = (search, userType) => {
+    let filtered = users.filter(user => 
+      user.firstName.toLowerCase().includes(search.toLowerCase()) ||
+      user.lastName.toLowerCase().includes(search.toLowerCase()) ||
+      user.email.toLowerCase().includes(search.toLowerCase()) ||
+      user.mobile.includes(search)
     );
+    
+    if (userType !== "all") {
+      filtered = filtered.filter(user => user.userType.toLowerCase() === userType);
+    }
+    
     setFilteredUsers(filtered);
+    setCurrentPage(1);
   };
 
-  // Handle user type selection
-  const handleUserTypeChange = (e) => {
-    setSelectedCategory(e.target.value);
-    const filtered = users.filter((user) => 
-      e.target.value === "All Users" || user.userType === e.target.value
-    );
-    setFilteredUsers(filtered);
-  };
+  const indexOfLastUser = currentPage * rowsPerPage;
+  const indexOfFirstUser = indexOfLastUser - rowsPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
 
-  // Handle rows per page change
-  const handleRowsPerPageChange = (e) => {
-    setRowsPerPage(parseInt(e.target.value, 10));
-    setCurrentPage(1); // Reset to first page when rows per page changes
-  };
-
-  const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
-
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + rowsPerPage);
-
-  const handlePageChange = (event, page) => {
-    setCurrentPage(page);
+  
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setCurrentPage(1);
   };
 
   return (
-    <div style={{ padding: "20px",paddingLeft:'40px',marginTop:'40px' }}>
-      <h1 style={{ color: "#34495e", fontFamily:'Outfit sans-serif'}}>User Table</h1>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
-        {/* Search Bar */}
-        <Typography>
-
+    <div style={{ padding: "20px", marginTop: "60px", fontFamily: "Outfit, sans-serif", marginLeft: '20px' }}>
+      <Typography variant="h4" fontWeight={600} color="#34495e" fontFamily={"Outfit sans-serif"} marginBottom={3}>
+        User Table
+      </Typography>
+      
+      {/* Filter Options */}
+      <Stack direction="row" spacing={2} mb={2} justifyContent={'space-between'}>
+        <Box gap={2} display={'flex'}>
+        <Box>
         <TextField
-        placeholder="Search user"
+          placeholder="Search user"
           label="Search"
           variant="outlined"
           value={searchTerm}
-          onChange={handleSearchName}
+          onChange={(e) => handleSearch(e.target.value)}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -97,84 +96,82 @@ const UserTable = () => {
               </InputAdornment>
             ),
           }}
-          style={{ width: "300px", marginRight:'9px' }}
+          style={{ width: "300px" }}
+          fontFamily={"Outfit sans-serif"}
         />
-
-          <FormControl style={{ width: "100px" }}>
-          <InputLabel>Rows per page</InputLabel>
-          <Select value={rowsPerPage} onChange={handleRowsPerPageChange} label="Rows per page">
-            {[6, 10, 15, 20].map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
+        </Box>
+        
+        <Box display="flex" gap={2} alignItems="center">
+                    <Select
+                      value={rowsPerPage}
+                      onChange={handleRowsPerPageChange}
+                      size="medium"
+                      sx={{ minWidth: 120 }}
+                    >
+                      {[6, 10, 15, 20].map((size) => (
+                        <MenuItem key={size} value={size}>
+                          {size}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    
+                  </Box>
+        </Box>
+        <FormControl style={{ minWidth: 200 }} fontFamily={"Outfit sans-serif"}>
+          <Select value={selectedUserType} onChange={handleUserTypeChange}>
+            <MenuItem value="all">All Users</MenuItem>
+            <MenuItem value="silver">Silver Users</MenuItem>
+            <MenuItem value="premium">Premium Users</MenuItem>
           </Select>
         </FormControl>
-        </Typography>
-       
-
-        {/* User Type Dropdown */}
-        <FormControl style={{ width: "150px"}}>
-          <InputLabel>User Type</InputLabel>
-          <Select
-            value={selectedCategory}
-            onChange={handleUserTypeChange}
-            label="User Type"
-          >
-            <MenuItem value="All Users">All Users</MenuItem>
-            <MenuItem value="Silver">Silver</MenuItem>
-            <MenuItem value="Premium">Premium</MenuItem>
-            <MenuItem value="Premium">Free users</MenuItem>
-          </Select>
-        </FormControl>
-      </div>
-
-      {/* Table */}
+      </Stack>
+      
+      {/* User Table */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>ID</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Name</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Email</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Phone</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}} >Gender</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>User Type</TableCell>
+              <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>S.No</TableCell>
+              <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>Name</TableCell>
+              <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>Email</TableCell>
+              <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>Phone</TableCell>
+              <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>User Type</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{user.id}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{user.name}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{user.email}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{user.phone}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>-</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px',color:'blue'}}>
-                {user.id % 2 === 0 ? "Silver" : "Premium"}
+            {currentUsers.length > 0 ? (
+              currentUsers.map((user, index) => (
+                <TableRow key={user._id}>
+                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>{indexOfFirstUser + index + 1}</TableCell>
+                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>{user.firstName} {user.lastName}</TableCell>
+                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>{user.email}</TableCell>
+                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>{user.mobile}</TableCell>
+                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>{user.userType}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} style={{ textAlign: "center", padding: "20px" }}>
+                  No users found.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>
 
-      {/* <Typography style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}> */}
-        {/* Rows per page dropdown */}
-      
-        {/* Pagination */}
-        <Stack spacing={2} direction="row" justifySelf={'end'} mt={3}>
+      {/* Pagination */}
+      {filteredUsers.length > rowsPerPage && (
+        <Stack spacing={2} direction="row" justifyContent="flex-end" mt={3}>
           <Pagination
-            count={totalPages}
+            count={Math.ceil(filteredUsers.length / rowsPerPage)}
             page={currentPage}
-            onChange={handlePageChange}
+            onChange={(event, page) => setCurrentPage(page)}
             shape="rounded"
             color="primary"
-            siblingCount={1}
-            boundaryCount={1}
           />
         </Stack>
-      {/* </Typography> */}
+      )}
     </div>
   );
 };

@@ -27,7 +27,7 @@ const Members=() =>{
 
   return (
     <>
-    <Navbar/>
+    {/* <Navbar/> */}
     <Container sx={{ textAlign: 'center', marginTop: 5,marginBottom:10, }}>
       <Typography variant="h4" sx={{ color: '#606c88', fontWeight: 'bold',  fontFamily: "Outfit sans-serif" }}>
         LAKHS OF HAPPY COUPLES

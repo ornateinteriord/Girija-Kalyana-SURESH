@@ -10,23 +10,18 @@
 //   </BrowserRouter>,
 //   document.getElementById("root")
 // );
+import React, { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App"; // Ensure this is correctly imported
 
-import React, { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+const rootElement = document.getElementById("root");
 
-
-import React, { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-// import './index.css'
-
-
-import App from './App';
-
-const root = createRoot(document.getElementById('root'));
-root.render(
-  <StrictMode>
-   
+if (rootElement) {
+  createRoot(rootElement).render(
+    <StrictMode>
       <App />
-   
-  </StrictMode>
-);
+    </StrictMode>
+  );
+} else {
+  console.error("Root element not found!");
+}
