@@ -21,6 +21,16 @@ const UserDashboard = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const cardsPerPage = 3;
+<<<<<<< HEAD
+=======
+  const [interestedProfiles, setInterestedProfiles] = useState([]);
+
+
+useEffect(() => {
+  const storedProfiles = JSON.parse(sessionStorage.getItem("interestedProfiles")) || [];
+  setInterestedProfiles(storedProfiles);
+}, []);
+>>>>>>> 90302d1 (my intrest updated)
 
   useEffect(() => {
     const storedFirstName = sessionStorage.getItem('firstName');
@@ -38,6 +48,7 @@ const UserDashboard = () => {
   };
 
   useEffect(() => {
+<<<<<<< HEAD
     const getData = () => {
       fetch("https://jsonplaceholder.typicode.com/users")
         .then((response) => response.json())
@@ -92,6 +103,58 @@ const UserDashboard = () => {
             <Typography variant="body2" color="textprimary">
               {card.address.street}
             </Typography>
+=======
+    const fetchInterestedUsers = async () => {
+      try {
+        const storedUser = JSON.parse(sessionStorage.getItem("userData"));
+        if (!storedUser || !storedUser._id) {
+          console.warn("No user ID found in sessionStorage.");
+          return;
+        }
+  
+        const response = await fetch(`http://localhost:5000/api/user-dashboard/${storedUser._id}`);
+  
+        // ✅ Check if response is OK before parsing JSON
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+  
+        const data = await response.json();
+  
+        if (data.interestedUsers) {
+          // console.log("Fetched interested users:", data.interestedUsers);
+          setInterestedProfiles(data.interestedUsers);
+        } else {
+          setInterestedProfiles([]);
+        }
+      } catch (error) {
+        console.error("Error fetching interested users:", error.message);
+      }
+    };
+  
+    fetchInterestedUsers();
+  }, []);
+  
+
+  const currentCards = interestedProfiles.slice(
+    (currentPage - 1) * cardsPerPage,
+    currentPage * cardsPerPage
+  );
+ 
+ 
+
+  const renderCards = () =>
+    currentCards.map((profile, index) => (
+      <Box key={index} sx={{ backgroundColor: "#ffffff", borderRadius: "8px", padding: "16px", marginBottom: "16px",width:'350px' }}>
+        <Box display="flex" alignItems="center" >
+          <Box display={'flex'} justifyContent={'space-evenly'} alignItems={'center'}>
+          <img src={profile.profileImg || "/default-placeholder.png"} alt="Profile" style={{ width: "100px", height: "90px", borderRadius: "10px" }} />
+          <Box ml={2}>
+            <Typography variant="h6" fontWeight="bold">{profile.firstName} {profile.lastName}</Typography>
+            <Typography variant="body2" color="textprimary">{profile.address || "N/A"}</Typography>
+            </Box>
+            
+>>>>>>> 90302d1 (my intrest updated)
           </Box>
         </Box>
         <Box
@@ -101,7 +164,11 @@ const UserDashboard = () => {
           sx={{ fontSize: "14px", color: "gray" }}
         >
           <Box textAlign="center">
+<<<<<<< HEAD
             <Typography fontWeight="bold">{card.id}</Typography>
+=======
+            <Typography fontWeight="bold">{profile.id}</Typography>
+>>>>>>> 90302d1 (my intrest updated)
             <Typography>Age</Typography>
           </Box>
           <Box textAlign="center">
@@ -120,7 +187,11 @@ const UserDashboard = () => {
     <Box
       sx={{
         backgroundColor: "#f4f6f8",
+<<<<<<< HEAD
         minHeight: "100vh",
+=======
+        // minHeight: "100vh",
+>>>>>>> 90302d1 (my intrest updated)
         padding: "24px",
         // paddingLeft:'260px'
       }}
@@ -198,6 +269,7 @@ const UserDashboard = () => {
           >
             Interested Profiles
           </Typography>
+<<<<<<< HEAD
           <Typography display={'flex'} justifyContent={'space-between'}>
           {renderCards()}
           </Typography>
@@ -207,12 +279,36 @@ const UserDashboard = () => {
             page={currentPage}
             onChange={handlePageChange}
             variant="text"
+=======
+          <Box 
+  display="flex" 
+  flexWrap="wrap" 
+  justifyContent="flex-start"  // Align cards to the start
+  alignItems="flex-start"      // Ensure top alignment
+  gap={4}                      // Add spacing between cards
+>
+  {interestedProfiles.length > 0 ? renderCards() : <Typography sx={{color:'black',fontSize:'17px',fontWeight:'bold',textAlign:'center'}}>No interested profiles yet.</Typography>}
+</Box>
+          {/* <Typography display={'flex'} justifyContent={'space-between'}>
+          {renderCards()}
+          </Typography> */}
+        
+          <Pagination
+            count={Math.ceil(interestedProfiles.length / cardsPerPage)}
+            page={currentPage}
+            onChange={handlePageChange}
+            // variant="text"
+>>>>>>> 90302d1 (my intrest updated)
             shape="rounded"
             color="primary"
             sx={{
               display: "flex",
               justifySelf:'end',
               mt: 3,
+<<<<<<< HEAD
+=======
+              mb:0
+>>>>>>> 90302d1 (my intrest updated)
             
             }}
           />

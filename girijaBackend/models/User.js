@@ -12,12 +12,19 @@ const UserSchema = new mongoose.Schema({
   mobile: { type: String, required: true },
   resetPasswordOTP: { type: String, default: null, required: false },
   resetPasswordExpires: { type: Date, default: null, required: false },
+<<<<<<< HEAD
+=======
+  age: { type: String, required: false },
+>>>>>>> 90302d1 (my intrest updated)
   address: { type: String, required: false },
   pincode: { type: String, required: false },
   language: { type: String, required: false },
   state: { type: String, required: false },
   profileImg: { type: String, required: false },
+<<<<<<< HEAD
   like: { type: Boolean, default: false },
+=======
+>>>>>>> 90302d1 (my intrest updated)
   occupationCountry: { type: String, required: false },
   education: {
     degree: { type: String, required: false },
@@ -45,6 +52,7 @@ const UserSchema = new mongoose.Schema({
     maritalStatus: { type: String, required: false },
     education: { type: String, required: false },
   },
+<<<<<<< HEAD
   info: { type: String, required: false },
 
 });
@@ -60,6 +68,29 @@ UserSchema.pre("save", async function (next) {
         { new: true, upsert: true } // Create if not exists
       );
       this.userId = counter.seq; // Assign the incremented sequence
+=======
+  // Relationship Fields
+  interestedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Users interested in this user
+  likedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Users this user liked
+  acceptedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Users who accepted this user
+  acceptedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Users this user accepted
+  interestedIn: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Users this user is interested in
+  sentInterestBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Users who sent interest to this user
+  pendingFor: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Users who haven't responded yet
+});
+
+
+UserSchema.pre("save", async function (next) {
+  if (this.isNew) {
+   
+    try {
+      const counter = await Counter.findOneAndUpdate(
+        { name: "userId" }, 
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true } 
+      );
+      this.userId = counter.seq; 
+>>>>>>> 90302d1 (my intrest updated)
       next();
     } catch (err) {
       next(err);

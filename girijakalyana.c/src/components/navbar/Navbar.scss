@@ -2,9 +2,16 @@
     position: fixed;
     top: 0;
     left: 0;
+<<<<<<< HEAD
     width: 100%;
     height: 56px;
     padding: 10px;
+=======
+    width: 100% !important;
+    
+    height: 70px;
+    padding:0 10px !important;
+>>>>>>> 90302d1 (my intrest updated)
     background: linear-gradient(to right, #182848 , #4d75d4);
     color: #fff;
     z-index: 1000;  
@@ -12,6 +19,10 @@
    font-family: "Outfit sans-serif";
 
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 90302d1 (my intrest updated)
 .link{
     text-decoration: none;
    list-style: none;

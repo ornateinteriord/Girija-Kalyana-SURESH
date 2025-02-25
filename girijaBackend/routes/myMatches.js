@@ -22,4 +22,38 @@ router.get("/users", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
+=======
+
+// Search API
+router.get("/search", async (req, res) => {
+  try {
+    const { searchQuery } = req.query;
+
+    if (!searchQuery) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const profiles = await User.find({
+      $or: [
+        { firstName: { $regex: searchQuery, $options: "i" } },
+        { lastName: { $regex: searchQuery, $options: "i" } },
+      ],
+    });
+
+    if (profiles.length === 0) {
+      return res.status(404).json({ error: "No profiles found" });
+    }
+
+    res.json(profiles);
+  } catch (error) {
+    console.error("Search error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
+
+>>>>>>> 90302d1 (my intrest updated)
 module.exports = router;

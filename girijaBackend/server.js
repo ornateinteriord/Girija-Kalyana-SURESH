@@ -12,6 +12,11 @@ const parentsPrefer = require("./routes/ParentPrefer");
 const others = require("./routes/Others");
 const mymatches = require("./routes/myMatches");
 const userRoutes = require("./routes/userRouters")
+<<<<<<< HEAD
+=======
+const intreset = require("./routes/IntrestedProfiles")
+const myintrets = require("./routes/myIntrests")
+>>>>>>> 90302d1 (my intrest updated)
 
 const app = express();
 
@@ -38,7 +43,23 @@ app.use("/api", parentsPrefer);
 app.use("/api", others);
 app.use("/api", mymatches);
 app.use("/api/users", userRoutes);
+<<<<<<< HEAD
 
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+=======
+app.use("/api", intreset);
+app.use("/api", myintrets);
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use.`);
+    process.exit(1);
+  }
+});
+>>>>>>> 90302d1 (my intrest updated)

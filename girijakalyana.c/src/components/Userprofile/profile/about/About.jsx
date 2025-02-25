@@ -14,6 +14,10 @@ const About = () => {
   const [mobile, setMobile] = useState("");
   const [email, setEmail] = useState("");
   const [state, setState] = useState("");
+<<<<<<< HEAD
+=======
+  const [age, setAge] = useState("");
+>>>>>>> 90302d1 (my intrest updated)
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -35,6 +39,10 @@ const About = () => {
         setLastName(data.lastName || "");
         setDob(formattedDob);
         setPincode(data.pincode || "");
+<<<<<<< HEAD
+=======
+        setAge(data.age || "");
+>>>>>>> 90302d1 (my intrest updated)
         setAddress(data.address || "");
         setOccupationCountry(data.occupationCountry || "");
         setLanguage(data.language || "");
@@ -63,6 +71,10 @@ const About = () => {
         lastName,
         dob,
         pincode,
+<<<<<<< HEAD
+=======
+        age,
+>>>>>>> 90302d1 (my intrest updated)
         address,
         state,
         occupationCountry,
@@ -87,6 +99,10 @@ const About = () => {
     setLastName("");
     setDob("");
     setPincode("");
+<<<<<<< HEAD
+=======
+    setAge("");
+>>>>>>> 90302d1 (my intrest updated)
     setAddress("");
     setState("");
     setOccupationCountry("");
@@ -126,6 +142,67 @@ const About = () => {
 
       <Stack>
         <Box sx={{ display: "flex", gap: "20px", justifyContent: "space-evenly",padding:1 }} >
+<<<<<<< HEAD
+=======
+    
+          <Box>
+            <Typography variant="h5" fontWeight={700} color="#34495e" gutterBottom>
+             Basic Information
+            </Typography>
+            <Stack spacing={3}>
+            <TextField
+                label="Age"
+                placeholder="Age"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                disabled={!isEditing}
+                sx={{ width: "500px" }}
+              />
+              <TextField
+                label="Address"
+                placeholder="Address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                disabled={!isEditing}
+                sx={{ width: "500px" }}
+              />
+              <TextField
+                label="Pin Code"
+                placeholder="Pin Code"
+                value={pincode}
+                onChange={(e) => setPincode(e.target.value)}
+                disabled={!isEditing}
+                sx={{ width: "500px" }}
+              />
+               <TextField
+                label="State"
+                placeholder="State name"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                disabled={!isEditing}
+                sx={{ width: "500px" }}
+              />
+
+              <TextField
+                label="Language"
+                placeholder="Language"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                disabled={!isEditing}
+                sx={{ width: "500px" }}
+              />
+              <TextField
+                label=" Country"
+                placeholder="Occupation Country"
+                value={occupationCountry}
+                onChange={(e) => setOccupationCountry(e.target.value)}
+                disabled={!isEditing}
+                sx={{ width: "500px" }}
+              />
+            </Stack>
+          </Box>
+
+>>>>>>> 90302d1 (my intrest updated)
           <Box>
             <Typography variant="h5" fontWeight={700} color="#34495e" gutterBottom>
             Personal Information
@@ -172,6 +249,7 @@ const About = () => {
               />
             </Stack>
           </Box>
+<<<<<<< HEAD
 
           <Box>
             <Typography variant="h5" fontWeight={700} color="#34495e" gutterBottom>
@@ -221,6 +299,8 @@ const About = () => {
               />
             </Stack>
           </Box>
+=======
+>>>>>>> 90302d1 (my intrest updated)
         </Box>
       </Stack>
 

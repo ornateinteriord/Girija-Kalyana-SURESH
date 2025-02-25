@@ -3,7 +3,12 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { CgSpinner,  CgSpinnerAlt } from 'react-icons/cg';
 import { CircularProgress } from '@mui/material';
+<<<<<<< HEAD
 
+=======
+import "./App.css"
+import { InterestProvider } from './components/Userprofile/myIntrest/UserContext/IntrestProvider';
+>>>>>>> 90302d1 (my intrest updated)
 // Lazy loading components
 const HeroSlider = lazy(() => import('./components/hero/HeroSlider'));
 const Connect = lazy(() => import('./components/howWorks/Connect'));
@@ -76,6 +81,10 @@ const Spinner = () => {
 const App = () => {
  
   return (
+<<<<<<< HEAD
+=======
+    <InterestProvider>
+>>>>>>> 90302d1 (my intrest updated)
     <Suspense fallback={<CgSpinner /> }>
       <Router>
         <Routes>
@@ -130,6 +139,10 @@ const App = () => {
         }}
       />
     </Suspense>
+<<<<<<< HEAD
+=======
+    </InterestProvider>
+>>>>>>> 90302d1 (my intrest updated)
   );
 };
 

@@ -15,18 +15,17 @@ import {
 import { MdEmail, MdLock } from 'react-icons/md';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUser } from 'react-icons/fa';
-import axios from 'axios'
+import axios from 'axios';
 import toast from 'react-hot-toast';
-import { convertFromBase64 } from '../Userprofile/profile/photo/Photos';
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [openAdminDialog, setOpenAdminDialog] = useState(false);
-  const [enterUsername, setEnterUsername] = useState('');  
+  const [enterUsername, setEnterUsername] = useState('');
   const [enterPassword, setEnterPassword] = useState('');
   const [isRegister, setIsRegister] = useState(false);
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
-  const [loginData, setLoginData] = useState({ username: '', password: '' });
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({
     firstName: '',
     lastName: '',
@@ -35,14 +34,14 @@ const Navbar = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    mobile:'',
+    mobile: '',
   });
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [newPassword, setNewPassword] = useState('');
-const [confirmPassword, setConfirmPassword] = useState('');
-const [error, setError] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
 
   const navigate = useNavigate();
 
@@ -50,41 +49,37 @@ const [error, setError] = useState('');
     try {
       const response = await axios.post('http://localhost:5000/api/auth/forgot-password', { email });
       toast.success(response.data.message);
-      setOtpSent(true); 
+      setOtpSent(true);
     } catch (error) {
       toast.error('Error sending OTP: ' + error.response?.data?.message || error.message);
     }
   };
+
   const handleResetPassword = async () => {
-  
-   
     if (newPassword !== confirmPassword) {
       toast.error('Passwords do not match!');
       return;
-    }  
+    }
     try {
-
       const response = await axios.post('http://localhost:5000/api/auth/reset-password', {
         email,
         newPassword,
         confirmPassword,
-        otp
+        otp,
       });
-  
+
       if (response.data.message === 'Password reset successfully.') {
         toast.success(response.data.message);
-        setOpenForgotPassword(false); 
+        setOpenForgotPassword(false);
         navigate('/');
       } else {
-      
         toast.error(response.data.message || 'Error resetting password');
       }
     } catch (error) {
-  
       toast.error(error.response?.data?.message || 'Error resetting password');
     }
   };
-  
+
   const handleOpenAdminDialog = () => setOpenAdminDialog(true);
   const handleCloseAdminDialog = () => setOpenAdminDialog(false);
 
@@ -96,59 +91,52 @@ const [error, setError] = useState('');
   const handleOpenForgotPassword = () => setOpenForgotPassword(true);
   const handleCloseForgotPassword = () => setOpenForgotPassword(false);
 
-
   const handleAdminLogin = async () => {
     try {
       const response = await axios.post('http://localhost:5000/api/admin/login', { email: enterUsername, password: enterPassword });
       const { token, user } = response.data;
       if (user.isAdmin) {
         localStorage.setItem('token', token);
-        localStorage.setItem('user', user);
+        localStorage.setItem('user', JSON.stringify(user));
         toast.success('Admin Login successful!');
         navigate('/admin');
         handleCloseAdminDialog();
-      
       } else {
         alert('Access Denied');
       }
     } catch (error) {
       toast.error('Invalid admin credentials');
     }
-    
   };
-  
- 
-const handleLogin = async () => {
-  try {
-    const response = await axios.post('http://localhost:5000/api/auth/login', loginData);
-    const { token, user } = response.data;
-    localStorage.setItem('token', token); // Store the token
-    localStorage.setItem('userId', user._id);
-    sessionStorage.setItem('firstName', user.firstName);
-    localStorage.setItem('lastName', user.lastName);
-    localStorage.setItem('email', user.email);
-    localStorage.setItem('mobile', user.mobile);
-    localStorage.setItem('profileImg', JSON.stringify( user.profileImg));
-  sessionStorage.setItem('userData', JSON.stringify(user));
 
-    toast.success('Login successful!');
-    navigate('/user/userdashboard'); // Redirect user to the dashboard or home page
-  } catch (error) {
-    console.error( error.message); // Log detailed error info
-    toast.error('Login failed: ' + (error.message || 'Unknown error'));
-  }
- 
-};
-  
-  
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/auth/login', loginData);
+      const { token, user } = response.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('userId', user._id);
+      sessionStorage.setItem('firstName', user.firstName);
+      localStorage.setItem('lastName', user.lastName);
+      localStorage.setItem('email', user.email);
+      localStorage.setItem('mobile', user.mobile);
+      localStorage.setItem('profileImg', JSON.stringify(user.profileImg));
+      sessionStorage.setItem('userData', JSON.stringify(user));
+
+      toast.success('Login successful!');
+      navigate('/user/userdashboard');
+    } catch (error) {
+      console.error(error.message);
+      toast.error('Invalid email or password!');
+    }
+  };
+
   const handleRegister = async () => {
     try {
       const response = await axios.post('http://localhost:5000/api/auth/register', registerData);
       const { userId, email } = response.data.user;
 
-      // Check if the userId is valid before storing it
       if (userId) {
-        localStorage.setItem('userId', userId); // Store the userId in localStorage
+        localStorage.setItem('userId', userId);
         localStorage.setItem('email', email);
         toast.success('Registration successful!');
       } else {
@@ -156,14 +144,13 @@ const handleLogin = async () => {
       }
 
       handleClose();
-      navigate('/'); 
+      navigate('/');
     } catch (error) {
       console.error(error);
       toast.error(error.response?.data?.message || 'Error registering user');
     }
   };
-  
-  
+
   const handleChangeLogin = (e) => {
     const { name, value } = e.target;
     setLoginData((prev) => ({ ...prev, [name]: value }));
@@ -175,7 +162,7 @@ const handleLogin = async () => {
   };
 
   return (
-    <div>
+    <div className="navbar-main-container">
       <div className="navbar-container">
         <div className="navbar">
           <h3>Girija❤️Kalyana</h3>
@@ -225,7 +212,7 @@ const handleLogin = async () => {
             >
               Login
             </Button>
-            {/* <Button
+            <Button
               variant="contained"
               size="large"
               onClick={handleOpenAdminDialog}
@@ -240,29 +227,25 @@ const handleLogin = async () => {
               }}
             >
               Admin
-            </Button> */}
+            </Button>
           </Typography>
         </div>
       </div>
 
       {/* Login/Register Dialog */}
-      <Dialog open={open} onClose={handleClose} >
-      
+      <Dialog open={open} onClose={handleClose}>
         <Box
           sx={{
             padding: '20px',
             maxWidth: '600px',
             width: '90%',
-            
             display: 'flex',
             flexDirection: 'column',
-            // gap: '10px',
             alignItems: 'center',
           }}
         >
-          <Typography variant="h4" textAlign="center" fontWeight={700} color='#34495e' mt={1} mb={1}>
+          <Typography variant="h4" textAlign="center" fontWeight={700} color="#34495e" mt={1} mb={1}>
             {isRegister ? 'Create Your Account' : 'Login'}
-      
           </Typography>
           {isRegister ? (
             <form style={{ width: '100%' }}>
@@ -306,15 +289,14 @@ const handleLogin = async () => {
                   InputLabelProps={{ shrink: true }}
                 />
                 <TextField
-                 fullWidth
-               label="Mobile Number"
-                 name="mobile"
-               value={registerData.mobile}
-              onChange={handleChangeRegister}
-              variant="outlined"
-               margin="normal"
-                     />
-
+                  fullWidth
+                  label="Mobile Number"
+                  name="mobile"
+                  value={registerData.mobile}
+                  onChange={handleChangeRegister}
+                  variant="outlined"
+                  margin="normal"
+                />
               </Box>
               <TextField
                 fullWidth
@@ -346,25 +328,24 @@ const handleLogin = async () => {
                 margin="normal"
               />
               <Button
-              
                 variant="contained"
                 onClick={handleRegister}
                 sx={{
                   background: '#34495e',
-                  width:'50%',
-                  display:'flex',
-                  justifySelf:'center',
-                  marginBottom:'15px',
-                   marginTop:'15px'
+                  width: '50%',
+                  display: 'flex',
+                  justifySelf: 'center',
+                  marginBottom: '15px',
+                  marginTop: '15px',
                 }}
               >
                 Create Account
               </Button>
             </form>
           ) : (
-            <form style={{ width: '100%',height:'90%',padding:'40px 20px',display:'flex',alignItems:'center',flexDirection:'column' }}>
+            <form style={{ width: '100%', height: '90%', padding: '40px 20px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
               <TextField
-               sx={{width:'400px'}}
+                sx={{ width: '400px' }}
                 label="Enter Email"
                 name="email"
                 value={loginData.email}
@@ -373,7 +354,7 @@ const handleLogin = async () => {
                 margin="normal"
               />
               <TextField
-              sx={{width:'400px',marginBottom:'20px'}}
+                sx={{ width: '400px', marginBottom: '20px' }}
                 label="Enter Password"
                 name="password"
                 value={loginData.password}
@@ -382,13 +363,14 @@ const handleLogin = async () => {
                 variant="outlined"
                 margin="normal"
               />
-             <Typography sx={{color: '#1976d2',cursor:'pointer'}} mb={1.5} onClick={handleOpenForgotPassword} >Forgot Password?</Typography>
+              <Typography sx={{ color: '#1976d2', cursor: 'pointer' }} mb={1.5} onClick={handleOpenForgotPassword}>
+                Forgot Password?
+              </Typography>
               <Button
-                
                 variant="contained"
                 onClick={handleLogin}
                 sx={{
-                  width:'250px',
+                  width: '250px',
                   background: '#34495e',
                 }}
               >
@@ -399,17 +381,13 @@ const handleLogin = async () => {
           <Typography
             variant="body2"
             textAlign="center"
-            sx={{ cursor: 'pointer', color: '#1976d2',marginBottom:'10px' }}
+            sx={{ cursor: 'pointer', color: '#1976d2', marginBottom: '10px' }}
             onClick={handleToggleForm}
           >
-            {isRegister
-              ? 'Already have an account? Login'
-              : "Don't have an account? Register"}
+            {isRegister ? 'Already have an account? Login' : "Don't have an account? Register"}
           </Typography>
         </Box>
-        
       </Dialog>
-
 
       <Dialog
         open={openAdminDialog}
@@ -454,8 +432,8 @@ const handleLogin = async () => {
           placeholder="Enter username"
           variant="outlined"
           margin="dense"
-          value={enterUsername} 
-          onChange={(e) => setEnterUsername(e.target.value)} 
+          value={enterUsername}
+          onChange={(e) => setEnterUsername(e.target.value)}
           fullWidth
           InputProps={{
             startAdornment: <InputAdornment position="start"></InputAdornment>,
@@ -477,147 +455,141 @@ const handleLogin = async () => {
           }}
         />
 
-        <Typography sx={{ color: 'black' }} onClick={handleOpenForgotPassword}>Forgot Password?</Typography>
-  <Typography style={{display:'flex',alignItems:'center',justifySelf:'flex-end',gap:'6px'}}>
-        <Button
-          variant="outlined"
-          onClick={handleAdminLogin}
-          sx={{
-            marginTop: '20px',
-            color:'black',
-            width: '150px',
-            borderRadius: '10px',
-            '&:hover': { backgroundColor: '#1a4f72', color:'#fff' },
-          }}
-        >
-           LOGIN
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={handleCloseAdminDialog}
-          sx={{
-            marginTop: '20px',
-            color:'black',
-            width: '150px',
-            borderRadius: '10px',
-            '&:hover': { backgroundColor: '#1a4f72', color:'#fff'  },
-          }}
-        >
-          cancel
-        </Button>
+        <Typography sx={{ color: 'black' }} onClick={handleOpenForgotPassword}>
+          Forgot Password?
+        </Typography>
+        <Typography style={{ display: 'flex', alignItems: 'center', justifySelf: 'flex-end', gap: '6px' }}>
+          <Button
+            variant="outlined"
+            onClick={handleAdminLogin}
+            sx={{
+              marginTop: '20px',
+              color: 'black',
+              width: '150px',
+              borderRadius: '10px',
+              '&:hover': { backgroundColor: '#1a4f72', color: '#fff' },
+            }}
+          >
+            LOGIN
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={handleCloseAdminDialog}
+            sx={{
+              marginTop: '20px',
+              color: 'black',
+              width: '150px',
+              borderRadius: '10px',
+              '&:hover': { backgroundColor: '#1a4f72', color: '#fff' },
+            }}
+          >
+            Cancel
+          </Button>
         </Typography>
       </Dialog>
 
       <div>
-      <Dialog open={openForgotPassword} onClose={handleCloseForgotPassword}>
-  <Box
-    component="form"
-    onSubmit={(e) => {
-      e.preventDefault(); // Prevent default form submission
-      otpSent ? handleResetPassword() : handleSendOtp();
-    }}
-    sx={{
-      padding: '20px',
-      width:'400px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '20px',
-    }}
-  >
-    {!otpSent ? (
-      <>
-        <Typography variant="h6" textAlign="center">
-          Forgot Password
-        </Typography>
-        <TextField
-          fullWidth
-          label="Enter Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          variant="outlined"
-          margin="normal"
-          required
-        />
-        <Button
-          type="submit"
-          variant="contained"
-          sx={{
-            width: '150px',
-            alignSelf: 'center',
-            background: '#34495e',
-          }}
-        >
-          Send OTP
-        </Button>
-        
-      </>
-    ) : (
-      <>
-        <Typography variant="h6" textAlign="center">
-          Reset Password
-        </Typography>
-        <TextField
-          fullWidth
-          label="Enter OTP"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value)}
-          variant="outlined"
-          required
-        />
-        <TextField
-          fullWidth
-          label="New Password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          variant="outlined"
-
-          type="password"
-          required
-        />
-        <TextField
-          fullWidth
-          label="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          variant="outlined"
-          type="password"
-          required
-        />
-        {error && (
-          <Typography color="error" textAlign="center">
-            {error}
-          </Typography>
-        )}
-        <Button
-          type="submit"
-          variant="contained"
-          sx={{
-            width: '190px',
-            padding:'10px',
-            alignSelf: 'center',
-            background: '#34495e',
-            marginTop: '10px',
-          }}
-        >
-          Reset Password
-        </Button>
-      </>
-    )}
-    <Button
-      // variant="text"
-
-      onClick={handleCloseForgotPassword}
-      sx={{ alignSelf: 'center', color: '#1976d2',"&:hover":{backgroundColor:'transparent'} }}
-    >
-      Cancel
-    </Button>
-  </Box>
-</Dialog>
-
-
-
-    </div>
-
+        <Dialog open={openForgotPassword} onClose={handleCloseForgotPassword}>
+          <Box
+            component="form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              otpSent ? handleResetPassword() : handleSendOtp();
+            }}
+            sx={{
+              padding: '20px',
+              width: '400px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '20px',
+            }}
+          >
+            {!otpSent ? (
+              <>
+                <Typography variant="h6" textAlign="center">
+                  Forgot Password
+                </Typography>
+                <TextField
+                  fullWidth
+                  label="Enter Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  variant="outlined"
+                  margin="normal"
+                  required
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    width: '150px',
+                    alignSelf: 'center',
+                    background: '#34495e',
+                  }}
+                >
+                  Send OTP
+                </Button>
+              </>
+            ) : (
+              <>
+                <Typography variant="h6" textAlign="center">
+                  Reset Password
+                </Typography>
+                <TextField
+                  fullWidth
+                  label="Enter OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  variant="outlined"
+                  required
+                />
+                <TextField
+                  fullWidth
+                  label="New Password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  variant="outlined"
+                  type="password"
+                  required
+                />
+                <TextField
+                  fullWidth
+                  label="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  variant="outlined"
+                  type="password"
+                  required
+                />
+                {error && (
+                  <Typography color="error" textAlign="center">
+                    {error}
+                  </Typography>
+                )}
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    width: '190px',
+                    padding: '10px',
+                    alignSelf: 'center',
+                    background: '#34495e',
+                    marginTop: '10px',
+                  }}
+                >
+                  Reset Password
+                </Button>
+              </>
+            )}
+            <Button
+              onClick={handleCloseForgotPassword}
+              sx={{ alignSelf: 'center', color: '#1976d2', '&:hover': { backgroundColor: 'transparent' } }}
+            >
+              Cancel
+            </Button>
+          </Box>
+        </Dialog>
+      </div>
     </div>
   );
 };

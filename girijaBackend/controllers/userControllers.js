@@ -7,6 +7,7 @@ const getAllUsers = async (req, res) => {
     page = parseInt(page);
     limit = parseInt(limit);
 
+<<<<<<< HEAD
     // ✅ Fetch unique users based on mobile number & email
     const users = await User.aggregate([
       {
@@ -16,6 +17,21 @@ const getAllUsers = async (req, res) => {
         },
       },
       { $replaceRoot: { newRoot: "$doc" } }, // Replace root with the selected document
+=======
+    if (page <= 0 || limit <= 0) {
+      return res.status(400).json({ message: "Page and limit must be positive integers" });
+    }
+
+  
+    const users = await User.aggregate([
+      {
+        $group: {
+          _id: { mobile: "$mobile", email: "$email" }, 
+          doc: { $first: "$$ROOT" }, 
+        },
+      },
+      { $replaceRoot: { newRoot: "$doc" } }, 
+>>>>>>> 90302d1 (my intrest updated)
       { $skip: (page - 1) * limit }, // Pagination
       { $limit: limit },
       {

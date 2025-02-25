@@ -71,24 +71,40 @@ const MyMatches = () => {
         <Typography variant="h4" fontWeight="bold" color="#34495e">
           My Matches
         </Typography>
+<<<<<<< HEAD
         <Button
+=======
+        {/* <Button
+>>>>>>> 90302d1 (my intrest updated)
           variant="contained"
           sx={{ background: "#34495e", color: "#fff" }}
           onClick={handleModifyButton}
         >
           Modify
+<<<<<<< HEAD
         </Button>
+=======
+        </Button> */}
+>>>>>>> 90302d1 (my intrest updated)
       </Box>
       <Divider />
 
        {/* Cards Section */}
+<<<<<<< HEAD
            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "space-evenly", marginTop: 2 }}>
+=======
+           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "flex-start", marginTop: 2 }}>
+>>>>>>> 90302d1 (my intrest updated)
              {userCard.map((card, index) => (
                <Card
                  key={index}
                  sx={{
                    width: "270px",
+<<<<<<< HEAD
                    height: "390px",
+=======
+                   height: "360px",
+>>>>>>> 90302d1 (my intrest updated)
                    borderRadius: 1,
                    boxShadow: 3,
                    textAlign: "center",
@@ -112,6 +128,7 @@ const MyMatches = () => {
                  />
      
                  <CardContent>
+<<<<<<< HEAD
                    <Box display={'flex'} justifyContent={'center'}>
                      <Typography variant="h6" fontWeight="bold" sx={{ color: '#fff' }}>
                        {card.firstName} {card.lastName}
@@ -119,6 +136,15 @@ const MyMatches = () => {
                     
                    </Box>
                    <Typography fontWeight={550} sx={{ color: '#fff' }}>{card.address || "N/A"}</Typography>
+=======
+                   <Box display={'flex'} justifyContent={'space-between'}>
+                     <Typography variant="h6" fontWeight="bold" sx={{ color: '#fff' }}>
+                       {card.firstName} {card.lastName}
+                     </Typography>
+                     <Typography fontWeight={550} sx={{ color: '#fff' }}>{card.address || "N/A"}</Typography>
+                   </Box>
+                  
+>>>>>>> 90302d1 (my intrest updated)
                    <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
                      <Box>
                        <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>
