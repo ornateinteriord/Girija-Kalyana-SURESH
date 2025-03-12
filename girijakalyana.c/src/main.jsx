@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 // import React from "react";
 // import ReactDOM from "react-dom";
 // import { BrowserRouter } from "react-router-dom";
@@ -13,12 +13,12 @@
 
 import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-=======
+
 
 import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 // import './index.css'
->>>>>>> 90302d1 (my intrest updated)
+
 
 import App from './App';
 

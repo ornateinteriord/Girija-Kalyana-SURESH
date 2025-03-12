@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 
 
 *{
@@ -25,7 +25,7 @@ html, body {
   ::-webkit-scrollbar {
     display: none; /* Hide the scrollbar */
   }
-=======
+
  * {
    margin: 0 !important;
    padding: 0 !important;
@@ -49,4 +49,4 @@ html, body {
 ::-webkit-scrollbar {
   display: none;
 }
->>>>>>> 90302d1 (my intrest updated)
+
