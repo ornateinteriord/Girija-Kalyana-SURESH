@@ -15,4 +15,6 @@ const UserSchema = new mongoose.Schema({
   mobile_no: { type: Number }
 }, { timestamps: true, collection: "user_tbl" }); // Ensures createdAt & updatedAt are auto-managed
 
-module.exports = mongoose.model('user_tbl', UserSchema);
+
+const UserModel = mongoose.model("user_tbl",UserSchema)
+module.exports = UserModel;
