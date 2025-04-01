@@ -1,14 +1,22 @@
 require('dotenv').config();
 const express = require('express');
 const connectDB = require('./config/db.config');
+const cors = require('cors');
 
 const authRoutes = require('./routes/auth.routes');
 const adminRoutes = require('./routes/admin.routes');
 const userRoutes = require('./routes/user.routes');
-const assistanceRoutes = require('./routes/assistance.routes');
-const profilesRouter = require ('./routes/profile.router')
 
 const app = express();
+
+app.use(cors({
+  origin: 'http://localhost:5173', // Allow requests from your frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true // If you're using cookies or authentication headers
+}));
+
+
+
 
 // Database connection
 connectDB();
@@ -20,8 +28,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
-// app.use('/api/assistance', assistanceRoutes);
-// app.use('/api/profiles', profilesRouter);
+
 
 
 

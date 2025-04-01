@@ -10,9 +10,9 @@ const UserSchema = new mongoose.Schema({
   status: { type: String , default : "inactive" },
   UpdateStatus: { type: String },
   counter: { type: Number, default: 0 },
-  last_loggedin: { type: String }, // Keeping it as String to match "01/30/2024"
+  last_loggedin: { type: String }, 
   loggedin_from: { type: String },
   mobile_no: { type: Number }
-}, { timestamps: true, collection: "user_tbl" }); // Ensures createdAt & updatedAt are auto-managed
+}, { timestamps: true, collection: "user_tbl" }); 
 
 module.exports = mongoose.model('user_tbl', UserSchema);
