@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
-const User = require('../../models/user.model');
+const UserModel = require('../../models/user');
 
 const login = async (req, res) => {
   try {
     const { username, password } = req.body;
 
     // Find user with exact username match
-    const user = await User.findOne({ username });
+    const user = await UserModel.findOne({ username });
 
     if (!user) {
       return res.status(401).json({ 
@@ -55,28 +55,15 @@ const login = async (req, res) => {
       success: true,
       token,
       user,
-      dashboard: getDashboardPath(user.user_role),
       message: 'Login successful'
     });
 
   } catch (error) {
-    console.error('Login error:', error);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Internal server error during login',
-      error: error.message 
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-function getDashboardPath(role) {
-  const paths = {
-    Admin: '/admin/dashboard',
-    PremiumUser: '/premium/dashboard',
-    Assistance: '/assistance/dashboard',
-  };
-  return paths[role] || '/user/dashboard';
-}
+
 
 module.exports = {
   login
