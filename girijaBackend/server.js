@@ -11,9 +11,9 @@ const userRoutes = require('./routes/user.routes');
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow requests from your frontend
+  origin: 'http://localhost:5173', 
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true // If you're using cookies or authentication headers
+  credentials: true 
 }));
 
 

@@ -6,7 +6,12 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   ref_no: { type: String, required: true , default : "SGM008" },
-  user_role: { type: String , default : "FreeUser" },
+  user_role: { 
+    type: String, 
+    required: true,
+    enum: ['FreeUser', 'Admin'], // Only these two roles allowed
+    default: 'FreeUser'
+  },
   status: { type: String , default : "inactive" },
   UpdateStatus: { type: String },
   counter: { type: Number, default: 0 },
