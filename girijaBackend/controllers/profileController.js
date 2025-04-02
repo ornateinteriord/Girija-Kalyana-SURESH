@@ -24,6 +24,31 @@ const getProfileByRegistrationNo = async (req, res) => {
   }
 };
 
+const updateProfile = async (req, res) => {
+  try {
+    const { registration_no } = req.params;
+    const profile = await Profile.findOneAndUpdate(
+      { registration_no }, 
+      { $set: req.body },   
+      { new: true } 
+    );
+
+    if (!profile) {
+      return res.status(404).json({
+        success: false,
+        message: "Profile not found with the given registration number",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: profile,
+      message:"Profile Updated Successfully."
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 const getAllUserProfile = async (req, res) => {
   try {
     const users = await UserModel.find();
@@ -33,4 +58,4 @@ const getAllUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { getProfileByRegistrationNo, getAllUserProfile };
+module.exports = { getProfileByRegistrationNo,updateProfile, getAllUserProfile };
