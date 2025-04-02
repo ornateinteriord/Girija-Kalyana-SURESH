@@ -11,12 +11,11 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  CircularProgress,
 } from '@mui/material';
-import { MdEmail, MdLock } from 'react-icons/md';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaUser } from 'react-icons/fa';
-import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useLoginMutation } from '../api/Auth';
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -25,7 +24,7 @@ const Navbar = () => {
   const [enterPassword, setEnterPassword] = useState('');
   const [isRegister, setIsRegister] = useState(false);
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
-  const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [loginData, setLoginData] = useState({ username: '', password: '' });
   const [registerData, setRegisterData] = useState({
     firstName: '',
     lastName: '',
@@ -44,40 +43,36 @@ const Navbar = () => {
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
+  const { mutate: login, isPending: isLoginPending } = useLoginMutation();
 
-  const handleSendOtp = async () => {
-    try {
-      const response = await axios.post('http://localhost:5000/api/auth/forgot-password', { email });
-      toast.success(response.data.message);
-      setOtpSent(true);
-    } catch (error) {
-      toast.error('Error sending OTP: ' + error.response?.data?.message || error.message);
-    }
-  };
-
-  const handleResetPassword = async () => {
-    if (newPassword !== confirmPassword) {
-      toast.error('Passwords do not match!');
+  // const handleLogin = (e) => {
+  //   e.preventDefault();
+  //   login(loginData, {
+  //     onSuccess: (data) => {
+  //       toast.success('Login successful!');
+  //       handleClose();
+  //       // Navigate based on user role or other criteria
+  //       navigate('/user');
+  //     },
+  //     onError: (error) => {
+  //       toast.error(error.response?.data?.message || 'Login failed');
+  //     }
+  //   });
+  // };
+  // const handleLogin = () => {
+  //   e.preventDefault();
+  //   login(loginData);
+  //   navigate('/user');
+  // };
+  const handleLogin = (e) => {
+    e.preventDefault();
+    
+    if (!loginData.username || !loginData.password) {
+      toast.error('Both username and password are required');
       return;
     }
-    try {
-      const response = await axios.post('http://localhost:5000/api/auth/reset-password', {
-        email,
-        newPassword,
-        confirmPassword,
-        otp,
-      });
-
-      if (response.data.message === 'Password reset successfully.') {
-        toast.success(response.data.message);
-        setOpenForgotPassword(false);
-        navigate('/');
-      } else {
-        toast.error(response.data.message || 'Error resetting password');
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Error resetting password');
-    }
+    
+    login(loginData);
   };
 
   const handleOpenAdminDialog = () => setOpenAdminDialog(true);
@@ -89,68 +84,14 @@ const Navbar = () => {
   const handleToggleForm = () => setIsRegister((prev) => !prev);
 
   const handleOpenForgotPassword = () => setOpenForgotPassword(true);
-  const handleCloseForgotPassword = () => setOpenForgotPassword(false);
-
-  const handleAdminLogin = async () => {
-    try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
-        username: enterUsername,
-        password: enterPassword
-      });
-      
-      const { token, user, dashboardPath } = response.data;
-      
-      if (user.user_role === 'Admin') {
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        toast.success('Admin Login successful!');
-        navigate('/admin/dashboard'); // Explicit path
-        handleCloseAdminDialog();
-      } else {
-        toast.error('Access Denied: Admin privileges required');
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Invalid credentials');
-    }
+  const handleCloseForgotPassword = () => {
+    setOpenForgotPassword(false);
+    setOtpSent(false);
+    setEmail('');
+    setOtp('');
+    setNewPassword('');
+    setConfirmPassword('');
   };
-  
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
-        username: loginData.email,
-        password: loginData.password
-      });
-      
-      const { token, user } = response.data;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify({
-        user_id: user.user_id,
-        username: user.username,
-        user_role: user.user_role,
-        ref_no: user.ref_no,
-        mobile_no: user.mobile_no,
-        status: user.status
-      }));
-      
-      toast.success('Login successful!');
-      
-      // Navigate based on user role
-      if (user.user_role === 'Admin') {
-        navigate('/admin/dashboard');
-      } else if (user.user_role === 'PremiumUser' || user.user_role === 'FreeUser') {
-        navigate('/user/dashboard');
-      } else {
-        navigate('/');
-      }
-      
-      handleClose();
-    } catch (error) {
-      console.error('Login error:', error);
-      toast.error(error.response?.data?.message || 'Login failed');
-    }
-  };
-
 
   const handleChangeLogin = (e) => {
     const { name, value } = e.target;
@@ -197,6 +138,7 @@ const Navbar = () => {
             </ul>
           </div>
           <Typography>
+            {/* Simplified for now - you can add auth status checks later */}
             <Button
               variant="contained"
               size="large"
@@ -213,7 +155,7 @@ const Navbar = () => {
             >
               Login
             </Button>
-            <Button
+            {/* <Button
               variant="contained"
               size="large"
               onClick={handleOpenAdminDialog}
@@ -228,7 +170,7 @@ const Navbar = () => {
               }}
             >
               Admin
-            </Button>
+            </Button> */}
           </Typography>
         </div>
       </div>
@@ -258,6 +200,7 @@ const Navbar = () => {
                   value={registerData.firstName}
                   onChange={handleChangeRegister}
                   variant="outlined"
+                  required
                 />
                 <TextField
                   style={{ flex: 1 }}
@@ -266,6 +209,7 @@ const Navbar = () => {
                   value={registerData.lastName}
                   onChange={handleChangeRegister}
                   variant="outlined"
+                  required
                 />
               </Box>
               <Box display="flex" gap={1} flexWrap="wrap" marginBottom={0}>
@@ -275,6 +219,7 @@ const Navbar = () => {
                     name="gender"
                     value={registerData.gender}
                     onChange={handleChangeRegister}
+                    required
                   >
                     <MenuItem value="male">Male</MenuItem>
                     <MenuItem value="female">Female</MenuItem>
@@ -288,6 +233,7 @@ const Navbar = () => {
                   onChange={handleChangeRegister}
                   type="date"
                   InputLabelProps={{ shrink: true }}
+                  required
                 />
                 <TextField
                   fullWidth
@@ -297,6 +243,7 @@ const Navbar = () => {
                   onChange={handleChangeRegister}
                   variant="outlined"
                   margin="normal"
+                  required
                 />
               </Box>
               <TextField
@@ -307,6 +254,7 @@ const Navbar = () => {
                 onChange={handleChangeRegister}
                 variant="outlined"
                 margin="normal"
+                required
               />
               <TextField
                 fullWidth
@@ -317,6 +265,7 @@ const Navbar = () => {
                 type="password"
                 variant="outlined"
                 margin="normal"
+                required
               />
               <TextField
                 fullWidth
@@ -327,10 +276,11 @@ const Navbar = () => {
                 type="password"
                 variant="outlined"
                 margin="normal"
+                required
               />
               <Button
                 variant="contained"
-                onClick={handleRegister}
+                type="submit"
                 sx={{
                   background: '#34495e',
                   width: '50%',
@@ -344,15 +294,16 @@ const Navbar = () => {
               </Button>
             </form>
           ) : (
-            <form style={{ width: '100%', height: '90%', padding: '40px 20px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+            <form onSubmit={handleLogin} style={{ width: '100%', height: '90%', padding: '40px 20px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
               <TextField
                 sx={{ width: '400px' }}
-                label="Enter Email"
-                name="email"
-                value={loginData.email}
+                label="Enter Username"
+                name="username"
+                value={loginData.username}
                 onChange={handleChangeLogin}
                 variant="outlined"
                 margin="normal"
+                required
               />
               <TextField
                 sx={{ width: '400px', marginBottom: '20px' }}
@@ -363,19 +314,21 @@ const Navbar = () => {
                 type="password"
                 variant="outlined"
                 margin="normal"
+                required
               />
               <Typography sx={{ color: '#1976d2', cursor: 'pointer' }} mb={1.5} onClick={handleOpenForgotPassword}>
                 Forgot Password?
               </Typography>
               <Button
                 variant="contained"
-                onClick={handleLogin}
+                type="submit"
+                disabled={isLoginPending}
                 sx={{
                   width: '250px',
                   background: '#34495e',
                 }}
               >
-                Login
+                {isLoginPending ? <CircularProgress size={24} color="inherit" /> : 'Login'}
               </Button>
             </form>
           )}
@@ -390,7 +343,8 @@ const Navbar = () => {
         </Box>
       </Dialog>
 
-      <Dialog
+      {/* Admin Login Dialog */}
+      {/* <Dialog
         open={openAdminDialog}
         onClose={handleCloseAdminDialog}
         sx={{
@@ -440,6 +394,7 @@ const Navbar = () => {
             startAdornment: <InputAdornment position="start"></InputAdornment>,
             style: { color: 'black', marginBottom: '18px', fontWeight: 700, borderRadius: '13px' },
           }}
+          required
         />
 
         <TextField
@@ -454,15 +409,16 @@ const Navbar = () => {
             startAdornment: <InputAdornment position="start"></InputAdornment>,
             style: { color: 'black', marginBottom: '15px', borderRadius: '13px', fontWeight: 700 },
           }}
+          required
         />
 
-        <Typography sx={{ color: 'black' }} onClick={handleOpenForgotPassword}>
+        <Typography sx={{ color: 'black', cursor: 'pointer' }} onClick={handleOpenForgotPassword}>
           Forgot Password?
         </Typography>
         <Typography style={{ display: 'flex', alignItems: 'center', justifySelf: 'flex-end', gap: '6px' }}>
           <Button
             variant="outlined"
-            onClick={handleAdminLogin}
+            onClick={handleLogin}
             sx={{
               marginTop: '20px',
               color: 'black',
@@ -487,110 +443,109 @@ const Navbar = () => {
             Cancel
           </Button>
         </Typography>
-      </Dialog>
+      </Dialog> */}
 
-      <div>
-        <Dialog open={openForgotPassword} onClose={handleCloseForgotPassword}>
-          <Box
-            component="form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              otpSent ? handleResetPassword() : handleSendOtp();
-            }}
-            sx={{
-              padding: '20px',
-              width: '400px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '20px',
-            }}
+      {/* Forgot Password Dialog */}
+      <Dialog open={openForgotPassword} onClose={handleCloseForgotPassword}>
+        <Box
+          component="form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            otpSent ? handleResetPassword() : handleSendOtp();
+          }}
+          sx={{
+            padding: '20px',
+            width: '400px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+          }}
+        >
+          {!otpSent ? (
+            <>
+              <Typography variant="h6" textAlign="center">
+                Forgot Password
+              </Typography>
+              <TextField
+                fullWidth
+                label="Enter Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                variant="outlined"
+                margin="normal"
+                required
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  width: '150px',
+                  alignSelf: 'center',
+                  background: '#34495e',
+                }}
+              >
+                Send OTP
+              </Button>
+            </>
+          ) : (
+            <>
+              <Typography variant="h6" textAlign="center">
+                Reset Password
+              </Typography>
+              <TextField
+                fullWidth
+                label="Enter OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                variant="outlined"
+                required
+              />
+              <TextField
+                fullWidth
+                label="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                variant="outlined"
+                type="password"
+                required
+              />
+              <TextField
+                fullWidth
+                label="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                variant="outlined"
+                type="password"
+                required
+              />
+              {error && (
+                <Typography color="error" textAlign="center">
+                  {error}
+                </Typography>
+              )}
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  width: '190px',
+                  padding: '10px',
+                  alignSelf: 'center',
+                  background: '#34495e',
+                  marginTop: '10px',
+                }}
+              >
+                Reset Password
+              </Button>
+            </>
+          )}
+          <Button
+            onClick={handleCloseForgotPassword}
+            sx={{ alignSelf: 'center', color: '#1976d2', '&:hover': { backgroundColor: 'transparent' } }}
           >
-            {!otpSent ? (
-              <>
-                <Typography variant="h6" textAlign="center">
-                  Forgot Password
-                </Typography>
-                <TextField
-                  fullWidth
-                  label="Enter Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  variant="outlined"
-                  margin="normal"
-                  required
-                />
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{
-                    width: '150px',
-                    alignSelf: 'center',
-                    background: '#34495e',
-                  }}
-                >
-                  Send OTP
-                </Button>
-              </>
-            ) : (
-              <>
-                <Typography variant="h6" textAlign="center">
-                  Reset Password
-                </Typography>
-                <TextField
-                  fullWidth
-                  label="Enter OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  variant="outlined"
-                  required
-                />
-                <TextField
-                  fullWidth
-                  label="New Password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  variant="outlined"
-                  type="password"
-                  required
-                />
-                <TextField
-                  fullWidth
-                  label="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  variant="outlined"
-                  type="password"
-                  required
-                />
-                {error && (
-                  <Typography color="error" textAlign="center">
-                    {error}
-                  </Typography>
-                )}
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{
-                    width: '190px',
-                    padding: '10px',
-                    alignSelf: 'center',
-                    background: '#34495e',
-                    marginTop: '10px',
-                  }}
-                >
-                  Reset Password
-                </Button>
-              </>
-            )}
-            <Button
-              onClick={handleCloseForgotPassword}
-              sx={{ alignSelf: 'center', color: '#1976d2', '&:hover': { backgroundColor: 'transparent' } }}
-            >
-              Cancel
-            </Button>
-          </Box>
-        </Dialog>
-      </div>
+            Cancel
+          </Button>
+        </Box>
+      </Dialog>
     </div>
   );
 };
