@@ -59,9 +59,20 @@ const Navbar = () => {
   //     }
   //   });
   // };
-  const handleLogin = () => {
+  // const handleLogin = () => {
+  //   e.preventDefault();
+  //   login(loginData);
+  //   navigate('/user');
+  // };
+  const handleLogin = (e) => {
     e.preventDefault();
-    mutate(loginData);
+    
+    if (!loginData.username || !loginData.password) {
+      toast.error('Both username and password are required');
+      return;
+    }
+    
+    login(loginData);
   };
 
   const handleOpenAdminDialog = () => setOpenAdminDialog(true);

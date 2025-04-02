@@ -20,13 +20,11 @@ export const useLoginMutation = () => {
 
         toast.success(response.message);
         const role = TokenService.getRole();
-        // console.log("Role from response:", response.user?.role);
-        console.log("Role from token:", TokenService.getRole());
         if (role === "FreeUser") {
           
-          navigate("/user");
+          navigate("/user/userDashboard");
         } else if (role === "Admin") {
-          navigate("/admin");
+          navigate("/admin/dashboard");
         } else {
           console.error("Invalid role:", role);
           localStorage.clear();

@@ -82,7 +82,7 @@ const App = () => {
 
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />}>
-              <Route index element={<Dashboard />} />
+              <Route path="dashboard" element={<Dashboard />} />
               <Route path="user-table" element={<UserTable />} />
               <Route path="userData" element={<UserData />} />
               <Route path="renewals" element={<RenewalsData />} />
@@ -106,7 +106,7 @@ const App = () => {
 
             {/* User Routes */}
             <Route path="/user" element={<UserNavBar />}>
-              <Route index element={<UserDashboard />} />
+              <Route path="userDashboard" element={<UserDashboard />} />
               <Route path="profile" element={<Profile />} />
               <Route path="MyMatches" element={<MyMatches />} />
               <Route path="myintrest" element={<MyInterest />} />
