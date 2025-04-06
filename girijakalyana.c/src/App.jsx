@@ -5,6 +5,7 @@ import { CircularProgress } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import './App.css';
+import ProfileProvider from './components/usecontext/ProfileProvider';
 
 // Create a query client with default options
 const queryClient = new QueryClient({
@@ -60,6 +61,7 @@ const Profile = lazy(() => import('./components/Userprofile/profile/Profile'));
 
 const App = () => {
   return (
+    <ProfileProvider>
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={
         <div style={{
@@ -134,10 +136,13 @@ const App = () => {
       </Suspense>
       
       {/* React Query Devtools - Only in development */}
-      {process.env.NODE_ENV === 'development' && (
+      {/* {process.env.NODE_ENV === 'development' && (
         <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
-      )}
+      )} */}
     </QueryClientProvider>
+
+    {/* <ProfileViewer /> */}
+    </ProfileProvider>
   );
 };
 
