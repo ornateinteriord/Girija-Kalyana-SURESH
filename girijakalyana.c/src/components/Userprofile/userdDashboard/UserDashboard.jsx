@@ -1,82 +1,71 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Divider,
   Stack,
-  Pagination,
   Typography,
-  Link as MuiLink,
+  CircularProgress,
+  Alert,
+  Button,
+  Pagination,
 } from "@mui/material";
-import { Link } from "react-router-dom";
-import { FaHeart, FaRegEnvelope } from "react-icons/fa";
-import { MdOutlineChatBubble } from "react-icons/md";
+import { toast } from "react-toastify";
+import TokenService from "../../token/tokenService";
+import useGetMemberDetails from "../../api/User/useGetProfileDetails";
 import HomeUserTable from "../../userupgrade/HomeUserTable";
 
 const UserDashboard = () => {
-  const [interestedProfiles, setInterestedProfiles] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const cardsPerPage = 3;
 
-  useEffect(() => {
-    const storedFirstName = sessionStorage.getItem("firstName");
-    const storedLastName = sessionStorage.getItem("lastName"); // Fixed storage retrieval
+  const registerNo = TokenService.getRegistrationNo();
 
-    if (storedFirstName) setFirstName(storedFirstName);
-    if (storedLastName) setLastName(storedLastName);
-  }, []);
+  const {
+    data: userProfile,
+    isLoading: profileLoading,
+    isError: profileError,
+    refetch: refetchProfile,
+  } = useGetMemberDetails(registerNo);
 
-  useEffect(() => {
-    const fetchInterestedUsers = async () => {
-      try {
-        const storedUser = sessionStorage.getItem("userData");
-  
-        if (!storedUser) {
-          console.warn("No user data found in sessionStorage.");
-          return;
-        }
-        
-  
-        const parsedUser = JSON.parse(storedUser);
-        if (!parsedUser || !parsedUser._id) {
-          console.warn("Invalid user data in sessionStorage.");
-          return;
-        }
-  
-        const response = await fetch(
-          `http://localhost:5000/api/user-dashboard/${parsedUser._id}`
-        );
-  
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-  
-        const data = await response.json();
-        console.log("Fetched User Data:", data); // Debugging step
-  
-        if (data && data.interestedUsers) {
-          setInterestedProfiles(data.interestedUsers);
-        } else {
-          console.warn("No interested users found in response.");
-        }
-      } catch (error) {
-        console.error("Error fetching interested users:", error.message);
-      }
-    };
-  
-    fetchInterestedUsers();
-  }, []);
-  ;
+ 
+
+  const handleRefresh = () => {
+    refetchProfile();
+    toast.success("Data refreshed successfully");
+  };
+
+  // Dummy array to mimic profile card layout (replace later)
+  const dummyProfiles = []; // keep empty or fill with mock data if needed
+
+  const currentCards = dummyProfiles.slice(
+    (currentPage - 1) * cardsPerPage,
+    currentPage * cardsPerPage
+  );
 
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
 
-  const currentCards = interestedProfiles.slice(
-    (currentPage - 1) * cardsPerPage,
-    currentPage * cardsPerPage
-  );
+  if (profileLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+        <CircularProgress size={60} />
+      </Box>
+    );
+  }
+
+  if (profileError) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {profileError?.message || "Failed to load data"}
+        </Alert>
+        <Button variant="contained" onClick={handleRefresh} sx={{ mt: 2 }}>
+          Retry
+        </Button>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -84,7 +73,7 @@ const UserDashboard = () => {
         backgroundColor: "#f4f6f8",
         minHeight: "100vh",
         padding: "10px 24px",
-        mt:'0'
+        mt: "0",
       }}
     >
       <Box sx={{ textAlign: "center", mb: 1 }}>
@@ -94,154 +83,34 @@ const UserDashboard = () => {
           color="#34495e"
           textTransform="capitalize"
         >
-          Welcome {firstName} {lastName}
+          Welcome {userProfile?.first_name || "User"} {userProfile?.last_name || ""}
         </Typography>
-        <Divider sx={{ mt: 0.5 }} />
+        <Divider sx={{ mt: 1 }} />
       </Box>
 
       <Stack spacing={3}>
-        {/* Top Statistics Cards */}
-        {/* <Stack
-          direction="row"
-          spacing={3}
-          justifyContent="space-around"
-          sx={{ marginBottom: "24px" }}
-        >
-          {[
-            {
-              count: interestedProfiles.length, // Dynamic count
-              label: "Interested Profiles",
-              icon: FaHeart,
-            },
-            { count: 2, label: "Messages", icon: FaRegEnvelope },
-            { count: 3, label: "Chats", icon: MdOutlineChatBubble },
-          ].map((item, index) => (
-            <Box
-              key={index}
-              sx={{
-                backgroundColor: "#ffffff",
-                borderRadius: "8px",
-                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                padding: "14px 50px",
-                textAlign: "center",
-                flex: 1,
-                "&:hover": {
-                  backgroundColor: "#f0f4ff",
-                },
-              }}
-            >
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-around"
-              >
-                <Typography>
-                  <item.icon size={40} color="black" />
-                </Typography>
-                <Box display="flex" flexDirection="column">
-                  <Typography variant="h5" fontWeight="bold" mt={1}>
-                    {item.count}
-                  </Typography>
-                  <Typography
-                    variant="subtitle1"
-                    fontWeight={700}
-                    fontSize={20}
-                    sx={{ color: "#34495e" }}
-                  >
-                    {item.label}
-                  </Typography>
-                  <MuiLink
-                    component={Link}
-                    to="#"
-                    sx={{ textDecoration: "none", color: "#3f51b5", mt: 1 }}
-                  >
-                    View All
-                  </MuiLink>
-                </Box>
-              </Box>
-            </Box>
-          ))}
-        </Stack> */}
+        <HomeUserTable />
 
-
-        <HomeUserTable/>
-
-        {/* Interested Profiles List */}
+        {/* Interested Profiles Section (UI only, logic removed) */}
         <Box>
-          <Typography
-            variant="h4"
-            fontWeight="bold"
-            mb={2}
-            sx={{ color: "#34495e" }}
-          >
-            Interested Profiles
-          </Typography>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              mb={2}
+              sx={{ color: "#34495e" }}
+            >
+              Interested Profiles
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Showing {currentCards.length} of {dummyProfiles.length} profiles
+            </Typography>
+          </Box>
 
           <Box display="flex" flexWrap="wrap" gap={4}>
-            {interestedProfiles.length > 0 ? (
+            {currentCards.length > 0 ? (
               currentCards.map((profile, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    backgroundColor: "#ffffff",
-                    borderRadius: "8px",
-                    padding: "16px",
-                    marginBottom: "16px",
-                    width: "350px",
-                  }}
-                >
-                  <Box display="flex" alignItems="center">
-                    <Box
-                      display="flex"
-                      justifyContent="space-evenly"
-                      alignItems="center"
-                    >
-                      <img
-                        src={profile.profileImg || "/default-placeholder.png"}
-                        alt="Profile"
-                        style={{
-                          width: "100px",
-                          height: "90px",
-                          borderRadius: "10px",
-                        }}
-                      />
-                      <Box ml={2}>
-                        <Typography variant="h6" fontWeight="bold">
-                          {profile.firstName || "N/A"} {profile.lastName || ""}
-                        </Typography>
-                        <Typography variant="body2" color="textprimary">
-                          {profile.address || "Not Available"}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    mt={2}
-                    sx={{ fontSize: "14px", color: "gray" }}
-                  >
-                    <Box textAlign="center">
-                      <Typography fontWeight="bold">
-                      {profile.dob ? new Date(profile.dob).toLocaleDateString("en-US", { day: '2-digit', month: 'short', year: 'numeric' }) : "N/A"}
-
-                      </Typography>
-                      <Typography>Dob</Typography>
-                    </Box>
-                    <Box textAlign="center">
-                      <Typography fontWeight="bold">
-                        {profile.height || "N/A"}
-                      </Typography>
-                      <Typography>Height</Typography>
-                    </Box>
-                    <Box textAlign="center">
-                      <Typography fontWeight="bold">
-                        {profile.regNo || "N/A"}
-                      </Typography>
-                      <Typography>Reg No</Typography>
-                    </Box>
-                  </Box>
-                </Box>
+                <ProfileCard key={index} profile={profile} />
               ))
             ) : (
               <Typography
@@ -250,6 +119,7 @@ const UserDashboard = () => {
                   fontSize: "17px",
                   fontWeight: "bold",
                   textAlign: "center",
+                  width: "100%",
                 }}
               >
                 No interested profiles yet.
@@ -257,23 +127,95 @@ const UserDashboard = () => {
             )}
           </Box>
 
-          {/* Pagination */}
-          <Pagination
-            count={Math.ceil(interestedProfiles.length / cardsPerPage)}
-            page={currentPage}
-            onChange={handlePageChange}
-            shape="rounded"
-            color="primary"
-            sx={{
-              display: "flex",
-              justifyContent: "flex-end",
-              mt: 1,
-            }}
-          />
+          {dummyProfiles.length > cardsPerPage && (
+            <Pagination
+              count={Math.ceil(dummyProfiles.length / cardsPerPage)}
+              page={currentPage}
+              onChange={handlePageChange}
+              shape="rounded"
+              color="primary"
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                mt: 3,
+              }}
+            />
+          )}
         </Box>
       </Stack>
     </Box>
   );
 };
+
+const ProfileCard = ({ profile }) => (
+  <Box
+    sx={{
+      backgroundColor: "#ffffff",
+      borderRadius: "8px",
+      padding: "16px",
+      width: "350px",
+      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+      transition: "transform 0.2s",
+      "&:hover": {
+        transform: "translateY(-2px)",
+        boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+      },
+    }}
+  >
+    <Box display="flex" alignItems="center">
+      <Box display="flex" justifyContent="space-evenly" alignItems="center">
+        <img
+          src={profile.profile_img || "/default-profile.png"}
+          alt="Profile"
+          style={{
+            width: "100px",
+            height: "100px",
+            borderRadius: "50%",
+            objectFit: "cover",
+          }}
+          onError={(e) => {
+            e.target.src = "/default-profile.png";
+          }}
+        />
+        <Box ml={2}>
+          <Typography variant="h6" fontWeight="bold">
+            {profile.first_name || "N/A"} {profile.last_name || ""}
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            {profile.city || "Location not specified"}
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            Reg No: {profile.registration_no || "N/A"}
+          </Typography>
+        </Box>
+      </Box>
+    </Box>
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      mt={2}
+      sx={{ fontSize: "14px", color: "gray" }}
+    >
+      <Box textAlign="center">
+        <Typography fontWeight="bold">
+          {profile.age || "N/A"} yrs
+        </Typography>
+        <Typography>Age</Typography>
+      </Box>
+      <Box textAlign="center">
+        <Typography fontWeight="bold">
+          {profile.height || "N/A"}
+        </Typography>
+        <Typography>Height</Typography>
+      </Box>
+      <Box textAlign="center">
+        <Typography fontWeight="bold">
+          {profile.occupation || "N/A"}
+        </Typography>
+        <Typography>Occupation</Typography>
+      </Box>
+    </Box>
+  </Box>
+);
 
 export default UserDashboard;

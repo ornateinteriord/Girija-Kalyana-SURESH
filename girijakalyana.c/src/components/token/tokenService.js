@@ -44,6 +44,13 @@ class TokenService {
 
   }
  
+  static getRegistrationNo() {
+  
+    const decoded = this.decodeToken();
+    console.log("qwertd",decoded?.ref_no)
+    return decoded?.ref_no ||  null;
+   
+  }
  
  
   static getUserId() {

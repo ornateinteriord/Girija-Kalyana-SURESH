@@ -29,9 +29,10 @@ import { Outlet, useNavigate } from "react-router-dom";
 import UserDashboard from "../userdDashboard/UserDashboard";
 import { convertFromBase64 } from "../profile/photo/Photos";
 import useStore from "../../../store";
+import useGetMemberDetails from "../../api/User/useGetProfileDetails";
+import TokenService from "../../token/tokenService";
 
 const drawerWidth = 240;
-// const user = "Ramesh V";
 
 const theme = createTheme({
   typography: {
@@ -40,45 +41,32 @@ const theme = createTheme({
 });
 
 const UserNavBar = () => {
-  const {profileImage,firstName, setFirstName}=useStore();
+  const { profileImage, firstName, setFirstName, setProfileImage } = useStore();
   const [anchorEl, setAnchorEl] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const navigation = useNavigate();
-  const [file, setFile] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
-  const profileImg = localStorage.getItem("profileImg");
-  // console.log("====!!!>", profileImg)
+  const registerNo = TokenService.getRegistrationNo();
+
+  const {
+    data: userProfile,
+    isLoading: profileLoading,
+    isError: profileError,
+    refetch: refetchProfile,
+  } = useGetMemberDetails(registerNo);
+
   useEffect(() => {
-    if (profileImg) {
-      try {
-        
-        const parsedProfileImg = JSON.parse(profileImg);
-        if (parsedProfileImg.startsWith("data:image/")) {
-          convertFromBase64(parsedProfileImg, "profileImg")
-            .then((convertedFile) => {
-              setFile(convertedFile); 
-            })
-            .catch((error) => {
-              console.error("Error converting Base64 to File:", error.message);
-            });
-        } else {
-          console.error("Invalid Base64 image format.");
-        }
-      } catch (error) {
-        console.error("Error parsing profileImg from localStorage:", error.message);
+    if (userProfile) {
+      setFirstName(userProfile.firstName || "");
+      if (userProfile.profileImage) {
+        const url = convertFromBase64(userProfile.profileImage);
+        setImageUrl(url);
+        setProfileImage(url);
       }
     }
-  }, [profileImage]);
-  
-  const imageUrl = file ? URL.createObjectURL(file) : null;
-  
-  useEffect(() => {
-    const storedFirstName = sessionStorage.getItem("firstName");
-    if (storedFirstName) {
-      setFirstName(storedFirstName); // Update state with first name
-    }
-  }, [firstName]);
-  
+  }, [userProfile, setFirstName, setProfileImage]);
+
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -120,6 +108,9 @@ const UserNavBar = () => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  if (profileLoading) return <div>Loading...</div>;
+  if (profileError) return <div>Error loading profile</div>;
 
   return (
     <>
@@ -163,19 +154,19 @@ const UserNavBar = () => {
                   marginRight={"10px"}
                   textTransform={"capitalize"}
                 >
-                  {firstName}
+                  {userProfile?.first_name}
                 </Typography>
-                {
-                  <Avatar
-                  src={imageUrl ? imageUrl : firstName}
-                    alt={firstName}
-                    sx={{
-                      color: "black",
-                      fontWeight: "bold",
-                      textTransform: "uppercase",
-                    }}
-                  />
-                }
+                <Avatar
+                  src={imageUrl || profileImage}
+                  alt={firstName}
+                  sx={{
+                    color: "black",
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {!imageUrl && !profileImage && firstName?.[0]}
+                </Avatar>
               </IconButton>
               <Menu
                 anchorEl={anchorEl}
@@ -190,7 +181,7 @@ const UserNavBar = () => {
                   horizontal: "right",
                 }}
               >
-                <MenuItem onClick={handleMenuClose}>My Profile</MenuItem>
+                <MenuItem onClick={handleProfileClick}>My Profile</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </Toolbar>
@@ -217,13 +208,28 @@ const UserNavBar = () => {
             <Box sx={{ overflow: "auto" }}>
               <List>
                 <ListItem>
-                  <Box sx={{ textAlign: "center", py: 2 }}>
+                  <Box sx={{ textAlign: "center", py: 0 }}>
+                    {/* <Avatar
+                      src={imageUrl || profileImage}
+                      alt={firstName}
+                      sx={{
+                        width: 80,
+                        height: 80,
+                        margin: "0 auto",
+                        mb: 2,
+                        color: "black",
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {!imageUrl && !profileImage && firstName?.[0]}
+                    </Avatar> */}
                     <Typography
                       variant="h5"
                       marginLeft={2}
                       textTransform={"capitalize"}
                     >
-                      {firstName}
+                      {userProfile?.first_name}
                     </Typography>
                   </Box>
                 </ListItem>
@@ -293,19 +299,16 @@ const UserNavBar = () => {
             component="main"
             sx={{
               flexGrow: 1,
-
               marginTop: 1,
               paddingLeft: isSidebarOpen ? `30px` : "20px",
               transition: "padding-left 0.4s ease",
             }}
           >
             <Toolbar />
-
             <Outlet />
           </Box>
         </Box>
       </ThemeProvider>
-      {/* <UserDashboard/> */}
     </>
   );
 };

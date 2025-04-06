@@ -1,62 +1,61 @@
 import React, { useEffect, useState } from "react";
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-  TextField, Pagination, Stack, InputAdornment, MenuItem, Select, FormControl, InputLabel,
+  TextField, Pagination, Stack, InputAdornment, MenuItem, Select, FormControl,
   Typography,
   Box
 } from "@mui/material";
-import axios from "axios";
 import { FaSearch } from "react-icons/fa";
+import { useGetAllMembersDetails } from "../../api/Admin/index";
 import toast from "react-hot-toast";
 
 const UserTable = () => {
-  const [users, setUsers] = useState([]);
+  const { data: users = [], isLoading, error } = useGetAllMembersDetails();
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUserType, setSelectedUserType] = useState("all");
- const [rowsPerPage, setRowsPerPage] = useState(6);
+  const [rowsPerPage, setRowsPerPage] = useState(6);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/users");
-        if (Array.isArray(response.data)) {
-          setUsers(response.data);
-          setFilteredUsers(response.data);
-        } else {
-          console.error("Unexpected API response:", response.data);
-          setUsers([]);
-          setFilteredUsers([]);
-        }
-      } catch (error) {
-        toast.error("Failed to fetch users");
-        console.error("Fetch error:", error);
-      }
-    };
-    fetchUsers();
-  }, []);
+    if (users && users.length > 0) {
+      filterUsers(searchTerm, selectedUserType);
+    }
+  }, [users, searchTerm, selectedUserType]);
 
   const handleSearch = (value) => {
     setSearchTerm(value);
-    filterUsers(value, selectedUserType);
   };
 
   const handleUserTypeChange = (event) => {
     setSelectedUserType(event.target.value);
-    filterUsers(searchTerm, event.target.value);
   };
 
   const filterUsers = (search, userType) => {
-    let filtered = users.filter(user => 
-      user.firstName.toLowerCase().includes(search.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase()) ||
-      user.mobile.includes(search)
-    );
+    let filtered = users.filter(user => {
+      const username = user?.username?.toLowerCase() || '';
+      const ref_no = user?.ref_no?.toLowerCase() || '';
+      const searchLower = search.toLowerCase();
+      
+      return username.includes(searchLower) || ref_no.includes(searchLower);
+    });
     
     if (userType !== "all") {
-      filtered = filtered.filter(user => user.userType.toLowerCase() === userType);
+      filtered = filtered.filter(user => {
+        const userRole = user?.user_role?.toLowerCase();
+        
+        // Map frontend filter names to backend role names
+        switch(userType) {
+          case "premium":
+            return userRole === "premiumuser";
+          case "silver":
+            return userRole === "silveruser";
+          case "free":
+            return userRole === "freeuser";
+          default:
+            return true;
+        }
+      });
     }
     
     setFilteredUsers(filtered);
@@ -67,11 +66,19 @@ const UserTable = () => {
   const indexOfFirstUser = indexOfLastUser - rowsPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
 
-  
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setCurrentPage(1);
   };
+
+  const formatUserRole = (role) => {
+    // Remove 'User' suffix and capitalize first letter
+    if (!role) return '';
+    return role.replace('User', '').replace(/^\w/, c => c.toUpperCase());
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading users</div>;
 
   return (
     <div style={{ padding: "20px", marginTop: "60px", fontFamily: "Outfit, sans-serif", marginLeft: '20px' }}>
@@ -82,77 +89,100 @@ const UserTable = () => {
       {/* Filter Options */}
       <Stack direction="row" spacing={2} mb={2} justifyContent={'space-between'}>
         <Box gap={2} display={'flex'}>
-        <Box>
-        <TextField
-          placeholder="Search user"
-          label="Search"
-          variant="outlined"
-          value={searchTerm}
-          onChange={(e) => handleSearch(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <FaSearch />
-              </InputAdornment>
-            ),
-          }}
-          style={{ width: "300px" }}
-          fontFamily={"Outfit sans-serif"}
-        />
-        </Box>
-        
-        <Box display="flex" gap={2} alignItems="center">
-                    <Select
-                      value={rowsPerPage}
-                      onChange={handleRowsPerPageChange}
-                      size="medium"
-                      sx={{ minWidth: 120 }}
-                    >
-                      {[6, 10, 15, 20].map((size) => (
-                        <MenuItem key={size} value={size}>
-                          {size}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    
-                  </Box>
+          <Box>
+            <TextField
+              placeholder="Search by username or reference"
+              label="Search"
+              variant="outlined"
+              value={searchTerm}
+              onChange={(e) => handleSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FaSearch />
+                  </InputAdornment>
+                ),
+              }}
+              style={{ width: "300px" }}
+              fontFamily={"Outfit sans-serif"}
+            />
+          </Box>
+          
+          <Box display="flex" gap={2} alignItems="center">
+            <Select
+              value={rowsPerPage}
+              onChange={handleRowsPerPageChange}
+              size="medium"
+              sx={{ minWidth: 120, height: '55px' }}
+            >
+              {[6, 10, 15, 20].map((size) => (
+                <MenuItem key={size} value={size}>
+                  Show {size}
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
         </Box>
         <FormControl style={{ minWidth: 200 }} fontFamily={"Outfit sans-serif"}>
-          <Select value={selectedUserType} onChange={handleUserTypeChange}>
+          <Select 
+            value={selectedUserType} 
+            onChange={handleUserTypeChange}
+            sx={{ height: '50px' }}
+          >
             <MenuItem value="all">All Users</MenuItem>
-            <MenuItem value="silver">Silver Users</MenuItem>
             <MenuItem value="premium">Premium Users</MenuItem>
+            <MenuItem value="silver">Silver Users</MenuItem>
+            <MenuItem value="free">Free Users</MenuItem>
           </Select>
         </FormControl>
       </Stack>
       
       {/* User Table */}
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
         <Table>
-          <TableHead>
+          <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
             <TableRow>
-              <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>S.No</TableCell>
-              <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>Name</TableCell>
-              <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>Email</TableCell>
-              <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>Phone</TableCell>
-              <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>User Type</TableCell>
+              <TableCell style={{ fontFamily: "Outfit sans-serif", fontSize: '19px', fontWeight: 'bold' }}>Sl.No</TableCell>
+              <TableCell style={{ fontFamily: 'Outfit sans-serif', fontSize: '19px', fontWeight: 'bold' }}>Username</TableCell>
+              <TableCell style={{ fontFamily: 'Outfit sans-serif', fontSize: '19px', fontWeight: 'bold' }}>Reference No</TableCell>
+              <TableCell style={{ fontFamily: 'Outfit sans-serif', fontSize: '19px', fontWeight: 'bold' }}>Membership</TableCell>
+              <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '19px', fontWeight: 'bold' }}>Status</TableCell>
+              <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '19px', fontWeight: 'bold' }}>Last Login</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {currentUsers.length > 0 ? (
               currentUsers.map((user, index) => (
-                <TableRow key={user._id}>
-                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>{indexOfFirstUser + index + 1}</TableCell>
-                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>{user.firstName} {user.lastName}</TableCell>
-                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>{user.email}</TableCell>
-                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>{user.mobile}</TableCell>
-                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '18px' }}>{user.userType}</TableCell>
+                <TableRow key={user._id} hover sx={{ '&:hover': { backgroundColor: '#f9f9f9' } }}>
+                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '17px' }}>{indexOfFirstUser + index + 1}</TableCell>
+                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '17px', fontWeight: 500 }}>{user.username}</TableCell>
+                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '17px' }}>{user.ref_no}</TableCell>
+                  <TableCell sx={{ 
+                    fontFamily: 'Outfit sans-serif', 
+                    fontSize: '15px',
+                    color: user.user_role === 'PremiumUser' ? '#FFD700' : 
+                           user.user_role === 'SilverUser' ? '#C0C0C0' : 
+                           user.user_role === 'FreeUser' ? '#4CAF50' : '#333',
+                    fontWeight: 'bold'
+                  }}>
+                    {formatUserRole(user.user_role)}
+                  </TableCell>
+                  <TableCell sx={{ 
+                    fontFamily: 'Outfit sans-serif', 
+                    fontSize: '17px',
+                    color: user.status === 'active' ? '#4CAF50' : '#F44336'
+                  }}>
+                    {user.status?.charAt(0).toUpperCase() + user.status?.slice(1)}
+                  </TableCell>
+                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '17px' }}>
+  {user.last_loggedin ? new Date(user.last_loggedin).toLocaleDateString() : 'Never'}
+</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} style={{ textAlign: "center", padding: "20px" }}>
-                  No users found.
+                <TableCell colSpan={6} sx={{ textAlign: "center", padding: "20px", fontFamily: 'Outfit' }}>
+                  No users found matching your criteria.
                 </TableCell>
               </TableRow>
             )}
@@ -169,6 +199,7 @@ const UserTable = () => {
             onChange={(event, page) => setCurrentPage(page)}
             shape="rounded"
             color="primary"
+            
           />
         </Stack>
       )}

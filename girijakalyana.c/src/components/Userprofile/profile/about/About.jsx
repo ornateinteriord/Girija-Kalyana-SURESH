@@ -1,274 +1,289 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Box, Typography, TextField, Button, Stack } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Stack,
+  CircularProgress,
+} from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
+
+import TokenService from "../../../token/tokenService";
+import useGetMemberDetails, { useUpdateProfile } from "../../../api/User/useGetProfileDetails";
+
 const About = () => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [dob, setDob] = useState("");
-  const [pincode, setPincode] = useState("");
-  const [address, setAddress] = useState("");
-  const [occupationCountry, setOccupationCountry] = useState("");
-  const [language, setLanguage] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [email, setEmail] = useState("");
-  const [state, setState] = useState("");
-
-
-  const [age, setAge] = useState("");
-
+  const registerNo = TokenService.getRegistrationNo();
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Fetch profile data
+  const { 
+    data: userProfile, 
+    isLoading: profileLoading, 
+    isError: profileError 
+  } = useGetMemberDetails(registerNo);
 
+  // Update profile mutation
+  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+
+  // Form state
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    date_of_birth: "",
+    pincode: "",
+    address: "",
+    occupation_country: "",
+    mother_tounge: "",
+    mobile_no: "",
+    email_id: "",
+    state: "",
+    age: "",
+  });
+
+  // Initialize form with fetched data
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userId = localStorage.getItem("userId"); // Get user ID from localStorage
-        if (!userId) {
-          toast.error("User ID not found. Please log in again.");
-          return;
-        }
-
-        // Fetch user data from the backend
-        const { data } = await axios.get(`http://localhost:5000/api/about/${userId}`);
-      
-        const formattedDob = data.dob ? new Date(data.dob).toISOString().split('T')[0] : "";
-
-        // Set state with the fetched data
-        setFirstName(data.firstName || "");
-        setLastName(data.lastName || "");
-        setDob(formattedDob);
-        setPincode(data.pincode || "");
-
-        setAge(data.age || "");
-
-        setAddress(data.address || "");
-        setOccupationCountry(data.occupationCountry || "");
-        setLanguage(data.language || "");
-        setState(data.state || "");
-        setMobile(data.mobile || "");
-        setEmail(data.email || "");
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        toast.error("Failed to fetch user data.");
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleSave = async () => {
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        toast.error("User ID not found. Please login again.");
-        return;
-      }
-
-      const updatedData = {
-        firstName,
-        lastName,
-        dob,
-        pincode,
-
-        age,
-
-        address,
-        state,
-        occupationCountry,
-        language,
-        mobile,
-        email
-      };
-
-      // Send the updated data to the backend
-      await axios.patch(`http://localhost:5000/api/update/${userId}`, updatedData);
-
-      toast.success("User updated successfully!");
-      setIsEditing(false); // Exit edit mode
-    } catch (error) {
-      console.error("Error updating user data:", error);
-      toast.error("Failed to update user data.");
+    if (userProfile) {
+      setFormData({
+        first_name: userProfile.first_name || "",
+        last_name: userProfile.last_name || "",
+        date_of_birth: userProfile.date_of_birth?.split('T')[0] || "",
+        pincode: userProfile.pincode || "",
+        address: userProfile.address || "",
+        occupation_country: userProfile.occupation_country || "",
+        mother_tounge: userProfile.mother_tounge || "",
+        state: userProfile.state || "",
+        mobile_no: userProfile.mobile_no || "",
+        email_id: userProfile.email_id || "",
+        age: userProfile.age || "",
+      });
     }
+  }, [userProfile]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleClear = () => {
-    setFirstName("");
-    setLastName("");
-    setDob("");
-    setPincode("");
-
-    setAge("");
-
-    setAddress("");
-    setState("");
-    setOccupationCountry("");
-    setLanguage("");
-    setMobile("");
-    setEmail("");
+  const handleSave = () => {
+    updateProfile(formData, {
+      onSuccess: () => setIsEditing(false)
+    });
   };
+
+  const handleReset = () => {
+    if (userProfile) {
+      setFormData({
+        first_name: userProfile.first_name || "",
+        last_name: userProfile.last_name || "",
+        date_of_birth: userProfile.date_of_birth?.split('T')[0] || "",
+        pincode: userProfile.pincode || "",
+        address: userProfile.address || "",
+        occupation_country: userProfile.occupation_country || "",
+        mother_tounge: userProfile.mother_tounge || "",
+        state: userProfile.state || "",
+        mobile_no: userProfile.mobile_no || "",
+        email_id: userProfile.email_id || "",
+        age: userProfile.age || "",
+      });
+    }
+    setIsEditing(false);
+  };
+
+  if (profileLoading) return (
+    <Box display="flex" justifyContent="center" p={4}>
+      <CircularProgress />
+    </Box>
+  );
+
+  if (profileError) return (
+    <Box display="flex" justifyContent="center" p={4}>
+      <Typography color="error">Failed to load profile data</Typography>
+    </Box>
+  );
 
   return (
-    <>
-    <Box
-      sx={{
-        boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
-        borderRadius: "8px",
-        backgroundColor: "#fff",
-        width: "90%",
-        // padding:'0px 10px'
-      }}
-    >
-      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+    <Box sx={{
+      bgcolor: 'background.paper',
+      borderRadius: 2,
+      boxShadow: 1,
+      p: 3,
+      maxWidth: 1200,
+      mx: 'auto'
+    }}>
+      {/* Header with edit button */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h5" fontWeight="bold">
+          Profile Information
+        </Typography>
         <Button
           variant={isEditing ? "outlined" : "contained"}
-          style={{
-            cursor: "pointer",
-            color: "#fff",
-            fontSize: "16px",
-            background: `${isEditing ? "red" : "#34495e"}`,
-            textTransform: "capitalize",
-            marginRight: "62px",
-            border: "none",
-          }}
+          color={isEditing ? "error" : "primary"}
           onClick={() => setIsEditing(!isEditing)}
+          disabled={isUpdating}
         >
-          {isEditing ? "Cancel" : "Edit"}
+          {isEditing ? 'Cancel' : 'Edit Profile'}
         </Button>
       </Box>
 
-      <Stack>
-        <Box sx={{ display: "flex", gap: "20px", justifyContent: "space-evenly",padding:1 }} >
-
-    
-          <Box>
-            <Typography variant="h5" fontWeight={700} color="#34495e" gutterBottom>
-             Basic Information
-            </Typography>
-            <Stack spacing={3}>
+      {/* Two-column form layout */}
+      <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={4}>
+        {/* Personal Information */}
+        <Box>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+            Personal Details
+          </Typography>
+          <Stack spacing={2}>
             <TextField
-                label="Age"
-                placeholder="Age"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                disabled={!isEditing}
-                sx={{ width: "500px" }}
-              />
-              <TextField
-                label="Address"
-                placeholder="Address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                disabled={!isEditing}
-                sx={{ width: "500px" }}
-              />
-              <TextField
-                label="Pin Code"
-                placeholder="Pin Code"
-                value={pincode}
-                onChange={(e) => setPincode(e.target.value)}
-                disabled={!isEditing}
-                sx={{ width: "500px" }}
-              />
-               <TextField
-                label="State"
-                placeholder="State name"
-                value={state}
-                onChange={(e) => setState(e.target.value)}
-                disabled={!isEditing}
-                sx={{ width: "500px" }}
-              />
-
-              <TextField
-                label="Language"
-                placeholder="Language"
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                disabled={!isEditing}
-                sx={{ width: "500px" }}
-              />
-              <TextField
-                label=" Country"
-                placeholder="Occupation Country"
-                value={occupationCountry}
-                onChange={(e) => setOccupationCountry(e.target.value)}
-                disabled={!isEditing}
-                sx={{ width: "500px" }}
-              />
-            </Stack>
-          </Box>
-
-
-          <Box>
-            <Typography variant="h5" fontWeight={700} color="#34495e" gutterBottom>
-            Personal Information
-            </Typography>
-            <Stack spacing={3}>
-              <TextField
-                label="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                disabled={!isEditing}
-                sx={{ width: "500px" }}
-              />
-              <TextField
-                label="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                disabled={!isEditing}
-                sx={{ width: "500px" }}
-              />
-              <TextField
-                label="Date of Birth"
-                type="date"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-                disabled={!isEditing}
-                sx={{ width: "500px" }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-              <TextField
-                label="Mobile"
-                value={mobile}
-                onChange={(e) => setMobile(e.target.value)}
-                disabled={!isEditing}
-                sx={{ width: "500px" }}
-              />
-              <TextField
-                label="Email"
-                value={email}
-                disabled={!isEditing}
-                onChange={(e) => setEmail(e.target.value)}
-                sx={{ width: "500px" }}
-              />
-            </Stack>
-          </Box>
-
+              label="First Name"
+              name="first_name"
+              value={formData.first_name}
+              onChange={handleChange}
+              disabled={!isEditing || isUpdating}
+              fullWidth
+            />
+            <TextField
+              label="Last Name"
+              name="last_name"
+              value={formData.last_name}
+              onChange={handleChange}
+              disabled={!isEditing || isUpdating}
+              fullWidth
+            />
+            <TextField
+              label="Date of Birth"
+              name="date_of_birth"
+              type="date"
+              value={formData.date_of_birth}
+              onChange={handleChange}
+              disabled={!isEditing || isUpdating}
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+            />
+            <TextField
+              label="Age"
+              name="age"
+              type="number"
+              value={formData.age}
+              onChange={handleChange}
+              disabled={!isEditing || isUpdating}
+              fullWidth
+            />
+          </Stack>
         </Box>
-      </Stack>
 
+        {/* Contact Information */}
+        <Box>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+            Contact Details
+          </Typography>
+          <Stack spacing={2}>
+            <TextField
+              label="Mobile Number"
+              name="mobile_no"
+              value={formData.mobile_no}
+              onChange={handleChange}
+              disabled={!isEditing || isUpdating}
+              fullWidth
+            />
+            <TextField
+              label="Email"
+              name="email_id"
+              type="email"
+              value={formData.email_id}
+              onChange={handleChange}
+              disabled={!isEditing || isUpdating}
+              fullWidth
+            />
+            <TextField
+              label="Address"
+              name="address"
+              multiline
+              rows={3}
+              value={formData.address}
+              onChange={handleChange}
+              disabled={!isEditing || isUpdating}
+              fullWidth
+            />
+          </Stack>
+        </Box>
+
+        {/* Location Information */}
+        <Box>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+            Location Details
+          </Typography>
+          <Stack spacing={2}>
+            <TextField
+              label="State"
+              name="state"
+              value={formData.state}
+              onChange={handleChange}
+              disabled={!isEditing || isUpdating}
+              fullWidth
+            />
+            <TextField
+              label="Pin Code"
+              name="pincode"
+              value={formData.pincode}
+              onChange={handleChange}
+              disabled={!isEditing || isUpdating}
+              fullWidth
+            />
+            <TextField
+              label="Occupation Country"
+              name="occupation_country"
+              value={formData.occupation_country}
+              onChange={handleChange}
+              disabled={!isEditing || isUpdating}
+              fullWidth
+            />
+          </Stack>
+        </Box>
+
+        {/* Additional Information */}
+        <Box>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+            Additional Details
+          </Typography>
+          <Stack spacing={2}>
+            <TextField
+              label="Mother Tongue"
+              name="mother_tounge"
+              value={formData.mother_tounge}
+              onChange={handleChange}
+              disabled={!isEditing || isUpdating}
+              fullWidth
+            />
+          </Stack>
+        </Box>
+      </Box>
+
+      {/* Save/Reset buttons */}
       {isEditing && (
-        <Box mt={1} display="flex" gap={2} sx={{ marginRight: "62px",marginBottom:1 }} justifySelf="flex-end">
+        <Box display="flex" justifyContent="flex-end" gap={2} mt={4}>
           <Button
-            variant="contained"
-            sx={{ background: "#34495e", textTransform: "capitalize" }}
-            onClick={handleClear}
+            variant="outlined"
+            color="error"
+            onClick={handleReset}
+            disabled={isUpdating}
           >
-            Clear
+            Reset
           </Button>
           <Button
             variant="contained"
-            sx={{ background: "#34495e", textTransform: "capitalize" }}
+            color="primary"
             onClick={handleSave}
+            disabled={isUpdating}
+            startIcon={isUpdating ? <CircularProgress size={20} /> : null}
           >
-            Save
+            {isUpdating ? 'Saving...' : 'Save Changes'}
           </Button>
         </Box>
       )}
     </Box>
-    </>
   );
 };
 
