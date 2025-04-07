@@ -29,8 +29,9 @@ import { Outlet, useNavigate } from "react-router-dom";
 import UserDashboard from "../userdDashboard/UserDashboard";
 import { convertFromBase64 } from "../profile/photo/Photos";
 import useStore from "../../../store";
-import useGetMemberDetails from "../../api/User/useGetProfileDetails";
+
 import TokenService from "../../token/tokenService";
+import { useGetMemberDetails } from "../../api/User/useGetProfileDetails";
 
 const drawerWidth = 240;
 

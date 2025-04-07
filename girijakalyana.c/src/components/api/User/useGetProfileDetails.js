@@ -5,10 +5,8 @@ import { toast } from "react-toastify";
 import { get, put } from "../authHooks";
 import TokenService from "../../token/tokenService";
 
-
-
   // your logic
-   const useGetMemberDetails = (reg_No) => {
+  export const useGetMemberDetails = (reg_No) => {
 
     return useQuery({
       queryKey: ["userDetails", reg_No], // Cache key
@@ -25,29 +23,28 @@ import TokenService from "../../token/tokenService";
     });
   };
 
-  
-export const useUpdateProfile = () => {
-  const queryClient = useQueryClient();
-  const registerNo = TokenService.getRegistrationNo();
-  
-  return useMutation({
-    mutationFn: async (data) => {
-      const response = await put(`/api/user/profile/${registerNo}`, data);
-      if (!response.success) {
-        throw new Error(response.message || "Failed to update profile");
+  export const useUpdateProfile = () => {
+    const queryClient = useQueryClient();
+    const reg_No = TokenService.getRegistrationNo(); 
+    
+    return useMutation({
+      mutationFn: async (data) => {
+        // Calls PUT /api/user/profile/:registerNo
+        return await put(`/api/user/update-profile/${reg_No}`, data);
+        
+      },
+      onSuccess: (response) => {
+        if(response.success){
+          toast.success(response.message);
+          queryClient.invalidateQueries({ queryKey: ["userDetails", reg_No] });
+        }else{
+          console.error(response.message)
+        }
+       
+      
+      },
+      onError: (error) => {
+        toast.error(error.message);
       }
-      return response.data;
-    },
-    onSuccess: () => {
-      toast.success("Profile updated successfully");
-      // Invalidate both user details queries to refresh the data
-      queryClient.invalidateQueries({ queryKey: ["userDetails", registerNo] });
-      queryClient.invalidateQueries({ queryKey: ["memberDetails"] });
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to update profile");
-      console.error("Update error:", error);
-    }
-  });
-};
-export default useGetMemberDetails;
+    });
+  };
