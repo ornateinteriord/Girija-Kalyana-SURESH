@@ -1,250 +1,220 @@
-
 import React, { useEffect, useState } from "react";
 import {
   Box,
-  Dialog,
-  DialogContent,
-  DialogActions,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
   Typography,
   Button,
-  Select,
-  MenuItem,
   TextField,
+  CircularProgress,
+  Divider,
 } from "@mui/material";
-import { FaEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
-import axios from "axios";
-import { useRouteLoaderData } from "react-router-dom";
+import useGetMemberDetails, { useUpdateProfile } from "../../../api/User/useGetProfileDetails";
+import TokenService from "../../../token/tokenService";
 
-const FamilyReligious = ({email}) => {
-  // const [userId, setUserId] = useState(null); 
- 
-  const [fields, setFields] = useState({
-    fatherName: "",
-    motherName: "",
-    Siblings:"",
-    caste: "",
-    nakshatra: "",
-    rashi: "",
-    gotra: "",
+
+const FamilyReligious = () => {
+  const registerNo = TokenService.getRegistrationNo();
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [formData, setFormData] = useState({
+    religion: '',
+    caste: '',
+    subcaste: '',
+    gotra: '',
+    rashi: '',
+    nakshatra: '',
+    sunsign: '',
+    name_of_parent: '',
+    brother_younger_unmarried: '',
+    brother_younger_married: '',
+    brother_elder_unmarried: '',
+    brother_elder_married: '',
+    sister_younger_unmarried: '',
+    sister_younger_married: '',
+    sister_elder_unmarried: '',
+    sister_elder_married: ''
   });
-  const [openDialog, setOpenDialog] = useState(false);
-  // const [selectedField, setSelectedField] = useState("fatherName");
-  const [tempValue, setTempValue] = useState(fields.fatherName);
-  const [isNewRecord, setIsNewRecord] = useState(true);
-  const [isEditing, setIsEditing] = useState(false); 
- 
+
+  const { data: userProfile, isLoading: profileLoading, isError: profileError } =
+    useGetMemberDetails(registerNo);
+  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userData = sessionStorage.getItem("userData");
-        const { _id: userId } = JSON.parse(userData);
-
-        const response = await axios.get(`http://localhost:5000/api/familyReligious/${userId}`);
-        if (response.data) {
-          setFields(response.data);
-          setIsNewRecord(false);
-        }
-      } catch (error) {     
-        console.warn("No existing record found:", error);
-        setIsNewRecord(true);
-      }
-    };      
-
-    fetchData();
-  }, []);
-
-      const clearData =()=>{
-        setFields({
-          fatherName: "",
-          motherName: "",
-          Siblings:"",
-          caste: "",
-          nakshatra: "",
-          rashi: "",
-          gotra: "",
-        }) 
-      }   
-
-
-  const handleFieldChange = (e) => {
-    const { name, value } = e.target;
-    setFields((prevFields) => ({
-      ...prevFields,
-      [name]: value,
-    }));
-  };
-
-  const handleSave = async () => {
-    // const updatedFields = { ...fields, [selectedField]: tempValue };
-
-    try {
-      const userData = sessionStorage.getItem("userData");
-      const { _id: userId } = JSON.parse(userData);
-
-      if (isNewRecord) {
-        // Add new record
-        const response = await axios.post("http://localhost:5000/api/addFamilyReligious", {
-          userId,
-         ...fields ,
-        });
-        toast.success(response.data.message || "Data added successfully!");
-      } else {
-        // Update existing record
-        const response = await axios.put("http://localhost:5000/api/updateFamilyReligious", {
-          userId,
-         ...fields ,
-        });
-        toast.success(response.data.message || "Data updated successfully!");
-      }
-   
-      setFields(fields);
-      setIsNewRecord(false);
-    } catch (error) {
-      toast.error("Failed to save data.");
+    if (userProfile) {
+      setFormData({
+        ...userProfile,
+      });
     }
+  }, [userProfile]);
 
-    setOpenDialog(false);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  
-
-  const tableHeaderStyle = {
-    fontWeight: "bold",
-    backgroundColor: "#f4f6f8",
-    color: "#34495e",
-    fontSize: "18px",
+  const handleSave = () => {
+    updateProfile(formData, {
+      onSuccess: () => setIsEditing(false)
+    });
   };
+
+  const handleReset = () => {
+      setFormData({
+        religion: '',
+        caste: '',
+        subcaste: '',
+        gotra: '',
+        rashi: '',
+        nakshatra: '',
+        sunsign: '',
+        name_of_parent: '',
+        brother_younger_unmarried: '',
+        brother_younger_married: '',
+        brother_elder_unmarried: '',
+        brother_elder_married: '',
+        sister_younger_unmarried: '',
+        sister_younger_married: '',
+        sister_elder_unmarried: '',
+        sister_elder_married: ''
+      })
+  };
+
+  if (profileLoading) {
+    return (
+      <Box display="flex" justifyContent="center" p={4}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (profileError) {
+    return (
+      <Box display="flex" justifyContent="center" p={4}>
+        <Typography color="error">Failed to load profile data</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box
-    padding={1}
-    sx={{
-      // Width: "80vw",
-      boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
-      borderRadius: "8px",
-      backgroundColor: "#fff",
-        width:'90%'
-    }}
-  >
-    <Box sx={{display:'flex',justifySelf:'end',mr:9}}>
- 
-        <Button variant={isEditing ? 'outlined' : 'contained'}   style={{ cursor: "pointer", color: "#fff", 
-        fontSize: "16px",background:`${isEditing?'red':'#34495e'}`
-        ,textTransform:'capitalize',border:'none' }}
-        onClick={() => setIsEditing(!isEditing)}>
-         {isEditing ? 'Cancel': 'Edit'}
-          </Button>
-   
-    </Box>
-
-    <Stack spacing={4} >
-      <Box sx={{ display:'flex',gap:'10px',justifyContent:'space-evenly'
-      }}>
-    
-      <Box>
-        <Typography variant="h5" fontWeight={700} color="#34495e" gutterBottom>
-          Religious Background
+      sx={{
+        bgcolor: '#fff',
+        p: 3,
+        borderRadius: 2,
+        boxShadow: 1,
+        maxWidth: 1200,
+        mx: 'auto'
+      }}
+    >
+      {/* Header */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h5" fontWeight="bold">
+          Family & Religious Information
         </Typography>
-        <Stack spacing={2}>
-          <TextField
-            label="Caste"
-            name="caste"
-            value={fields.caste}
-            onChange={handleFieldChange}
-            disabled={!isEditing}
-            sx={{width:'500px'}}
-          />
-          <TextField
-            label="Nakshatra"
-            name="nakshatra"
-            value={fields.nakshatra}
-            onChange={handleFieldChange}
-            disabled={!isEditing}
-            sx={{width:'500px'}}
-          />
-          <TextField
-            label="Rashi"
-            name="rashi"
-            value={fields.rashi}
-            onChange={handleFieldChange}
-            disabled={!isEditing}
-            sx={{width:'500px'}}
-          />
-          <TextField
-            label="Gotra"
-            name="gotra"
-            value={fields.gotra}
-            onChange={handleFieldChange}
-            disabled={!isEditing}
-            sx={{width:'500px'}}
-          />
-        </Stack>
-      </Box>
-      <Box>
-        <Typography variant="h5" fontWeight={700} color="#34495e" gutterBottom>
-          Family Information
-        </Typography>
-        <Stack spacing={2}>
-          <TextField
-            label="Father Name"
-            name="fatherName"
-            value={fields.fatherName}
-            onChange={handleFieldChange}
-            disabled={!isEditing}
-            sx={{width:'500px'}}
-          />
-          <TextField
-            label="Mother Name"
-            name="motherName"
-            value={fields.motherName}
-            onChange={handleFieldChange}
-            disabled={!isEditing}
-            sx={{width:'500px'}}
-          />
-           <TextField
-            label="Sibling Name"
-            name="Siblings"
-            value={fields.Siblings}
-            onChange={handleFieldChange}
-            disabled={!isEditing}
-            sx={{width:'500px'}}
-          />
-           {/* <TextField
-            label="Mother Name"
-            name="motherName"
-            value={fields.motherName}
-            onChange={handleFieldChange}
-            disabled={!isEditing}
-            sx={{width:'500px'}}
-          /> */}
-        </Stack>
-      </Box>
-
-      </Box>
-    </Stack>
-
-    {isEditing && (
-      <Box mt={3} display="flex" gap={2} justifyContent={'flex-end'} mr={9}>
         <Button
-          variant="contained"
-        sx={{background:'#34495e',textTransform:'capitalize'}}
-          onClick={clearData}
+          variant={isEditing ? 'outlined' : 'contained'}
+          color={isEditing ? 'error' : 'primary'}
+          onClick={() => setIsEditing(!isEditing)}
+          disabled={isUpdating}
         >
-          clear
-        </Button>
-        <Button variant="contained"  sx={{background:'#34495e',textTransform:'capitalize'}} onClick={handleSave}>
-          Save
+          {isEditing ? 'Cancel' : 'Edit'}
         </Button>
       </Box>
-    )}
-  </Box>
+
+      {/* Sections */}
+      <Stack spacing={4}>
+        {/* Religious Section */}
+        <Box>
+          <Typography variant="h6" fontWeight={600} gutterBottom>
+            Religious Details
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
+          <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }} gap={2}>
+            {[
+              { name: 'religion', label: 'Religion' },
+              { name: 'caste', label: 'Caste' },
+              { name: 'subcaste', label: 'Subcaste' },
+              { name: 'gotra', label: 'Gotra' },
+              { name: 'rashi', label: 'Rashi' },
+              { name: 'nakshatra', label: 'Nakshatra' },
+              { name: 'sunsign', label: 'Sun Sign' },
+            ].map(({ name, label }) => (
+              <TextField
+                key={name}
+                label={label}
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                disabled={!isEditing || isUpdating}
+                fullWidth
+              />
+            ))}
+          </Box>
+        </Box>
+
+        {/* Family Section */}
+        <Box>
+          <Typography variant="h6" fontWeight={600} gutterBottom>
+            Family Details
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
+          <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr' }} gap={2}>
+            <TextField
+              label="Name of Parent"
+              name="name_of_parent"
+              value={formData.name_of_parent}
+              onChange={handleChange}
+              disabled={!isEditing || isUpdating}
+              fullWidth
+            />
+            {[
+              'brother_younger_unmarried',
+              'brother_younger_married',
+              'brother_elder_unmarried',
+              'brother_elder_married',
+              'sister_younger_unmarried',
+              'sister_younger_married',
+              'sister_elder_unmarried',
+              'sister_elder_married',
+            ].map((field) => (
+              <TextField
+                key={field}
+                label={field.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                name={field}
+                value={formData[field]}
+                onChange={handleChange}
+                disabled={!isEditing || isUpdating}
+                fullWidth
+              />
+            ))}
+          </Box>
+        </Box>
+      </Stack>
+
+      {/* Actions */}
+      {isEditing && (
+        <Box display="flex" justifyContent="flex-end" gap={2} mt={4}>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={handleReset}
+            disabled={isUpdating}
+          >
+            Reset
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSave}
+            disabled={isUpdating}
+            startIcon={isUpdating ? <CircularProgress size={20} /> : null}
+          >
+            {isUpdating ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </Box>
+      )}
+    </Box>
   );
 };
 
