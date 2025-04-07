@@ -12,12 +12,27 @@ import toast from "react-hot-toast";
 
 
 import TokenService from "../../../token/tokenService";
-import useGetMemberDetails, { useUpdateProfile } from "../../../api/User/useGetProfileDetails";
+import { useGetMemberDetails, useUpdateProfile } from "../../../api/User/useGetProfileDetails";
+
 
 const About = () => {
   const registerNo = TokenService.getRegistrationNo();
   const [isEditing, setIsEditing] = useState(false);
-  
+      // Form state
+      const [formData, setFormData] = useState({
+        first_name: '',
+        last_name: '',
+        date_of_birth: '',
+        pincode: '',
+        address: '',
+        occupation_country: '',
+        mother_tounge: '',
+        state: '',
+        mobile_no: '',
+        email_id: '',
+        age: ''
+      });
+      
   // Fetch profile data
   const { 
     data: userProfile, 
@@ -28,36 +43,29 @@ const About = () => {
   // Update profile mutation
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
 
-  // Form state
-  const [formData, setFormData] = useState({
-    first_name: "",
-    last_name: "",
-    date_of_birth: "",
-    pincode: "",
-    address: "",
-    occupation_country: "",
-    mother_tounge: "",
-    mobile_no: "",
-    email_id: "",
-    state: "",
-    age: "",
-  });
 
-  // Initialize form with fetched data
+  const handleReset = () => {
+    setFormData({
+      first_name: '',
+      last_name: '',
+      date_of_birth: '',
+      pincode: '',
+      address: '',
+      occupation_country: '',
+      mother_tounge: '',
+      state: '',
+      mobile_no: '',
+      email_id: '',
+      age: ''
+    });
+  };
+
+  // Initialize form when data loads
   useEffect(() => {
     if (userProfile) {
       setFormData({
-        first_name: userProfile.first_name || "",
-        last_name: userProfile.last_name || "",
-        date_of_birth: userProfile.date_of_birth?.split('T')[0] || "",
-        pincode: userProfile.pincode || "",
-        address: userProfile.address || "",
-        occupation_country: userProfile.occupation_country || "",
-        mother_tounge: userProfile.mother_tounge || "",
-        state: userProfile.state || "",
-        mobile_no: userProfile.mobile_no || "",
-        email_id: userProfile.email_id || "",
-        age: userProfile.age || "",
+        ...userProfile,
+        date_of_birth: userProfile.date_of_birth?.split('T')[0] || ""
       });
     }
   }, [userProfile]);
@@ -73,24 +81,7 @@ const About = () => {
     });
   };
 
-  const handleReset = () => {
-    if (userProfile) {
-      setFormData({
-        first_name: userProfile.first_name || "",
-        last_name: userProfile.last_name || "",
-        date_of_birth: userProfile.date_of_birth?.split('T')[0] || "",
-        pincode: userProfile.pincode || "",
-        address: userProfile.address || "",
-        occupation_country: userProfile.occupation_country || "",
-        mother_tounge: userProfile.mother_tounge || "",
-        state: userProfile.state || "",
-        mobile_no: userProfile.mobile_no || "",
-        email_id: userProfile.email_id || "",
-        age: userProfile.age || "",
-      });
-    }
-    setIsEditing(false);
-  };
+
 
   if (profileLoading) return (
     <Box display="flex" justifyContent="center" p={4}>

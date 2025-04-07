@@ -6,11 +6,12 @@ import {
   Box
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
-import { useGetAllMembersDetails } from "../../api/Admin/index";
+
 import toast from "react-hot-toast";
+import { useGetAllUsersDetails } from "../../api/Admin";
 
 const UserTable = () => {
-  const { data: users = [], isLoading, error } = useGetAllMembersDetails();
+  const { data: users = [], isLoading, error } = useGetAllUsersDetails();
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
