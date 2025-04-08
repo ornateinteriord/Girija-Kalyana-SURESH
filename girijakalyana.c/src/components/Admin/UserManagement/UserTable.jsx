@@ -6,8 +6,6 @@ import {
   Box
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
-
-import toast from "react-hot-toast";
 import { useGetAllUsersDetails } from "../../api/Admin";
 
 const UserTable = () => {
@@ -16,13 +14,14 @@ const UserTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUserType, setSelectedUserType] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("status");
   const [rowsPerPage, setRowsPerPage] = useState(6);
 
   useEffect(() => {
     if (users && users.length > 0) {
-      filterUsers(searchTerm, selectedUserType);
+      filterUsers(searchTerm, selectedUserType,selectedStatus);
     }
-  }, [users, searchTerm, selectedUserType]);
+  }, [users, searchTerm, selectedUserType,selectedStatus]);
 
   const handleSearch = (value) => {
     setSearchTerm(value);
@@ -32,8 +31,7 @@ const UserTable = () => {
     setSelectedUserType(event.target.value);
   };
 
-  const filterUsers = (search, userType) => {
-    // Filter out only admin users (keep assistance and others)
+  const filterUsers = (search, userType,Status) => {
     let filtered = users.filter(user => {
       const isAdmin = user?.user_role?.toLowerCase() === "admin";
       return !isAdmin;
@@ -47,6 +45,24 @@ const UserTable = () => {
       
       return username.includes(searchLower) || ref_no.includes(searchLower);
     });
+
+    if(Status !=="status"){
+      filtered = filtered.filter(user =>{
+        const UserStatus = user?.status?.toLowerCase() 
+        switch(Status.toLowerCase()) {  // Make comparison case-insensitive
+          case "active":
+            return UserStatus === "active";
+          case "inactive":
+            return UserStatus === "inactive";
+          case "pending":
+            return UserStatus === "pending";
+          case "expires":
+            return UserStatus === "expires";
+          default:
+            return true;
+        }
+      })
+    }
     
     // Then apply user type filter if not "all"
     if (userType !== "all") {
@@ -68,6 +84,8 @@ const UserTable = () => {
         }
       });
     }
+
+
     
     setFilteredUsers(filtered);
     setCurrentPage(1);
@@ -136,6 +154,20 @@ const UserTable = () => {
             </Select>
           </Box>
         </Box>
+        <Box sx={{display:"flex",gap:2}}>
+        <FormControl style={{ minWidth: 200 }} fontFamily={"Outfit sans-serif"}>
+          <Select 
+              value={selectedStatus} 
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            sx={{ height: '50px' }}
+          >
+            <MenuItem value="status">Status</MenuItem>
+            <MenuItem value="active">Active</MenuItem>
+            <MenuItem value="inactive">Inactive</MenuItem>
+            <MenuItem value="pending">Pending</MenuItem>
+            <MenuItem value="expires">Expires</MenuItem>
+          </Select>
+        </FormControl>
         <FormControl style={{ minWidth: 200 }} fontFamily={"Outfit sans-serif"}>
           <Select 
             value={selectedUserType} 
@@ -149,6 +181,7 @@ const UserTable = () => {
             <MenuItem value="free">Free Users</MenuItem>
           </Select>
         </FormControl>
+        </Box>
       </Stack>
       
       {/* User Table */}
