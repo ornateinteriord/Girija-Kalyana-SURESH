@@ -20,7 +20,7 @@ const UserDashboard = () => {
   const cardsPerPage = 3;
 
   const registerNo = TokenService.getRegistrationNo();
-  console.log("Register No:", registerNo);
+  
   const {
     data: userProfile,
     isLoading: profileLoading,

@@ -37,10 +37,7 @@ import TokenService from "../../token/tokenService";
         if(response.success){
           toast.success(response.message);
           queryClient.invalidateQueries({ queryKey: ["userDetails", reg_No] });
-        }else{
-          console.error(response.message)
-        }
-       
+        }  
       
       },
       onError: (error) => {
