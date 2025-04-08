@@ -33,7 +33,14 @@ const UserTable = () => {
   };
 
   const filterUsers = (search, userType) => {
+    // Filter out only admin users (keep assistance and others)
     let filtered = users.filter(user => {
+      const isAdmin = user?.user_role?.toLowerCase() === "admin";
+      return !isAdmin;
+    });
+
+    // Then apply search filter
+    filtered = filtered.filter(user => {
       const username = user?.username?.toLowerCase() || '';
       const ref_no = user?.ref_no?.toLowerCase() || '';
       const searchLower = search.toLowerCase();
@@ -41,12 +48,15 @@ const UserTable = () => {
       return username.includes(searchLower) || ref_no.includes(searchLower);
     });
     
+    // Then apply user type filter if not "all"
     if (userType !== "all") {
       filtered = filtered.filter(user => {
         const userRole = user?.user_role?.toLowerCase();
         
         // Map frontend filter names to backend role names
-        switch(userType) {
+        switch(userType.toLowerCase()) {  // Make comparison case-insensitive
+          case "assistance":
+            return userRole === "assistance";
           case "premium":
             return userRole === "premiumuser";
           case "silver":
@@ -73,8 +83,10 @@ const UserTable = () => {
   };
 
   const formatUserRole = (role) => {
-    // Remove 'User' suffix and capitalize first letter
     if (!role) return '';
+    // Special case for Assistance
+    if (role.toLowerCase() === "assistance") return "Assistance";
+    // For other roles, remove 'User' suffix and capitalize
     return role.replace('User', '').replace(/^\w/, c => c.toUpperCase());
   };
 
@@ -133,6 +145,7 @@ const UserTable = () => {
             <MenuItem value="all">All Users</MenuItem>
             <MenuItem value="premium">Premium Users</MenuItem>
             <MenuItem value="silver">Silver Users</MenuItem>
+            <MenuItem value="Assistance">Assistance Users</MenuItem>
             <MenuItem value="free">Free Users</MenuItem>
           </Select>
         </FormControl>
@@ -163,7 +176,8 @@ const UserTable = () => {
                     fontSize: '15px',
                     color: user.user_role === 'PremiumUser' ? '#FFD700' : 
                            user.user_role === 'SilverUser' ? '#C0C0C0' : 
-                           user.user_role === 'FreeUser' ? '#4CAF50' : '#333',
+                           user.user_role === 'FreeUser' ? '#4CAF50' :
+                           user.user_role === 'Assistance' ? '#3498db' : '#333',
                     fontWeight: 'bold'
                   }}>
                     {formatUserRole(user.user_role)}
@@ -176,8 +190,8 @@ const UserTable = () => {
                     {user.status?.charAt(0).toUpperCase() + user.status?.slice(1)}
                   </TableCell>
                   <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '17px' }}>
-  {user.last_loggedin ? new Date(user.last_loggedin).toLocaleDateString() : 'Never'}
-</TableCell>
+                    {user.last_loggedin ? new Date(user.last_loggedin).toLocaleDateString() : 'Never'}
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
@@ -200,7 +214,6 @@ const UserTable = () => {
             onChange={(event, page) => setCurrentPage(page)}
             shape="rounded"
             color="primary"
-            
           />
         </Stack>
       )}

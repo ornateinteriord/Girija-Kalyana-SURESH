@@ -92,7 +92,7 @@ const About = () => {
 
   if (profileError) return (
     <Box display="flex" justifyContent="center" p={4}>
-      <Typography color="error">Failed to load profile data</Typography>
+      <Typography color="error">Failed to load About data</Typography>
     </Box>
   );
 
