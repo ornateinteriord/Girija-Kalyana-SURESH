@@ -23,6 +23,8 @@ export const useLoginMutation = () => {
           case "FreeUser":
           case "PremiumUser":
           case "SilverUser":
+            case "Assistance":
+            
             navigate("/user/userDashboard");
             break;
           case "Admin":
