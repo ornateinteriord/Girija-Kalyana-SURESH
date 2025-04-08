@@ -35,6 +35,8 @@ const ParentsPrefer = () => {
   const { data: userProfile, isLoading: profileLoading, isError: profileError } = useGetMemberDetails(registerNo);
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
 
+  // console.log("parent:",userProfile)
+
   useEffect(() => {
     if (userProfile) {
       setFormData({
@@ -51,9 +53,7 @@ const ParentsPrefer = () => {
   };
 
   const handleSave = () => {
-    updateProfile(formData, {
-
-    });
+    updateProfile(formData);
   };
 
   const handleClear = () => {
@@ -115,9 +115,8 @@ const ParentsPrefer = () => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <FormControl fullWidth variant="outlined">
-                <InputLabel id="caste-label">Caste Preference</InputLabel>
+                <InputLabel >Caste Preference</InputLabel>
                 <Select
-                  labelId="caste-label"
                   value={formData.caste_preference}
                   onChange={(e) => handleChange("caste_preference", e.target.value)}
                   label="Caste Preference"
