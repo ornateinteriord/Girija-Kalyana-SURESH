@@ -18,8 +18,8 @@ const LifeStyle = () => {
     diet: "",
     sunsign: "",
     bloodgroup: "",
-    body_type: "",  // Note: Changed from bodyType to match your state
-    skin_type: ""   // Note: Changed from skinType to match your state
+    body_type: "", 
+    skin_type: ""  
   });
 
   const { 
@@ -32,18 +32,13 @@ const LifeStyle = () => {
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
 
   useEffect(() => {
-    if (userProfile) {
-      setFormData({
-        drink: userProfile.drink || "",
-        smoke: userProfile.smoke || "",
-        diet: userProfile.diet || "",
-        sunsign: userProfile.sunsign || "",
-        bloodgroup: userProfile.bloodgroup || "",
-        body_type: userProfile.body_type || "",  // Changed to match your state
-        skin_type: userProfile.skin_type || ""   // Changed to match your state
-      });
-    }
-  }, [userProfile]);
+      if (userProfile) {
+        setFormData({
+          ...userProfile,
+        });
+      }
+    }, [userProfile]);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
