@@ -38,14 +38,7 @@ const ParentsPrefer = () => {
   useEffect(() => {
     if (userProfile) {
       setFormData({
-        caste_preference: userProfile.caste_preference || "",
-        from_age_preference: userProfile.from_age_preference || "",
-        to_age_preference: userProfile.to_age_preference || "",
-        from_height_preference: userProfile.from_height_preference || "",
-        to_height_preference: userProfile.to_height_preference || "",
-        occupation_country_preference: userProfile.occupation_country_preference || "",
-        maritalstatus_preference: userProfile.maritalstatus_preference || "",
-        education_preference: userProfile.education_preference || ""
+       ...userProfile
       });
     }
   }, [userProfile]);
@@ -59,8 +52,7 @@ const ParentsPrefer = () => {
 
   const handleSave = () => {
     updateProfile(formData, {
-      onSuccess: () => toast.success("Preferences saved successfully!"),
-      onError: () => toast.error("Failed to update preferences.")
+
     });
   };
 
