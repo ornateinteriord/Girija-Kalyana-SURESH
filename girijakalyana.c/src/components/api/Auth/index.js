@@ -16,7 +16,7 @@ export const useLoginMutation = () => {
         TokenService.setToken(response.token);
         window.dispatchEvent(new Event("storage")); // For sync
 
-        toast.success(response.message || "Login successful");
+        toast.success(response.message );
 
         const role = TokenService.getRole();
         switch (role) {

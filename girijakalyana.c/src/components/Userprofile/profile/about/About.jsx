@@ -32,6 +32,7 @@ const About = () => {
         email_id: '',
         age: ''
       });
+
       
   // Fetch profile data
   const { 

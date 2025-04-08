@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import toast from "react-hot-toast";
 import { useGetMemberDetails, useUpdateProfile } from "../../../api/User/useGetProfileDetails";
+import TokenService from "../../../token/tokenService";
 
 
 
@@ -39,7 +40,7 @@ const FamilyReligious = () => {
 
   const { data: userProfile, isLoading: profileLoading, isError: profileError } =
     useGetMemberDetails(registerNo);
-  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfileile();
+  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
 
   useEffect(() => {
     if (userProfile) {

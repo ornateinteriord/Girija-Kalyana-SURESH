@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import './App.css';
 import ProfileProvider from './components/usecontext/ProfileProvider';
+import { ToastContainer } from 'react-toastify';
 
 // Create a query client with default options
 const queryClient = new QueryClient({
@@ -120,19 +121,8 @@ const App = () => {
             <Route path="*" element={<div>404 Not Found</div>} />
           </Routes>
         </Router>
-        
-        <Toaster
-          position="top-right"
-          reverseOrder={false}
-          toastOptions={{
-            duration: 5000,
-            style: {
-              borderRadius: '10px',
-              background: '#333',
-              color: '#fff',
-            },
-          }}
-        />
+      
+        <ToastContainer position="top-right" autoClose={5000} />
       </Suspense>
       
       {/* React Query Devtools - Only in development */}
