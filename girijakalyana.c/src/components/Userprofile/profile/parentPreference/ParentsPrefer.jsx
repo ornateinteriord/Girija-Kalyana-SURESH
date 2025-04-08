@@ -9,103 +9,81 @@ import {
   MenuItem,
   Button,
   Typography,
+  CircularProgress
 } from "@mui/material";
-import jsonData from "../eduction/jsondata/data.json";
+import rawJsonData from "../eduction/jsondata/data.json";
 import toast from "react-hot-toast";
-import axios from "axios";
+import { useGetMemberDetails, useUpdateProfile } from "../../../api/User/useGetProfileDetails";
+import TokenService from "../../../token/tokenService";
+
+const datas = rawJsonData.reduce((acc, curr) => ({ ...acc, ...curr }), {});
 
 const ParentsPrefer = () => {
-  const datas = jsonData;
+  const registerNo = TokenService.getRegistrationNo();
 
-  const [preferences, setPreferences] = useState({
-    caste: "",
-    fromAge: "",
-    toAge: "",
-    fromHeight: "",
-    toHeight: "",
-    occupation: "",
-    maritalStatus: "",
-    education: "",
+  const [formData, setFormData] = useState({
+    caste_preference: "",
+    from_age_preference: "",
+    to_age_preference: "",
+    from_height_preference: "",
+    to_height_preference: "",
+    occupation_country_preference: "",
+    maritalstatus_preference: "",
+    education_preference: ""
   });
 
+  const { data: userProfile, isLoading: profileLoading, isError: profileError } = useGetMemberDetails(registerNo);
+  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+
   useEffect(() => {
-    const fetchData = async () => {
-      const userData = sessionStorage.getItem("userData");
-      if (!userData) {
-        toast.error("No user data found. Please log in.");
-        return;
-      }
-      const { _id: userId } = JSON.parse(userData);
+    if (userProfile) {
+      setFormData({
+       ...userProfile
+      });
+    }
+  }, [userProfile]);
 
-      try {
-        const response = await axios.get(
-          `http://localhost:5000/api/parentsPrefer/${userId}`
-        );
-        const parentPrefer = response.data?.parentPrefer || {};
-        setPreferences({
-          caste: parentPrefer.caste || "",
-          fromAge: parentPrefer.fromAge || "",
-          toAge: parentPrefer.toAge || "",
-          fromHeight: parentPrefer.fromHeight || "",
-          toHeight: parentPrefer.toHeight || "",
-          occupation: parentPrefer.occupation || "",
-          maritalStatus: parentPrefer.maritalStatus || "",
-          education: parentPrefer.education || "",
-        });
-      } catch (error) {
-        console.error("Error fetching preferences:", error);
-        toast.error("Failed to load preferences.");
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleChange = (key, value) => {
-    setPreferences((prev) => ({
+  const handleChange = (name, value) => {
+    setFormData(prev => ({
       ...prev,
-      [key]: value,
+      [name]: value
     }));
   };
 
-  const handleSubmit = async () => {
-    const userData = sessionStorage.getItem("userData");
-    if (!userData) {
-      toast.error("No user data found. Please log in.");
-      return;
-    }
+  const handleSave = () => {
+    updateProfile(formData, {
 
-    const { _id: userId } = JSON.parse(userData);
-
-    const payload = {
-      userId,
-      parentPrefer: preferences,
-    };
-
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/parentsPrefer",
-        payload
-      );
-      toast.success("Preferences saved successfully!");
-    } catch (error) {
-      console.error("Error saving preferences:", error);
-      toast.error("Failed to save preferences.");
-    }
-  };
-
-  const handleReset = () => {
-    setPreferences({
-      caste: "",
-      fromAge: "",
-      toAge: "",
-      fromHeight: "",
-      toHeight: "",
-      occupation: "",
-      maritalStatus: "",
-      education: "",
     });
   };
+
+  const handleClear = () => {
+    setFormData({
+      caste_preference: "",
+      from_age_preference: "",
+      to_age_preference: "",
+      from_height_preference: "",
+      to_height_preference: "",
+      occupation_country_preference: "",
+      maritalstatus_preference: "",
+      education_preference: ""
+    });
+  };
+
+  if (profileLoading) {
+    return (
+      <Box display="flex" justifyContent="center" p={4}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (profileError) {
+    return (
+      <Box display="flex" justifyContent="center" p={4}>
+        <Typography color="error">Failed to load preference data</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -132,34 +110,19 @@ const ParentsPrefer = () => {
       </Typography>
 
       <Stack direction="row" spacing={4}>
+        {/* LEFT SIDE */}
         <Box flex={1}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-            <FormControl fullWidth variant="outlined">
-      <InputLabel id="caste-label">Caste Preference</InputLabel>
-      <Select
-        labelId="caste-label"
-        value={preferences.caste}
-        onChange={(e) => handleChange("caste", e.target.value)}
-        label="Caste Preference" // Ensures label fits within the outlined border
-      >
-                  {datas[0].casteValues.map((item, index) => (
-                    <MenuItem key={index} value={item}>
-                      {item}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel shrink={!!preferences.fromAge}>Age Preference (From)</InputLabel>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel id="caste-label">Caste Preference</InputLabel>
                 <Select
-                  value={preferences.fromAge}
-                  onChange={(e) => handleChange("fromAge", e.target.value)}
-                  label="Age Preference  (From)"
+                  labelId="caste-label"
+                  value={formData.caste_preference}
+                  onChange={(e) => handleChange("caste_preference", e.target.value)}
+                  label="Caste Preference"
                 >
-                  {datas[9].minAge.map((item, index) => (
+                  {datas?.casteValues?.map((item, index) => (
                     <MenuItem key={index} value={item}>
                       {item}
                     </MenuItem>
@@ -167,101 +130,112 @@ const ParentsPrefer = () => {
                 </Select>
               </FormControl>
             </Grid>
+
             <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel shrink={!!preferences.fromHeight}>Height Preference (From)</InputLabel>
+                <InputLabel>Age Preference (From)</InputLabel>
                 <Select
-                  value={preferences.fromHeight}
-                  onChange={(e) => handleChange("fromHeight", e.target.value)}
-                    label="Height Preference (From)"
+                  value={formData.from_age_preference}
+                  onChange={(e) => handleChange("from_age_preference", e.target.value)}
+                  label="Age Preference (From)"
                 >
-                  {datas[5].heightValues.map((item, index) => (
-                    <MenuItem key={index} value={item}>
-                      {item}
-                    </MenuItem>
+                  {datas?.minAge?.map((item, index) => (
+                    <MenuItem key={index} value={item}>{item}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Grid>
+
             <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel shrink={!!preferences.occupation}>Occupation Country</InputLabel>
+                <InputLabel>Height Preference (From)</InputLabel>
                 <Select
-                  value={preferences.occupation}
-                  onChange={(e) => handleChange("occupation", e.target.value)}
-                   label="Occupation Country"
+                  value={formData.from_height_preference}
+                  onChange={(e) => handleChange("from_height_preference", e.target.value)}
+                  label="Height Preference (From)"
+                >
+                  {datas?.heightValues?.map((item, index) => (
+                    <MenuItem key={index} value={item}>{item}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Occupation Country</InputLabel>
+                <Select
+                  value={formData.occupation_country_preference}
+                  onChange={(e) => handleChange("occupation_country_preference", e.target.value)}
+                  label="Occupation Country"
                 >
                   <MenuItem value="India">India</MenuItem>
-                  <MenuItem value="China">China</MenuItem>
                   <MenuItem value="USA">USA</MenuItem>
+                  <MenuItem value="China">China</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
           </Grid>
         </Box>
 
+        {/* RIGHT SIDE */}
         <Box flex={1}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel shrink={!!preferences.education}>Education Preference</InputLabel>
+                <InputLabel>Education Preference</InputLabel>
                 <Select
-                  value={preferences.education}
-                  onChange={(e) => handleChange("education", e.target.value)}
-                   label="Education Preference"
+                  value={formData.education_preference}
+                  onChange={(e) => handleChange("education_preference", e.target.value)}
+                  label="Education Preference"
                 >
-                  {datas[4].qualificationValues.map((item, index) => (
-                    <MenuItem key={index} value={item}>
-                      {item}
-                    </MenuItem>
+                  {datas?.qualificationValues?.map((item, index) => (
+                    <MenuItem key={index} value={item}>{item}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Grid>
+
             <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel shrink={!!preferences.toAge}>Age Preference (To)</InputLabel>
+                <InputLabel>Age Preference (To)</InputLabel>
                 <Select
-                  value={preferences.toAge}
-                  onChange={(e) => handleChange("toAge", e.target.value)}
-                    label="Age Preference (To)"
+                  value={formData.to_age_preference}
+                  onChange={(e) => handleChange("to_age_preference", e.target.value)}
+                  label="Age Preference (To)"
                 >
-                  {datas[9].minAge.map((item, index) => (
-                    <MenuItem key={index} value={item}>
-                      {item}
-                    </MenuItem>
+                  {datas?.minAge?.map((item, index) => (
+                    <MenuItem key={index} value={item}>{item}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Grid>
+
             <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel shrink={!!preferences.toHeight}>Height Preference (To)</InputLabel>
+                <InputLabel>Height Preference (To)</InputLabel>
                 <Select
-                  value={preferences.toHeight}
-                  onChange={(e) => handleChange("toHeight", e.target.value)}
-                   label="Height Preference (To)"
+                  value={formData.to_height_preference}
+                  onChange={(e) => handleChange("to_height_preference", e.target.value)}
+                  label="Height Preference (To)"
                 >
-                  {datas[5].heightValues.map((item, index) => (
-                    <MenuItem key={index} value={item}>
-                      {item}
-                    </MenuItem>
+                  {datas?.heightValues?.map((item, index) => (
+                    <MenuItem key={index} value={item}>{item}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Grid>
+
             <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel shrink={!!preferences.maritalStatus}>Marital Status</InputLabel>
+                <InputLabel>Marital Status</InputLabel>
                 <Select
-                  value={preferences.maritalStatus}
-                  onChange={(e) => handleChange("maritalStatus", e.target.value)}
+                  value={formData.maritalstatus_preference}
+                  onChange={(e) => handleChange("maritalstatus_preference", e.target.value)}
                   label="Marital Status"
                 >
-                  {datas[6].marritalStatus.map((item, index) => (
-                    <MenuItem key={index} value={item}>
-                      {item}
-                    </MenuItem>
+                  {datas?.marritalStatus?.map((item, index) => (
+                    <MenuItem key={index} value={item}>{item}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -270,33 +244,21 @@ const ParentsPrefer = () => {
         </Box>
       </Stack>
 
-      <Box
-        sx={{
-          marginTop: "24px",
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: "16px",
-        }}
-      >
-        <Button
-          variant="contained"
-          onClick={handleSubmit}
-          sx={{
-            backgroundColor: "#34495e",
-          }}
-        >
-          Submit
-        </Button>
+      <Box display="flex" justifyContent="end" gap={1} mt={3}>
         <Button
           variant="outlined"
-          onClick={handleReset}
-          sx={{
-            backgroundColor: "#34495e",
-            color: "#fff",
-            border: "none",
-          }}
+          sx={{ background: "#34495e", color: "#fff", border: "none" }}
+          onClick={handleClear}
         >
-          Reset
+          Clear
+        </Button>
+        <Button
+          variant="contained"
+          sx={{ background: "#34495e" }}
+          onClick={handleSave}
+          disabled={isUpdating}
+        >
+          {isUpdating ? <CircularProgress size={24} /> : "Save"}
         </Button>
       </Box>
     </Box>

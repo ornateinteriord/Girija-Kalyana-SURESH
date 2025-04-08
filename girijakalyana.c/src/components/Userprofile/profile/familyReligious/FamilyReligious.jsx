@@ -146,7 +146,7 @@ const FamilyReligious = () => {
               { name: 'gotra', label: 'Gotra' },
               { name: 'rashi', label: 'Rashi' },
               { name: 'nakshatra', label: 'Nakshatra' },
-              { name: 'sunsign', label: 'Sun Sign' },
+             
             ].map(({ name, label }) => (
               <TextField
                 key={name}
