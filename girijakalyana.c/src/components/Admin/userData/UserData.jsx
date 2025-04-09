@@ -40,7 +40,6 @@ const UserData = () => {
   const upgradeUserMutation = UpgradeUserStatus();
 
   const handleUpgrade = async (regno, currentStatus) => {
-    console.log(`Current status for ${regno}:`, currentStatus);
     try {
       const newStatus = currentStatus === "active" ? "inactive" : "active";
       await upgradeUserMutation.mutateAsync(

@@ -36,7 +36,6 @@ export const UpgradeUserStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ regno, status }) => {
-        console.log('Sending regno:', regno);
         const response = await put(`/api/admin/upgrade-user/${regno}`, {
           status
         });
@@ -51,7 +50,6 @@ export const UpgradeUserStatus = () => {
       }
     },
     onError: (err) => {
-      console.error('Mutation error:', err);
       const errorMessage = err.response?.data?.message;
       toast.error(errorMessage);
     },

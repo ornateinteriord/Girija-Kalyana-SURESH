@@ -99,7 +99,16 @@ const App = () => {
   return (
     <ProfileProvider>
     <QueryClientProvider client={queryClient}>
-      <Suspense>
+      <Suspense fallback={
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh'
+        }}>
+          <LoadingComponent />
+        </div>
+      }>
         <Router>
           <Routes>
             {/* Public Routes */}
