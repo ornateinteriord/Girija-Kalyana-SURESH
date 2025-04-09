@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import {
-  Box,
   TextField,
   Select,
   MenuItem,
@@ -21,69 +19,97 @@ import {
   Button,
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
-import './UserData.css';
+import "./UserData.css";
+import { getAllUserProfiles, UpgradeUserStatus } from "../../api/Admin";
+import { LoadingComponent } from "../../../App";
+import toast from "react-hot-toast";
 
 const UserData = () => {
+  const { data: users = [], isLoading, isError, error } = getAllUserProfiles();
   const firstPage = 1;
   const [currentPage, setCurrentPage] = useState(firstPage);
   const [rowsPerPage, setRowsPerPage] = useState(6);
-  const [records, setRecords] = useState([]);
+  const [localUsers, setLocalUsers] = useState(users);
+   const [selectedStatus, setSelectedStatus] = useState("status");
   const [search, setSearch] = useState("");
 
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = records.slice(indexOfFirstRow, indexOfLastRow);
+  useEffect(() => {
+    setLocalUsers(users);
+  }, [users]);
 
-  const filteredRows = currentRows.filter((data) => {
-    return (
-      search === "" ||
-      data.id.toString().includes(search.toString()) ||
-      data.name.toLowerCase().includes(search.toLowerCase()) ||
-      data.username.toLowerCase().includes(search.toLowerCase()) ||
-      data.email.toLowerCase().includes(search.toLowerCase()) ||
-      data.phone.toLowerCase().includes(search.toLowerCase()) ||
-      data.address.city.toLowerCase().includes(search.toLowerCase())
-    );
+  const upgradeUserMutation = UpgradeUserStatus();
+
+  const handleUpgrade = async (regno, currentStatus) => {
+    try {
+      const newStatus = currentStatus === "active" ? "inactive" : "active";
+      await upgradeUserMutation.mutateAsync(
+        { regno, status: newStatus },
+        {
+          onSuccess: () => {
+            setLocalUsers((prevUsers) =>
+              prevUsers.map((user) =>
+                user.registration_no === regno
+                  ? { ...user, status: newStatus }
+                  : user
+              )
+            );
+          },
+          onError: (error) => {
+            console.error(error.message);
+          },
+        }
+      );
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(error.message);
+    }
+  }, [isError, error]);
+
+  const filteredRows = localUsers.filter((data) => {
+    const matchesSearch = 
+    search === "" ||
+    data.registration_no.toString().includes(search.toString()) ||
+    data.first_name.toLowerCase().includes(search.toLowerCase()) ||
+    data.email_id.toLowerCase().includes(search.toLowerCase()) ||
+    data.gender.toLowerCase().includes(search.toLowerCase());
+  
+  const matchesStatus = (() => {
+    switch(selectedStatus.toLowerCase()) {
+      case "active":
+        return data.status === "active";
+      case "inactive":
+        return data.status === "inactive";
+      case "pending":
+        return data.status === "pending";
+      case "expires":
+        return data.status === "expires";
+      default:
+        return true;
+    }
+  })();
+  
+  return matchesSearch && matchesStatus;
+
   });
 
-  const totalPages = Math.ceil(records.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = filteredRows.slice(indexOfFirstRow, indexOfLastRow);
 
   const handlePageClick = (event, value) => setCurrentPage(value);
-  
-  
+
   const handleRowsPerPageChange = (e) => {
     setRowsPerPage(parseInt(e.target.value, 10));
     setCurrentPage(1);
   };
 
-  const fetchData = async () => {
-    try {
-      const response = await axios.get("https://jsonplaceholder.typicode.com/users");
-      const updatedData = response.data.map((user) => ({
-        ...user,
-        status: "Pending", // Initialize with default status
-      }));
-      setRecords(updatedData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const handleSearchChange = (event) => setSearch(event.target.value);
-
-  const handleUpgrade = (id) => {
-    setRecords((prevRecords) =>
-      prevRecords.map((user) =>
-        user.id === id
-          ? { ...user, status: user.status === "Pending" ? "Active" : "Pending" }
-          : user
-      )
-    );
-  };
 
   return (
     <div className="upgrade-user">
@@ -114,6 +140,22 @@ const UserData = () => {
           </div>
         </Typography>
         <div className="search-div">
+          <FormControl
+            style={{ minWidth: 200 }}
+            fontFamily={"Outfit sans-serif"}
+          >
+            <Select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              sx={{ height: "50px" }}
+            >
+              <MenuItem value="status">Status</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+              <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="expires">Expires</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
             label="Search"
             id="search"
@@ -135,50 +177,78 @@ const UserData = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}>
+              <TableCell
+                sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}
+              >
                 Registration No
               </TableCell>
-              <TableCell sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}>
+              <TableCell
+                sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}
+              >
                 Name
               </TableCell>
-              <TableCell sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}>
+              <TableCell
+                sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}
+              >
                 Email Id
               </TableCell>
-              <TableCell sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}>
+              <TableCell
+                sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}
+              >
                 Gender
               </TableCell>
-              <TableCell sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}>
+              <TableCell
+                sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}
+              >
                 User Type
               </TableCell>
-              <TableCell sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}>
+              <TableCell
+                sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}
+              >
                 Status
               </TableCell>
-              <TableCell sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}>
+              <TableCell
+                sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}
+              >
                 Upgrade
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredRows.length > 0 ? (
-              filteredRows.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}>
-                    {row.id}
+            {currentRows.length > 0 ? (
+              currentRows.map((row) => (
+                <TableRow key={row.registration_no}>
+                  <TableCell
+                    sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
+                  >
+                    {row.registration_no}
                   </TableCell>
-                  <TableCell sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}>
-                    {row.name}
+                  <TableCell
+                    sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
+                  >
+                    {row.first_name} {row.last_name}
                   </TableCell>
-                  <TableCell sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}>
-                    {row.email}
+                  <TableCell
+                    sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
+                  >
+                    {row.email_id}
                   </TableCell>
-                  <TableCell sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}>
-                    -
+                  <TableCell
+                    sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
+                  >
+                    {row.gender}
                   </TableCell>
-                  <TableCell sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}>
-                    -
+                  <TableCell
+                    sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
+                  >
+                    {row.type_of_user}
                   </TableCell>
-                  <TableCell sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}>
-                    <Typography color={row.status === "Pending" ? "orange" : "green"}>
+                  <TableCell
+                    sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
+                  >
+                    <Typography
+                      color={row.status === "active" ? "green" : "red"}
+                    >
                       {row.status}
                     </Typography>
                   </TableCell>
@@ -188,9 +258,16 @@ const UserData = () => {
                       color="success"
                       size="small"
                       sx={{ textTransform: "capitalize" }}
-                      onClick={() => handleUpgrade(row.id)}
+                      onClick={() => handleUpgrade(row.registration_no,row.status)}
+                      disabled={upgradeUserMutation.isLoading && 
+                        upgradeUserMutation.variables?.regno === row.registration_no}
                     >
-                      Upgrade
+                      {upgradeUserMutation.isLoading && 
+                       upgradeUserMutation.variables?.regno === row.registration_no
+                        ? "Processing..."
+                        : row.status === "active"
+                        ? "Deactivate"
+                        : "Activate"}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -207,17 +284,20 @@ const UserData = () => {
       </TableContainer>
 
       {/* Pagination */}
-      <Stack spacing={2} direction="row" justifyContent="end" mt={3}>
-        <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={handlePageClick}
-          shape="rounded"
-          color="primary"
-          siblingCount={1}
-          boundaryCount={1}
-        />
-      </Stack>
+      {filteredRows.length > 0 && (
+        <Stack spacing={2} direction="row" justifyContent="end" mt={3}>
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageClick}
+            shape="rounded"
+            color="primary"
+            siblingCount={1}
+            boundaryCount={1}
+          />
+        </Stack>
+      )}
+      {isLoading && <LoadingComponent />}
     </div>
   );
 };

@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
 import { useGetAllUsersDetails } from "../../api/Admin";
+import { LoadingComponent } from "../../../App";
 
 const UserTable = () => {
   const { data: users = [], isLoading, error } = useGetAllUsersDetails();
@@ -108,7 +109,6 @@ const UserTable = () => {
     return role.replace('User', '').replace(/^\w/, c => c.toUpperCase());
   };
 
-  if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading users</div>;
 
   return (
@@ -250,6 +250,7 @@ const UserTable = () => {
           />
         </Stack>
       )}
+      {isLoading && <LoadingComponent/>}
     </div>
   );
 };
