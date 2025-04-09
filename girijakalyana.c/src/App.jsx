@@ -100,14 +100,7 @@ const App = () => {
     <ProfileProvider>
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh'
-        }}>
           <LoadingComponent />
-        </div>
       }>
         <Router>
           <Routes>
