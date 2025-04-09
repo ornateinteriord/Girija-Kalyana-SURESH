@@ -35,10 +35,13 @@ const ParentsPrefer = () => {
   const { data: userProfile, isLoading: profileLoading, isError: profileError } = useGetMemberDetails(registerNo);
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
 
+
   useEffect(() => {
+
     if (userProfile) {
       setFormData({
        ...userProfile
+      
       });
     }
   }, [userProfile]);
@@ -121,7 +124,11 @@ const ParentsPrefer = () => {
                   value={formData.caste_preference}
                   onChange={(e) => handleChange("caste_preference", e.target.value)}
                   label="Caste Preference"
-                >
+                > {formData.caste_preference && !datas?.casteValues?.includes(formData.caste_preference) && (
+                  <MenuItem key="current" value={formData.caste_preference}>
+                    {formData.caste_preference}
+                  </MenuItem>
+                )}
                   {datas?.casteValues?.map((item, index) => (
                     <MenuItem key={index} value={item}>
                       {item}
@@ -154,6 +161,11 @@ const ParentsPrefer = () => {
                   onChange={(e) => handleChange("from_height_preference", e.target.value)}
                   label="Height Preference (From)"
                 >
+                  {formData.from_height_preference && !datas?.heightValues?.includes(formData.from_height_preference) && (
+                  <MenuItem key="current" value={formData.from_height_preference}>
+                    {formData.from_height_preference}
+                  </MenuItem>
+                )}
                   {datas?.heightValues?.map((item, index) => (
                     <MenuItem key={index} value={item}>{item}</MenuItem>
                   ))}
@@ -189,6 +201,11 @@ const ParentsPrefer = () => {
                   onChange={(e) => handleChange("education_preference", e.target.value)}
                   label="Education Preference"
                 >
+                   {formData.education_preference && !datas?.qualificationValues?.includes(formData.education_preference) && (
+                  <MenuItem key="current" value={formData.education_preference}>
+                    {formData.education_preference}
+                  </MenuItem>
+                )}
                   {datas?.qualificationValues?.map((item, index) => (
                     <MenuItem key={index} value={item}>{item}</MenuItem>
                   ))}
@@ -219,6 +236,11 @@ const ParentsPrefer = () => {
                   onChange={(e) => handleChange("to_height_preference", e.target.value)}
                   label="Height Preference (To)"
                 >
+                  {formData.to_height_preference && !datas?.heightValues?.includes(formData.to_height_preference) && (
+                  <MenuItem key="current" value={formData.to_height_preference}>
+                    {formData.to_height_preference}
+                  </MenuItem>
+                )}
                   {datas?.heightValues?.map((item, index) => (
                     <MenuItem key={index} value={item}>{item}</MenuItem>
                   ))}
