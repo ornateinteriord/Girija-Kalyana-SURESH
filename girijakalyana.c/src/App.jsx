@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Dialog, DialogContent, Typography } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import './App.css';
@@ -60,20 +60,46 @@ const Search = lazy(() => import('./components/Userprofile/search/Search'));
 const UserDashboard = lazy(() => import('./components/Userprofile/userdDashboard/UserDashboard'));
 const Profile = lazy(() => import('./components/Userprofile/profile/Profile'));
 
+
+
+
+export const LoadingComponent = () => {
+  return (
+    <Dialog 
+      open={true}
+      PaperProps={{
+        style: {
+          backgroundColor: 'transparent',
+          boxShadow: 'none',
+          overflow: 'hidden',
+        }
+      }}
+    >
+      <DialogContent>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          p={6}
+        >
+          <CircularProgress 
+            size={64}  
+            thickness={3.6} 
+            sx={{
+              color:"white",
+              animationDuration: '800ms', 
+            }} 
+          />
+        </Box>
+      </DialogContent>
+    </Dialog>
+  );
+};
 const App = () => {
   return (
     <ProfileProvider>
     <QueryClientProvider client={queryClient}>
-      <Suspense fallback={
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh'
-        }}>
-          <CircularProgress size={60} />
-        </div>
-      }>
+      <Suspense>
         <Router>
           <Routes>
             {/* Public Routes */}
