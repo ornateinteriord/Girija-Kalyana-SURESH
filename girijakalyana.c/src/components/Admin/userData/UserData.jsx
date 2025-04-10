@@ -34,7 +34,9 @@ const UserData = () => {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    setLocalUsers(users);
+    if (users.length > 0) {
+      setLocalUsers(users)
+    }
   }, [users]);
 
   const upgradeUserMutation = UpgradeUserStatus();
@@ -71,12 +73,13 @@ const UserData = () => {
   }, [isError, error]);
 
   const filteredRows = localUsers.filter((data) => {
+    const isAdmin = data?.user_role?.toLowerCase() === "admin";
     const matchesSearch = 
     search === "" ||
-    data.registration_no.toString().includes(search.toString()) ||
-    data.first_name.toLowerCase().includes(search.toLowerCase()) ||
-    data.email_id.toLowerCase().includes(search.toLowerCase()) ||
-    data.gender.toLowerCase().includes(search.toLowerCase());
+    data.registration_no?.toString().includes(search.toString()) ||
+    data.first_name?.toLowerCase().includes(search.toLowerCase()) ||
+    data.username?.toLowerCase().includes(search.toLowerCase()) ||
+    data.gender?.toLowerCase().includes(search.toLowerCase());
   
   const matchesStatus = (() => {
     switch(selectedStatus.toLowerCase()) {
@@ -93,7 +96,7 @@ const UserData = () => {
     }
   })();
   
-  return matchesSearch && matchesStatus;
+  return matchesSearch && matchesStatus && !isAdmin;
 
   });
 
@@ -217,7 +220,7 @@ const UserData = () => {
           <TableBody>
             {currentRows.length > 0 ? (
               currentRows.map((row) => (
-                <TableRow key={row.registration_no}>
+                <TableRow key={row.id}>
                   <TableCell
                     sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
                   >
@@ -231,7 +234,7 @@ const UserData = () => {
                   <TableCell
                     sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
                   >
-                    {row.email_id}
+                    {row.username}
                   </TableCell>
                   <TableCell
                     sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
