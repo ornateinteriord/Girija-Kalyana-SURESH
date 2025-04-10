@@ -5,6 +5,22 @@ import { toast } from "react-toastify";
 import { get, put } from "../authHooks";
 import TokenService from "../../token/tokenService";
 
+
+export const useGetAllUsersProfiles = () => {
+  return useQuery({
+    queryKey: ["allUsersProfiles"],
+    queryFn: async () => {
+      const response = await get('/api/user/all-users-profiles');
+
+      if (response && response.success) {
+        return response.users || []; // 
+      } else {
+        throw new Error(response?.message || "Failed to fetch all users profiles");
+      }
+    },
+  });
+};
+
   // your logic
   export const useGetMemberDetails = (reg_No) => {
 

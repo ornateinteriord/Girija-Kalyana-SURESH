@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Box,
   Stack,
@@ -9,20 +9,38 @@ import {
   TableRow,
   Paper,
   Typography,
-  CircularProgress,
 } from "@mui/material";
 
-
-const EducationPop = ({userDetails}) => {
- 
+const EducationPop = ({ userDetails }) => {
   if (!userDetails || Object.keys(userDetails).length === 0) {
     return <Typography>No user details available.</Typography>;
   }
+
   const data = [
-    { label: "Qualification", value: userDetails?.education?.degree || "Not Available" },
-    { label: "Occupation", value: userDetails?.education?.occupation || "Not Available" },
-    { label: "Income Per Annum", value: userDetails?.education?.income || "Not Available" },
-    { label: "Occupation Country", value: userDetails?.education?.occupationCountry || "Not Available" },
+    {
+      label: "Highest Qualification",
+      value: userDetails.educational_qualification || "N/A",
+    },
+    {
+      label: "Occupation",
+      value: userDetails.occupation || "N/A",
+    },
+    {
+      label: "Monthly Income",
+      value: userDetails.income_per_month || "N/A",
+    },
+    {
+      label: "Work Location",
+      value: userDetails.occupation_country || "N/A",
+    },
+    {
+      label: "Preferred Work Country",
+      value: userDetails.occupation_country_preference || "N/A",
+    },
+    {
+      label: "Preferred Marital Status",
+      value: userDetails.maritalstatus_preference || "N/A",
+    },
   ];
 
   return (
@@ -36,7 +54,13 @@ const EducationPop = ({userDetails}) => {
             <TableBody>
               {data.map((row, index) => (
                 <TableRow key={index}>
-                  <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f9f9f9", width: "40%" }}>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      backgroundColor: "#f9f9f9",
+                      width: "40%",
+                    }}
+                  >
                     {row.label}
                   </TableCell>
                   <TableCell>{row.value}</TableCell>

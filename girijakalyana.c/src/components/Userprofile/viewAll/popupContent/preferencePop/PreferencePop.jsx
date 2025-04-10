@@ -1,19 +1,28 @@
 import React from "react";
-import { Box, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  Typography,
+} from "@mui/material";
 
-const PreferencePop = ({userDetails}) => {
-
+const PreferencePop = ({ userDetails }) => {
   if (!userDetails || Object.keys(userDetails).length === 0) {
     return <Typography>No user details available.</Typography>;
   }
-  
+
   const data = [
-    { label: "Marital Status", value: userDetails?.parentPrefer?.maritalStatus || "N/A" },
-    { label: "Age Preference", value: userDetails?.parentPrefer?.toAge  || "N/A" },
-    { label: "Height Preference", value: userDetails?.parentPrefer?.fromHeight  || "N/A" },
-    { label: "Education Preference", value: userDetails?.parentPrefer?.education  || "N/A" },
-    { label: "Caste Preference", value:userDetails?.parentPrefer?.caste  },
-    { label: "Occupation Country", value: userDetails?.parentPrefer?.occupation  || "N/A" },
+    { label: "Marital Status", value: userDetails.maritalstatus_preference || "N/A" },
+    { label: "Age Preference", value: userDetails.to_age_preference || "N/A" },
+    { label: "Height Preference", value: userDetails.from_height_preference || "N/A" },
+    { label: "Education Preference", value: userDetails.education_preference || "N/A" },
+    { label: "Caste Preference", value: userDetails.caste_preference || "N/A" },
+    { label: "Occupation Country", value: userDetails.occupation_country_preference || "N/A" },
   ];
 
   return (
@@ -22,7 +31,7 @@ const PreferencePop = ({userDetails}) => {
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
           Partner Preferences
         </Typography>
-        <TableContainer  sx={{ boxShadow: 3 }}>
+        <TableContainer component={Paper} sx={{ boxShadow: 3 }}>
           <Table>
             <TableBody>
               {data.map((row, index) => (
@@ -30,7 +39,11 @@ const PreferencePop = ({userDetails}) => {
                   <TableCell
                     component="th"
                     scope="row"
-                    sx={{ fontWeight: "bold", width: "40%", backgroundColor: "#f9f9f9" }}
+                    sx={{
+                      fontWeight: "bold",
+                      width: "40%",
+                      backgroundColor: "#f9f9f9",
+                    }}
                   >
                     {row.label}
                   </TableCell>
