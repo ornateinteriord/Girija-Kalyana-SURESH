@@ -73,10 +73,10 @@ const UserData = () => {
   const filteredRows = localUsers.filter((data) => {
     const matchesSearch = 
     search === "" ||
-    data.registration_no.toString().includes(search.toString()) ||
-    data.first_name.toLowerCase().includes(search.toLowerCase()) ||
-    data.email_id.toLowerCase().includes(search.toLowerCase()) ||
-    data.gender.toLowerCase().includes(search.toLowerCase());
+    data.registration_no?.toString().includes(search.toString()) ||
+    data.first_name?.toLowerCase().includes(search.toLowerCase()) ||
+    data.email_id?.toLowerCase().includes(search.toLowerCase()) ||
+    data.gender?.toLowerCase().includes(search.toLowerCase());
   
   const matchesStatus = (() => {
     switch(selectedStatus.toLowerCase()) {
