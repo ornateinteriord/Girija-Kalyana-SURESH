@@ -1,20 +1,30 @@
 import React from "react";
-import { Box, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  Typography,
+} from "@mui/material";
 
-const LifeStylePop = ({userDetails}) => {
+const LifeStylePop = ({ userDetails }) => {
   if (!userDetails || Object.keys(userDetails).length === 0) {
     return <Typography>No user details available.</Typography>;
   }
 
 
   const data = [
-    { label: "Skin Type", value: userDetails?.lifestyle?.skinType  || "N/A" },
-    { label: "Body Type", value: userDetails?.lifestyle?.bodyType  || "N/A" },
-    { label: "Diet", value: userDetails?.lifestyle?.diet  || "N/A" },
-    { label: "Drink", value: userDetails?.lifestyle?.drink  || "N/A" },
-    { label: "Smoke", value: userDetails?.lifestyle?.smoke  || "N/A" },
-    { label: "Sunsign", value:  userDetails?.lifestyle?.sunsign  || "N/A" },
-    { label: "Blood Group", value: userDetails?.lifestyle?.bloodgroup  || "N/A" },
+    { label: "Skin Type", value: userDetails.skin_type },
+    { label: "Body Type", value: userDetails.body_type },
+    { label: "Diet", value: userDetails.diet },
+    { label: "Drink", value:userDetails.drink },
+    { label: "Smoke", value: userDetails.smoke},
+    { label: "Sunsign", value: userDetails.sunsign },
+    { label: "Blood Group", value: userDetails.bloodgroup },
   ];
 
   return (
@@ -23,7 +33,7 @@ const LifeStylePop = ({userDetails}) => {
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
           Lifestyle Details
         </Typography>
-        <TableContainer  sx={{ boxShadow: 3 }}>
+        <TableContainer component={Paper} sx={{ boxShadow: 3 }}>
           <Table>
             <TableBody>
               {data.map((row, index) => (
@@ -31,7 +41,11 @@ const LifeStylePop = ({userDetails}) => {
                   <TableCell
                     component="th"
                     scope="row"
-                    sx={{ fontWeight: "bold", width: "40%", backgroundColor: "#f9f9f9" }}
+                    sx={{
+                      fontWeight: "bold",
+                      width: "40%",
+                      backgroundColor: "#f9f9f9",
+                    }}
                   >
                     {row.label}
                   </TableCell>
