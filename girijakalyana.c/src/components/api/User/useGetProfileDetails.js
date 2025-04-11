@@ -8,18 +8,18 @@ import TokenService from "../../token/tokenService";
 
 export const useGetAllUsersProfiles = () => {
   return useQuery({
-    queryKey: ["allUsersProfiles"], // Cache key
+    queryKey: ["allUsersProfiles"],
     queryFn: async () => {
       const response = await get('/api/user/all-users-profiles');
-      if (response.success) {
-        return response.users;
+
+      if (response && response.success) {
+        return response.users || []; // 
       } else {
-        throw new Error(response.message || "Failed to fetch all users profiles");
+        throw new Error(response?.message || "Failed to fetch all users profiles");
       }
     },
   });
 };
-
 
   // your logic
   export const useGetMemberDetails = (reg_No) => {

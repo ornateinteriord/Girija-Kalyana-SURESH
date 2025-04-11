@@ -28,13 +28,13 @@ const LifeStylePop = ({ userDetails }) => {
   };
 
   const data = [
-    { label: "Skin Type", value: lifestyle.skinType },
-    { label: "Body Type", value: lifestyle.bodyType },
-    { label: "Diet", value: lifestyle.diet },
-    { label: "Drink", value: lifestyle.drink },
-    { label: "Smoke", value: lifestyle.smoke },
-    { label: "Sunsign", value: lifestyle.sunsign },
-    { label: "Blood Group", value: lifestyle.bloodgroup },
+    { label: "Skin Type", value: userDetails.skin_type },
+    { label: "Body Type", value: userDetails.body_type },
+    { label: "Diet", value: userDetails.diet },
+    { label: "Drink", value:userDetails.drink },
+    { label: "Smoke", value: userDetails.smoke},
+    { label: "Sunsign", value: userDetails.sunsign },
+    { label: "Blood Group", value: userDetails.bloodgroup },
   ];
 
   return (

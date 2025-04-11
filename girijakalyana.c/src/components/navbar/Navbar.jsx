@@ -13,15 +13,12 @@ import {
   MenuItem,
   CircularProgress,
 } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link,} from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useLoginMutation } from '../api/Auth';
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [openAdminDialog, setOpenAdminDialog] = useState(false);
-  const [enterUsername, setEnterUsername] = useState('');
-  const [enterPassword, setEnterPassword] = useState('');
   const [isRegister, setIsRegister] = useState(false);
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
   const [loginData, setLoginData] = useState({ username: '', password: '' });
@@ -42,28 +39,9 @@ const Navbar = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
-  const navigate = useNavigate();
+
   const { mutate: login, isPending: isLoginPending } = useLoginMutation();
 
-  // const handleLogin = (e) => {
-  //   e.preventDefault();
-  //   login(loginData, {
-  //     onSuccess: (data) => {
-  //       toast.success('Login successful!');
-  //       handleClose();
-  //       // Navigate based on user role or other criteria
-  //       navigate('/user');
-  //     },
-  //     onError: (error) => {
-  //       toast.error(error.response?.data?.message || 'Login failed');
-  //     }
-  //   });
-  // };
-  // const handleLogin = () => {
-  //   e.preventDefault();
-  //   login(loginData);
-  //   navigate('/user');
-  // };
   const handleLogin = (e) => {
     e.preventDefault();
     
@@ -75,8 +53,7 @@ const Navbar = () => {
     login(loginData);
   };
 
-  const handleOpenAdminDialog = () => setOpenAdminDialog(true);
-  const handleCloseAdminDialog = () => setOpenAdminDialog(false);
+
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -155,22 +132,6 @@ const Navbar = () => {
             >
               Login
             </Button>
-            {/* <Button
-              variant="contained"
-              size="large"
-              onClick={handleOpenAdminDialog}
-              style={{
-                backgroundColor: 'black',
-                marginRight: '25px',
-                width: '150px',
-                color: '#fff',
-                fontWeight: 700,
-                height: '42px',
-                textTransform: 'capitalize',
-              }}
-            >
-              Admin
-            </Button> */}
           </Typography>
         </div>
       </div>
@@ -181,7 +142,6 @@ const Navbar = () => {
           sx={{
             padding: '20px',
             maxWidth: '600px',
-            width: '90%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -343,107 +303,6 @@ const Navbar = () => {
         </Box>
       </Dialog>
 
-      {/* Admin Login Dialog */}
-      {/* <Dialog
-        open={openAdminDialog}
-        onClose={handleCloseAdminDialog}
-        sx={{
-          '& .MuiDialog-paper': {
-            width: '350px',
-            height: '430px',
-            background: '#fff',
-            backdropFilter: 'blur(10px)',
-            borderRadius: '10px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '20px',
-            textAlign: 'center',
-            marginTop: '70px',
-          },
-        }}
-      >
-        <Box
-          sx={{
-            width: '80px',
-            height: '80px',
-            borderRadius: '50%',
-            overflow: 'hidden',
-            marginBottom: '10px',
-          }}
-        >
-          <img
-            src="src/assets/profile.jpg"
-            alt="Admin Profile"
-            style={{ width: '100%', height: '100%' }}
-          />
-        </Box>
-
-        <Typography variant="h6" sx={{ marginBottom: '20px', fontWeight: 'bold', color: 'black' }}>
-          Admin Login
-        </Typography>
-
-        <TextField
-          placeholder="Enter username"
-          variant="outlined"
-          margin="dense"
-          value={enterUsername}
-          onChange={(e) => setEnterUsername(e.target.value)}
-          fullWidth
-          InputProps={{
-            startAdornment: <InputAdornment position="start"></InputAdornment>,
-            style: { color: 'black', marginBottom: '18px', fontWeight: 700, borderRadius: '13px' },
-          }}
-          required
-        />
-
-        <TextField
-          placeholder="Enter password"
-          variant="outlined"
-          type="password"
-          value={enterPassword}
-          onChange={(e) => setEnterPassword(e.target.value)}
-          margin="dense"
-          fullWidth
-          InputProps={{
-            startAdornment: <InputAdornment position="start"></InputAdornment>,
-            style: { color: 'black', marginBottom: '15px', borderRadius: '13px', fontWeight: 700 },
-          }}
-          required
-        />
-
-        <Typography sx={{ color: 'black', cursor: 'pointer' }} onClick={handleOpenForgotPassword}>
-          Forgot Password?
-        </Typography>
-        <Typography style={{ display: 'flex', alignItems: 'center', justifySelf: 'flex-end', gap: '6px' }}>
-          <Button
-            variant="outlined"
-            onClick={handleLogin}
-            sx={{
-              marginTop: '20px',
-              color: 'black',
-              width: '150px',
-              borderRadius: '10px',
-              '&:hover': { backgroundColor: '#1a4f72', color: '#fff' },
-            }}
-          >
-            LOGIN
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={handleCloseAdminDialog}
-            sx={{
-              marginTop: '20px',
-              color: 'black',
-              width: '150px',
-              borderRadius: '10px',
-              '&:hover': { backgroundColor: '#1a4f72', color: '#fff' },
-            }}
-          >
-            Cancel
-          </Button>
-        </Typography>
-      </Dialog> */}
 
       {/* Forgot Password Dialog */}
       <Dialog open={openForgotPassword} onClose={handleCloseForgotPassword}>

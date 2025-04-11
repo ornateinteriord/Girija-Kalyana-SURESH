@@ -6,17 +6,24 @@ import {
   Box
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
-import { useGetAllUsersDetails } from "../../api/Admin";
+import { getAllUserProfiles, } from "../../api/Admin";
 import { LoadingComponent } from "../../../App";
 
 const UserTable = () => {
-  const { data: users = [], isLoading, error } = useGetAllUsersDetails();
+  const { data: users = [], isLoading, isError,error } = getAllUserProfiles();
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUserType, setSelectedUserType] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("status");
   const [rowsPerPage, setRowsPerPage] = useState(6);
+
+
+   useEffect(() => {
+      if (isError) {
+        toast.error(error.message);
+      }
+    }, [isError, error]);
 
   useEffect(() => {
     if (users && users.length > 0) {
@@ -41,10 +48,10 @@ const UserTable = () => {
     // Then apply search filter
     filtered = filtered.filter(user => {
       const username = user?.username?.toLowerCase() || '';
-      const ref_no = user?.ref_no?.toLowerCase() || '';
+      const registration_no = user?.registration_no?.toLowerCase() || '';
       const searchLower = search.toLowerCase();
       
-      return username.includes(searchLower) || ref_no.includes(searchLower);
+      return username.includes(searchLower) || registration_no.includes(searchLower);
     });
 
     if(Status !=="status"){
@@ -109,7 +116,7 @@ const UserTable = () => {
     return role.replace('User', '').replace(/^\w/, c => c.toUpperCase());
   };
 
-  if (error) return <div>Error loading users</div>;
+ 
 
   return (
     <div style={{ padding: "20px", marginTop: "60px", fontFamily: "Outfit, sans-serif", marginLeft: '20px' }}>
@@ -200,10 +207,10 @@ const UserTable = () => {
           <TableBody>
             {currentUsers.length > 0 ? (
               currentUsers.map((user, index) => (
-                <TableRow key={user._id} hover sx={{ '&:hover': { backgroundColor: '#f9f9f9' } }}>
+                <TableRow key={user.id} hover sx={{ '&:hover': { backgroundColor: '#f9f9f9' } }}>
                   <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '17px' }}>{indexOfFirstUser + index + 1}</TableCell>
                   <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '17px', fontWeight: 500 }}>{user.username}</TableCell>
-                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '17px' }}>{user.ref_no}</TableCell>
+                  <TableCell sx={{ fontFamily: 'Outfit sans-serif', fontSize: '17px' }}>{user.registration_no}</TableCell>
                   <TableCell sx={{ 
                     fontFamily: 'Outfit sans-serif', 
                     fontSize: '15px',
