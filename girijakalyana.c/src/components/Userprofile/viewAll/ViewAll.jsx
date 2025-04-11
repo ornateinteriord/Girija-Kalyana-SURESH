@@ -38,20 +38,17 @@ const ViewAll = () => {
   // Data fetching
   const { data: users = [], isLoading, error } = useGetAllUsersProfiles();
 
-  const loggedInUserId = TokenService.getRegistrationNo()?.ref_no ;
-  console.log("mmmmm:",loggedInUserId)
+  const loggedInUserId = TokenService.getRegistrationNo(); 
 
-// Filter out admin and logged-in user
-const filteredUsers = users.filter(
-  (user) => user._id !== loggedInUserId && user.user_role !== "Admin"
-);
-
+  const filteredUsers = (users || []).filter(
+    (user) => user.ref_no !== loggedInUserId && user.user_role !== "Admin"
+  );
   
   // Correct pagination calculation
- const paginatedUsers = filteredUsers.slice(
-  (currentPage - 1) * itemsPerPage,
-  Math.min(currentPage * itemsPerPage, filteredUsers.length)
-);
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * itemsPerPage,
+    Math.min(currentPage * itemsPerPage, filteredUsers.length)
+  );
 
   const handleOpenDialog = (user) => {
     setSelectedUser(user);
@@ -136,7 +133,7 @@ const filteredUsers = users.filter(
                 display: "flex", 
                 flexDirection: "column",
                 alignItems: "center", 
-                gap: 2
+                gap: 2,
               }}>
                 <CardMedia
                   component="img"
@@ -146,7 +143,7 @@ const filteredUsers = users.filter(
                     borderRadius: "8px", 
                     height: 280, 
                     width: "100%",
-                    objectFit: "cover" 
+                    objectFit: "cover",
                   }}
                 />
                 <Box sx={{ width: "100%", textAlign: "center" }}>
@@ -258,7 +255,7 @@ const UserCard = ({ user, onViewMore, onLike }) => {
       transition: "transform 0.2s",
       "&:hover": { transform: "translateY(-4px)" }
     }}>
-      <Box sx={{ position: "relative"}}>
+      <Box sx={{ position: "relative", padding: '0 48px' }}>
         <CardMedia
           component="img"
           height="200"
@@ -296,7 +293,7 @@ const UserCard = ({ user, onViewMore, onLike }) => {
 
       <CardContent>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={0}>
-          <Typography sx={{fontSize:'16px'}} fontWeight="bold">
+          <Typography sx={{ fontSize: '16px' }} fontWeight="bold">
             {user.first_name} {user.last_name}
           </Typography>
           <Typography color="text.secondary">
