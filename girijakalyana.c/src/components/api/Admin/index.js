@@ -66,3 +66,17 @@ export const UserResetPassword = () => {
     },
   });
 };
+
+export const getAllAssistanceTransactions =()=>{
+  return useQuery({
+    queryKey: ["transactions"],
+    queryFn: async () => {
+      const response = await get("/api/admin/all-Assistance-transactions");
+      if (response.success) {
+        return response.transactions;
+      } else {
+        throw new Error(response.message);
+      }
+    },
+  });
+}
