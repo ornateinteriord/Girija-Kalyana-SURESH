@@ -26,7 +26,7 @@ const AboutPop = ({ userDetails }) => {
           <Table>
             <TableBody>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold" }}>Full Name</TableCell>
+                <TableCell sx={{ fontWeight: "bold",width:'150px' }}>Full Name</TableCell>
                 <TableCell>{`${userDetails.first_name || "N/A"} ${userDetails.last_name || ""}`}</TableCell>
               </TableRow>
               <TableRow>
