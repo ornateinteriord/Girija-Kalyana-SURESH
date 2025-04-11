@@ -1,9 +1,17 @@
 import React from "react";
-import { Box, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Typography } from "@mui/material";
+import { 
+  Box, 
+  Stack, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableRow, 
+  Paper, 
+  Typography 
+} from "@mui/material";
 
 const FamilyPop = ({ userDetails }) => {
-
-
   if (!userDetails || typeof userDetails !== "object" || Object.keys(userDetails).length === 0) {
     return <Typography>No family details available</Typography>;
   }
@@ -19,31 +27,39 @@ const FamilyPop = ({ userDetails }) => {
             <TableBody>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Father's Name</TableCell>
-                <TableCell>{userDetails?.fatherName || "N/A"}</TableCell>
+                <TableCell>{userDetails?.name_of_parent?.includes("Father") ? 
+                  userDetails.name_of_parent.split("-")[1]?.trim() || "N/A" : 
+                  "N/A"}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold" }}>Mother's Name</TableCell>
-                <TableCell>{userDetails?.motherName || "N/A"}</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Brothers</TableCell>
+                <TableCell>
+                  {`${userDetails.brother_elder_married || 0 + userDetails.brother_elder_unmarried || 0} elder, `}
+                  {`${userDetails.brother_younger_married || 0 + userDetails.brother_younger_unmarried || 0} younger` || "N/A"}
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold" }}>Siblings</TableCell>
-                <TableCell>{userDetails?.Siblings || "N/A"}</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Sisters</TableCell>
+                <TableCell>
+                  {`${userDetails.sister_elder_married || 0 + userDetails.sister_elder_unmarried || 0} elder, `}
+                  {`${userDetails.sister_younger_married || 0 + userDetails.sister_younger_unmarried || 0} younger` || "N/A"}
+                </TableCell>
               </TableRow>
-              {/* <TableRow>
-                <TableCell sx={{ fontWeight: "bold" }}>Religion</TableCell>
-                <TableCell>{userDetails?.religion || "N/A"}</TableCell>
-              </TableRow> */}
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Caste</TableCell>
                 <TableCell>{userDetails?.caste || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold" }}>Rashi</TableCell>
-                <TableCell>{userDetails?.rashi || "N/A"}</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Subcaste</TableCell>
+                <TableCell>{userDetails?.subcaste || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Gotra</TableCell>
                 <TableCell>{userDetails?.gotra || "N/A"}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold" }}>Rashi</TableCell>
+                <TableCell>{userDetails?.rashi || "N/A"}</TableCell>
               </TableRow>
             </TableBody>
           </Table>

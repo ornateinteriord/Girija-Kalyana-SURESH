@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 
-const AboutPop = ({  userDetails }) => {
+const AboutPop = ({ userDetails }) => {
   if (!userDetails || Object.keys(userDetails).length === 0) {
     return <Typography>No user details available.</Typography>;
   }
@@ -27,19 +27,19 @@ const AboutPop = ({  userDetails }) => {
             <TableBody>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Full Name</TableCell>
-                <TableCell>{`${userDetails.firstName || "N/A"} ${userDetails.lastName || ""}`}</TableCell>
+                <TableCell>{`${userDetails.first_name || "N/A"} ${userDetails.last_name || ""}`}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Date of Birth</TableCell>
-                <TableCell>{userDetails.dob || "N/A"}</TableCell>
+                <TableCell>{userDetails.date_of_birth || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Marital Status</TableCell>
-                <TableCell>{userDetails?.parentPrefer?.maritalStatus || "N/A"}</TableCell>
+                <TableCell>{userDetails.marital_status || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Language</TableCell>
-                <TableCell>{userDetails.language || "N/A"}</TableCell>
+                <TableCell>{userDetails.mother_tounge || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
@@ -47,11 +47,11 @@ const AboutPop = ({  userDetails }) => {
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Contact No</TableCell>
-                <TableCell>{userDetails.mobile || "N/A"}</TableCell>
+                <TableCell>{userDetails.mobile_no || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
-                <TableCell>{userDetails.email || "N/A"}</TableCell>
+                <TableCell>{userDetails.email_id || "N/A"}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
