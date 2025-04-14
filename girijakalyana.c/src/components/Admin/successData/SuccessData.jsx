@@ -5,40 +5,55 @@ import {
   Typography,
   Select,
   MenuItem,
-  TextField,
+  Pagination,
+  Stack,
   InputAdornment,
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
-import axios from "axios";
-import { customStyles, getPendingandSuccessUserDataColumns } from "../../../utils/DataTableColumnsProvider";
+import { getAllUserProfiles } from "../../api/Admin";
 
 const SuccessData = () => {
-  const [records, setRecords] = useState([]);
+  const {data:users =[],isLoading,isError,error} = getAllUserProfiles()
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(7);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("https://jsonplaceholder.typicode.com/users");
-        setRecords(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, []);
+
+    useEffect(() => {
+        if (isError) {
+          toast.error(error.message);
+        }
+      }, [isError, error]);
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
   };
 
-  const filteredRecords = records.filter((data) =>
-    data.name.toLowerCase().includes(search.toLowerCase()) ||
-    data.email.toLowerCase().includes(search.toLowerCase()) ||
-    data.phone.includes(search) ||
-    data.username.toLowerCase().includes(search.toLowerCase()) ||
-    data.address.city.toLowerCase().includes(search.toLowerCase())
-  );
+  const filterCurrentRowData = users.filter((data) => {
+    const isAdmin = data?.user_role?.toLowerCase() === "admin";
+    const isActive = data?.status?.toLowerCase() === "active";
+    
+    return (
+      !isAdmin && 
+      isActive && 
+      (
+        search === "" ||
+        data.registration_no?.toString().toLowerCase().includes(search.toLowerCase()) ||
+        data.first_name?.toLowerCase().includes(search.toLowerCase()) ||
+        data.username?.toString().toLowerCase().includes(search.toLowerCase()) ||
+        data.mobile_no?.toString().toLowerCase().includes(search.toLowerCase()) ||
+        data.caste?.toString().toLowerCase().includes(search.toLowerCase()) ||
+        data.type_of_user?.toString().toLowerCase().includes(search.toLowerCase())
+      )
+    );
+  });
+
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const paginatedRecords = filterCurrentRowData.slice(startIndex, startIndex + rowsPerPage);
+
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div style={{ padding: "20px", paddingLeft: "50px", paddingTop: "100px" }}>
@@ -73,23 +88,44 @@ const SuccessData = () => {
         </Box>
       </Box>
 
-      <DataTable
-        columns={getPendingandSuccessUserDataColumns()}
-        data={filteredRecords}
-        pagination
-        paginationPerPage={6}
-        paginationRowsPerPageOptions={[6, 10, 15, 20]}
-        paginationComponentOptions={{
-          rowsPerPageText: "Rows per page:",
-          rangeSeparatorText: "of",
-        }}
-       noDataComponent={
-          <Typography padding={3} textAlign="center">
-            No records found
-          </Typography>
-        }
-        customStyles={customStyles}
-      />
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Registration No</TableCell>
+              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Name</TableCell>
+              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Email</TableCell>
+              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Mobile No</TableCell>
+              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Caste</TableCell>
+              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>User Type</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {paginatedRecords.map((row, index) => (
+              <TableRow key={row.id}>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.registration_no}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.first_name}{row.last_name}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.username}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.mobile_no}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.caste}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.type_of_user}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <Stack spacing={2} direction="row" alignItems="center" justifySelf={"end"} mt={3}>
+        <Pagination
+          count={Math.ceil(filterCurrentRowData.length / rowsPerPage)}
+          page={currentPage}
+          onChange={handlePageChange}
+          shape="rounded"
+          color="primary"
+          siblingCount={1}
+          boundaryCount={1}
+        />
+      </Stack>
     </div>
   );
 };

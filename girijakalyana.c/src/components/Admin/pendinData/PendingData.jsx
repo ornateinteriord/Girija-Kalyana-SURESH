@@ -8,87 +8,53 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
-import DataTable from "react-data-table-component";
-import { customStyles, getPendingandSuccessUserDataColumns } from "../../../utils/DataTableColumnsProvider";
-
-// Dummy static user data
-const dummyUsers = [
-  {
-    id: 101,
-    name: "Abhinav Kumar",
-    username: "abhinavk",
-    email: "abhinav@example.com",
-    phone: "9876543210",
-  },
-  {
-    id: 102,
-    name: "Suma Ramesh",
-    username: "suma123",
-    email: "suma@example.com",
-    phone: "9988776655",
-  },
-  {
-    id: 103,
-    name: "John Doe",
-    username: "jdoe",
-    email: "john@example.com",
-    phone: "9123456789",
-  },
-  {
-    id: 104,
-    name: "Priya Shetty",
-    username: "priyas",
-    email: "priya@example.com",
-    phone: "9888997766",
-  },
-  {
-    id: 105,
-    name: "Arun N",
-    username: "arunn",
-    email: "arun@example.com",
-    phone: "9001234567",
-  },
-  {
-    id: 106,
-    name: "Divya Rao",
-    username: "divrao",
-    email: "divya@example.com",
-    phone: "9012345678",
-  },
-  {
-    id: 107,
-    name: "Ravi Patel",
-    username: "ravip",
-    email: "ravi@example.com",
-    phone: "9876512345",
-  },
-  {
-    id: 108,
-    name: "Sneha Joshi",
-    username: "sneha88",
-    email: "sneha@example.com",
-    phone: "8899776655",
-  },
-];
+import { getAllUserProfiles } from "../../api/Admin";
+import { LoadingComponent } from "../../../App";
+import { toast } from "react-toastify";
 
 const PendingData = () => {
-  const [records, setRecords] = useState([]);
+  const {data:users =[],isLoading,isError,error} = getAllUserProfiles()
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(7);
   const [search, setSearch] = useState("");
 
-  // Load dummy data
-  useEffect(() => {
-    setRecords(dummyUsers);
-  }, []);
 
-  const filteredRecords = records.filter((record) =>
-    [
-      record.id.toString(),
-      record.name?.toLowerCase(),
-      record.username?.toLowerCase(),
-      record.email?.toLowerCase(),
-      record.phone?.toLowerCase(),
-    ].some((field) => field?.includes(search.toLowerCase()))
-  );
+  useEffect(() => {
+      if (isError) {
+        toast.error(error.message);
+      }
+    }, [isError, error]);
+
+  const handleSearch = (event) => {
+    setSearch(event.target.value);
+  };
+
+  const handlePageChange = (event, newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setCurrentPage(1);
+  };
+
+  const filteredRecords = users.filter((record) => {
+    const isAdmin = record?.user_role?.toLowerCase() === "admin";
+    const isPending = record?.status?.toLowerCase() === "pending"; // Check if status is "pending"
+
+    return (
+      !isAdmin &&
+      isPending && // Only include pending users
+      [
+        record.registration_no?.toString().toLowerCase(),
+        record.first_name?.toLowerCase(),
+        record.username?.toLowerCase(),
+        record.mobile_no?.toString().toLowerCase(),
+        record.caste?.toString().toLowerCase(),
+        record.type_of_user?.toString().toLowerCase(),
+      ].some((field) => field?.includes(search.toLowerCase()))
+    );
+  });
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
@@ -120,23 +86,50 @@ const PendingData = () => {
         </Box>
       </Box>
 
-      <DataTable
-        columns={getPendingandSuccessUserDataColumns()}
-        data={filteredRecords}
-        pagination
-        paginationPerPage={6}
-        paginationRowsPerPageOptions={[6, 10, 15, 20]}
-        paginationComponentOptions={{
-          rowsPerPageText: "Rows per page:",
-          rangeSeparatorText: "of",
-        }}
-       noDataComponent={
-          <Typography padding={3} textAlign="center">
-            No records found
-          </Typography>
-        }
-        customStyles={customStyles}
-      />
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Registration No</TableCell>
+              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Name</TableCell>
+              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Email</TableCell>
+              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Phone</TableCell>
+              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Caste</TableCell>
+              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>User Type</TableCell>
+              {/* <TableCell>Action</TableCell> */}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {paginatedRecords.map((record) => (
+              <TableRow key={record.id}>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.registration_no}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.first_name}{record.last_name}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.username}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.mobile_no}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.caste}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.type_of_user}</TableCell>
+                {/* <TableCell>
+                  <Button variant="contained" color="success">
+                    Active
+                  </Button>
+                </TableCell> */}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Stack spacing={2} direction="row" alignItems="center" justifySelf={"end"} mt={3}>
+        <Pagination
+          count={Math.ceil(filteredRecords.length / rowsPerPage)}
+          page={currentPage}
+          onChange={handlePageChange}
+          shape="rounded"
+          color="primary"
+          siblingCount={1}
+          boundaryCount={1}
+        />
+      </Stack>
+      {isLoading && <LoadingComponent/>}
     </Box>
   );
 };
