@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { FaUsers } from "react-icons/fa";
 import { MdCurrencyRupee } from "react-icons/md";
 import { Link } from "react-router-dom";
 import "./dashboard.scss";
+import { getAllUserProfiles } from "../../api/Admin";
+import { LoadingComponent } from "../../../App";
 
 // Reusable Card Component
 const DashboardCard = ({ count, label, icon, link, style }) => {
@@ -23,34 +25,26 @@ const DashboardCard = ({ count, label, icon, link, style }) => {
 };
 
 const Dashboard=() =>{
-  const [users, setUsers] = useState([]);
-  const [error, setError] = useState(null);
-
+const {data:users =[],isLoading,isError,error} = getAllUserProfiles()
+console.log(users)
+const freeUsersCount = users.filter(user => user?.type_of_user?.toLowerCase() === "freeuser").length;
+const silverUsersCount = users.filter(user => user?.type_of_user?.toLowerCase() === "silveruser").length;
+const premiumUsersCount = users.filter(user => user?.type_of_user?.toLowerCase() === "premiumuser").length;
+console.log(freeUsersCount,"free user")
   // Fetch users using async/await
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch("https://jsonplaceholder.typicode.com/users");
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} - ${response.statusText}`);
-      }
-      const data = await response.json();
-      setUsers(data);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+   useEffect(() => {
+       if (isError) {
+         toast.error(error.message);
+       }
+     }, [isError, error]);
 
   // Define iconStyle before it is used
   const iconStyle = { fontSize: "50px", color: "#92d0f3" };
 
   const stats = [
-    { count: 405, label: "Free Users", icon: <FaUsers style={iconStyle} /> },
-    { count: 108, label: "Silver Users", icon: <FaUsers style={iconStyle} /> },
-    { count: 10, label: "Premium Users", icon: <FaUsers style={iconStyle} /> },
+    { count: freeUsersCount, label: "Free Users", icon: <FaUsers style={iconStyle} /> },
+    { count: silverUsersCount, label: "Silver Users", icon: <FaUsers style={iconStyle} /> },
+    { count: premiumUsersCount, label: "Premium Users", icon: <FaUsers style={iconStyle} /> },
     { count: 67, label: "Total Paid Users", icon: <FaUsers style={iconStyle} />, link: "/admin/onlinetransaction" },
     { count: 325, label: "Assistance Pending", icon: <FaUsers style={iconStyle} />, link: "/admin/assistencepending" },
     { count: 2, label: "Assistance Success", icon: <FaUsers style={iconStyle} />, link: "/admin/assistencesuccess" },
@@ -105,6 +99,7 @@ const Dashboard=() =>{
           </div> */}
         {/* </div> */}
       {/* </div> */}
+      {isLoading && <LoadingComponent/>}
     </div>
   );
 }

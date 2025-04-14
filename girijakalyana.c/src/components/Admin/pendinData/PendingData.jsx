@@ -18,25 +18,22 @@ import {
   Paper,
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
-import axios from "axios";
+import { getAllUserProfiles } from "../../api/Admin";
+import { LoadingComponent } from "../../../App";
+import { toast } from "react-toastify";
 
 const PendingData = () => {
+  const {data:users =[],isLoading,isError,error} = getAllUserProfiles()
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(7);
-  const [records, setRecords] = useState([]);
   const [search, setSearch] = useState("");
 
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("https://jsonplaceholder.typicode.com/users");
-        setRecords(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      if (isError) {
+        toast.error(error.message);
       }
-    };
-    fetchData();
-  }, []);
+    }, [isError, error]);
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
@@ -51,15 +48,23 @@ const PendingData = () => {
     setCurrentPage(1);
   };
 
-  const filteredRecords = records.filter((record) =>
-    [
-      record.id.toString(),
-      record.name.toLowerCase(),
-      record.username.toLowerCase(),
-      record.email.toLowerCase(),
-      record.phone.toLowerCase(),
-    ].some((field) => field.includes(search.toLowerCase()))
-  );
+  const filteredRecords = users.filter((record) => {
+    const isAdmin = record?.user_role?.toLowerCase() === "admin";
+    const isPending = record?.status?.toLowerCase() === "pending"; // Check if status is "pending"
+
+    return (
+      !isAdmin &&
+      isPending && // Only include pending users
+      [
+        record.registration_no?.toString().toLowerCase(),
+        record.first_name?.toLowerCase(),
+        record.username?.toLowerCase(),
+        record.mobile_no?.toString().toLowerCase(),
+        record.caste?.toString().toLowerCase(),
+        record.type_of_user?.toString().toLowerCase(),
+      ].some((field) => field?.includes(search.toLowerCase()))
+    );
+  });
 
   const startIndex = (currentPage - 1) * rowsPerPage;
   const paginatedRecords = filteredRecords.slice(startIndex, startIndex + rowsPerPage);
@@ -123,12 +128,12 @@ const PendingData = () => {
           <TableBody>
             {paginatedRecords.map((record) => (
               <TableRow key={record.id}>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.id}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.name}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.email}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.phone}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>-</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>Free/Silver User</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.registration_no}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.first_name}{record.last_name}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.username}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.mobile_no}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.caste}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.type_of_user}</TableCell>
                 {/* <TableCell>
                   <Button variant="contained" color="success">
                     Active
@@ -150,6 +155,7 @@ const PendingData = () => {
           boundaryCount={1}
         />
       </Stack>
+      {isLoading && <LoadingComponent/>}
     </Box>
   );
 };

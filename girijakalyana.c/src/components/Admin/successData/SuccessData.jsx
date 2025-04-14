@@ -10,8 +10,6 @@ import {
   TextField,
   Select,
   MenuItem,
-  FormControl,
-  InputLabel,
   Pagination,
   Stack,
   InputAdornment,
@@ -20,24 +18,20 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { FaSearch } from "react-icons/fa";
+import { getAllUserProfiles } from "../../api/Admin";
 
 const SuccessData = () => {
+  const {data:users =[],isLoading,isError,error} = getAllUserProfiles()
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(7);
-  const [records, setRecords] = useState([]);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("https://jsonplaceholder.typicode.com/users");
-        setRecords(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, []);
+
+    useEffect(() => {
+        if (isError) {
+          toast.error(error.message);
+        }
+      }, [isError, error]);
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
@@ -49,14 +43,22 @@ const SuccessData = () => {
     setCurrentPage(1);
   };
 
-  const filterCurrentRowData = records.filter((data) => {
+  const filterCurrentRowData = users.filter((data) => {
+    const isAdmin = data?.user_role?.toLowerCase() === "admin";
+    const isActive = data?.status?.toLowerCase() === "active";
+    
     return (
-      search === "" ||
-      data.name.toLowerCase().includes(search.toLowerCase()) ||
-      data.email.toLowerCase().includes(search.toLowerCase()) ||
-      data.phone.includes(search) ||
-      data.username.toLowerCase().includes(search.toLowerCase()) ||
-      data.address.city.toLowerCase().includes(search.toLowerCase())
+      !isAdmin && 
+      isActive && 
+      (
+        search === "" ||
+        data.registration_no?.toString().toLowerCase().includes(search.toLowerCase()) ||
+        data.first_name?.toLowerCase().includes(search.toLowerCase()) ||
+        data.username?.toString().toLowerCase().includes(search.toLowerCase()) ||
+        data.mobile_no?.toString().toLowerCase().includes(search.toLowerCase()) ||
+        data.caste?.toString().toLowerCase().includes(search.toLowerCase()) ||
+        data.type_of_user?.toString().toLowerCase().includes(search.toLowerCase())
+      )
     );
   });
 
@@ -124,12 +126,12 @@ const SuccessData = () => {
           <TableBody>
             {paginatedRecords.map((row, index) => (
               <TableRow key={row.id}>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>-</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.name}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.email}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.phone}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>Here Caste</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>Free/Silver User</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.registration_no}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.first_name}{row.last_name}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.username}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.mobile_no}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.caste}</TableCell>
+                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.type_of_user}</TableCell>
               </TableRow>
             ))}
           </TableBody>
