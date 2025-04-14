@@ -22,6 +22,7 @@ import { LoadingComponent } from "../../../App";
 import { toast } from "react-toastify";
 import { customStyles, getResetPasswordColumns } from "../../../utils/DataTableColumnsProvider";
 
+
 const ResetPassword = () => {
   const [search, setSearch] = useState("");
   const [openDialog, setOpenDialog] = useState(false);

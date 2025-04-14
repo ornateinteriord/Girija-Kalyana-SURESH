@@ -340,4 +340,72 @@ export const getUserDataColumns = (upgradeUserMutation, handleUpgrade) => [
     },
   ];
 
+  export const getAssistancePendingColumns = () => [
+    {
+      name: "Registration No",
+      selector: row => row.registration_no,
+      sortable: true,
+    },
+    {
+      name: "Name",
+      selector: row => `${row.first_name} ${row.last_name}`,
+      sortable: true,
+    },
+    {
+      name: "Email",
+      selector: row => row.username,
+      sortable: true,
+    },
+    {
+      name: "Phone",
+      selector: row => row.mobile_no,
+      sortable: true,
+    },
+    {
+      name: "Caste",
+      selector: row => row.caste,
+      sortable: true,
+    },
+    {
+      name: "User Type",
+      selector: row => row.type_of_user,
+      sortable: true,
+    },
+
+  ];
+
+  export const getAssistanceSuccessColumns = () => [
+    {
+      name: "Registration No",
+      selector: row => row.registration_no,
+      sortable: true,
+    },
+    {
+      name: "Name",
+      selector: row => `${row.first_name} ${row.last_name}`,
+      sortable: true,
+    },
+    {
+      name: "Email",
+      selector: row => row.username,
+      sortable: true,
+    },
+    {
+      name: "Phone",
+      selector: row => row.mobile_no,
+      sortable: true,
+    },
+    {
+      name: "Caste",
+      selector: row => row.caste,
+      sortable: true,
+    },
+    {
+      name: "User Type",
+      selector: row => row.type_of_user,
+      sortable: true,
+    },
+
+  ];
+
 

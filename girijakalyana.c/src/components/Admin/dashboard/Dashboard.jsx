@@ -26,11 +26,9 @@ const DashboardCard = ({ count, label, icon, link, style }) => {
 
 const Dashboard=() =>{
 const {data:users =[],isLoading,isError,error} = getAllUserProfiles()
-console.log(users)
 const freeUsersCount = users.filter(user => user?.type_of_user?.toLowerCase() === "freeuser").length;
 const silverUsersCount = users.filter(user => user?.type_of_user?.toLowerCase() === "silveruser").length;
 const premiumUsersCount = users.filter(user => user?.type_of_user?.toLowerCase() === "premiumuser").length;
-console.log(freeUsersCount,"free user")
   // Fetch users using async/await
    useEffect(() => {
        if (isError) {
