@@ -9,6 +9,7 @@ import {
 import { FaSearch } from "react-icons/fa";
 import { customStyles, getImageVerificationColumns } from "../../../utils/DataTableColumnsProvider";
 
+
 const dummyImageVerificationRecords = [
   {
     id: 1,

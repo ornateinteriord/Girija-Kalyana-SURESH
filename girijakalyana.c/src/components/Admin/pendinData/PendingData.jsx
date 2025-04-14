@@ -6,16 +6,18 @@ import {
   MenuItem,
   TextField,
   InputAdornment,
+  Paper,
+  Stack,
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
 import { getAllUserProfiles } from "../../api/Admin";
 import { LoadingComponent } from "../../../App";
 import { toast } from "react-toastify";
+import DataTable from "react-data-table-component";
+import { customStyles, getAssistancePendingColumns } from "../../../utils/DataTableColumnsProvider";
 
 const PendingData = () => {
   const {data:users =[],isLoading,isError,error} = getAllUserProfiles()
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(7);
   const [search, setSearch] = useState("");
 
 
@@ -25,18 +27,9 @@ const PendingData = () => {
       }
     }, [isError, error]);
 
-  const handleSearch = (event) => {
-    setSearch(event.target.value);
-  };
 
-  const handlePageChange = (event, newPage) => {
-    setCurrentPage(newPage);
-  };
 
-  const handleRowsPerPageChange = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(1);
-  };
+
 
   const filteredRecords = users.filter((record) => {
     const isAdmin = record?.user_role?.toLowerCase() === "admin";
@@ -86,50 +79,24 @@ const PendingData = () => {
         </Box>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Registration No</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Name</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Email</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Phone</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Caste</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>User Type</TableCell>
-              {/* <TableCell>Action</TableCell> */}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedRecords.map((record) => (
-              <TableRow key={record.id}>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.registration_no}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.first_name}{record.last_name}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.username}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.mobile_no}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.caste}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.type_of_user}</TableCell>
-                {/* <TableCell>
-                  <Button variant="contained" color="success">
-                    Active
-                  </Button>
-                </TableCell> */}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Stack spacing={2} direction="row" alignItems="center" justifySelf={"end"} mt={3}>
-        <Pagination
-          count={Math.ceil(filteredRecords.length / rowsPerPage)}
-          page={currentPage}
-          onChange={handlePageChange}
-          shape="rounded"
-          color="primary"
-          siblingCount={1}
-          boundaryCount={1}
+      <Paper>
+        <DataTable
+          columns={getAssistancePendingColumns()}
+          data={filteredRecords}
+          customStyles={customStyles}
+          pagination
+          paginationPerPage={6}
+          paginationRowsPerPageOptions={[6, 10, 15, 20]}
+          paginationComponentOptions={{
+            rowsPerPageText: 'Rows per page:',
+            rangeSeparatorText: 'of',
+            noRowsPerPage: false,
+          }}
+          noDataComponent={<Typography padding={3}>No data available</Typography>}
+          progressPending={isLoading}
+          progressComponent={<LoadingComponent />}
         />
-      </Stack>
-      {isLoading && <LoadingComponent/>}
+      </Paper>
     </Box>
   );
 };

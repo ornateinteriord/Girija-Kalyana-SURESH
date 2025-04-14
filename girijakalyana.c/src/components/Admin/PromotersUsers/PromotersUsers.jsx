@@ -16,6 +16,7 @@ import { FaSearch } from "react-icons/fa";
 import axios from "axios";
 import { customStyles, getPromoterTableColumns } from "../../../utils/DataTableColumnsProvider";
 
+
 const PromotersUsers = () => {
   const [records, setRecords] = useState([]);
   const [search, setSearch] = useState("");

@@ -10,8 +10,9 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
-import { customStyles, getRenewalsColumns } from "../../../utils/DataTableColumnsProvider";
+
 import { LoadingComponent } from "../../../App";
+import { customStyles, getRenewalsColumns } from "../../../utils/DataTableColumnsProvider";
 
 const RenewalsData = () => {
   const [records, setRecords] = useState([]);

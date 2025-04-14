@@ -8,9 +8,13 @@ import {
   Pagination,
   Stack,
   InputAdornment,
+  Paper,
+  TextField,
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
 import { getAllUserProfiles } from "../../api/Admin";
+import { customStyles, getAssistanceSuccessColumns } from "../../../utils/DataTableColumnsProvider";
+import { LoadingComponent } from "../../../App";
 
 const SuccessData = () => {
   const {data:users =[],isLoading,isError,error} = getAllUserProfiles()
@@ -87,45 +91,24 @@ const SuccessData = () => {
           />
         </Box>
       </Box>
-
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Registration No</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Name</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Email</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Mobile No</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Caste</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>User Type</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedRecords.map((row, index) => (
-              <TableRow key={row.id}>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.registration_no}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.first_name}{row.last_name}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.username}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.mobile_no}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.caste}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.type_of_user}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <Stack spacing={2} direction="row" alignItems="center" justifySelf={"end"} mt={3}>
-        <Pagination
-          count={Math.ceil(filterCurrentRowData.length / rowsPerPage)}
-          page={currentPage}
-          onChange={handlePageChange}
-          shape="rounded"
-          color="primary"
-          siblingCount={1}
-          boundaryCount={1}
+      <Paper>
+        <DataTable
+          columns={getAssistanceSuccessColumns()}
+          data={filterCurrentRowData}
+          customStyles={customStyles}
+          pagination
+          paginationPerPage={6}
+          paginationRowsPerPageOptions={[6, 10, 15, 20]}
+          paginationComponentOptions={{
+            rowsPerPageText: 'Rows per page:',
+            rangeSeparatorText: 'of',
+            noRowsPerPage: false,
+          }}
+          noDataComponent={<Typography padding={3}>No data available</Typography>}
+          progressPending={isLoading}
+          progressComponent={<LoadingComponent />}
         />
-      </Stack>
+      </Paper>
     </div>
   );
 };

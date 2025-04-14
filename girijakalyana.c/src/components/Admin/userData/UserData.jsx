@@ -16,6 +16,7 @@ import { LoadingComponent } from "../../../App";
 import toast from "react-hot-toast";
 import { customStyles, getUserDataColumns } from "../../../utils/DataTableColumnsProvider";
 
+
 const UserData = () => {
   const { data: users = [], isLoading, isError, error } = getAllUserProfiles();
   const [localUsers, setLocalUsers] = useState(users);

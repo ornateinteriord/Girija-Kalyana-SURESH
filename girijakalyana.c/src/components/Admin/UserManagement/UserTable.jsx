@@ -17,6 +17,7 @@ import { LoadingComponent } from "../../../App";
 import toast from "react-hot-toast";
 import { customStyles, getUserTableColumns } from "../../../utils/DataTableColumnsProvider";
 
+
 const UserTable = () => {
   const { data: users = [], isLoading, isError, error } = getAllUserProfiles();
   const [filteredUsers, setFilteredUsers] = useState([]);
