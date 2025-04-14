@@ -1,21 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
   Box,
-  Button,
+  Typography,
   Select,
   MenuItem,
   TextField,
   InputAdornment,
-  Stack,
-  Pagination,
-  Paper,
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
 import { getAllUserProfiles } from "../../api/Admin";
@@ -66,51 +56,35 @@ const PendingData = () => {
     );
   });
 
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const paginatedRecords = filteredRecords.slice(startIndex, startIndex + rowsPerPage);
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  };
+
 
   return (
     <Box p={5} marginTop={6}>
-      
-           <Box display="flex" justifyContent="space-between" marginBottom={2}>
-           <Typography style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
-           <Typography variant="h4" gutterBottom color="#34495e" fontWeight={600} marginRight={2} fontFamily={'Outfit sans-serif'}>
-             Pending data
-           </Typography>
-           <Select
-               value={rowsPerPage}
-               onChange={handleRowsPerPageChange}
-               size="medium"
-               style={{width:'90px'}}
-               displayEmpty
-             >
-               {[5, 7, 10].map((size) => (
-                 <MenuItem key={size} value={size}>
-                   {size}
-                 </MenuItem>
-               ))}
-             </Select>
-           </Typography>
-           
-     
-             <TextField
-             placeholder="Search user"
-               label="Search"
-               variant="outlined"
-               value={search}
-               onChange={handleSearch}
-               size="medium"
-               style={{width:'300px'}}
-               InputProps={{
-                 startAdornment: (
-                   <InputAdornment position="start" style={{ marginRight: "8px" }}>
-                     <FaSearch />
-                   </InputAdornment>
-                 ),
-               }}
-             />
-            
-           </Box>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h4" color="#34495e" fontWeight={600} fontFamily="Outfit sans-serif">
+          Pending Data
+        </Typography>
+
+        <Box display="flex" alignItems="center" gap={2}>
+          <TextField
+            size="small"
+            label="Search"
+            placeholder="Search user"
+            value={search}
+            onChange={handleSearch}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <FaSearch />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+      </Box>
 
       <TableContainer component={Paper}>
         <Table>

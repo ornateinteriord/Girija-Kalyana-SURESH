@@ -1,163 +1,140 @@
 import React, { useEffect, useState } from "react";
+import DataTable from "react-data-table-component";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-  Select,
-  MenuItem,
   Box,
-  Button,
+  Typography,
+  TextField,
   InputAdornment,
-  Stack,
-  Pagination,
-  FormControl,
-  InputLabel,
-  Paper,
 } from "@mui/material";
-import axios from "axios";
 import { FaSearch } from "react-icons/fa";
+import { customStyles, getImageVerificationColumns } from "../../../utils/DataTableColumnsProvider";
+
+const dummyImageVerificationRecords = [
+  {
+    id: 1,
+    name: "Ravi Kumar",
+    email: "ravi.kumar@example.com",
+    isActive: true,
+  },
+  {
+    id: 2,
+    name: "Ayesha Singh",
+    email: "ayesha.singh@example.com",
+    isActive: false,
+  },
+  {
+    id: 3,
+    name: "Vikram Patel",
+    email: "vikram.patel@example.com",
+    isActive: true,
+  },
+  {
+    id: 4,
+    name: "Sneha Reddy",
+    email: "sneha.reddy@example.com",
+    isActive: false,
+  },
+  {
+    id: 5,
+    name: "Manoj Das",
+    email: "manoj.das@example.com",
+    isActive: true,
+  },
+  {
+    id: 6,
+    name: "Divya Iyer",
+    email: "divya.iyer@example.com",
+    isActive: false,
+  },
+  {
+    id: 7,
+    name: "Arun Mehta",
+    email: "arun.mehta@example.com",
+    isActive: true,
+  },
+  {
+    id: 8,
+    name: "Meera Joseph",
+    email: "meera.joseph@example.com",
+    isActive: false,
+  },
+];
 
 const ImageVerificationData = () => {
-  const [currentPage, setCurrentPage] = useState(1); // Start from page 1
-  const [rowsPerPage, setRowsPerPage] = useState(6);
   const [records, setRecords] = useState([]);
+  const [filteredRecords, setFilteredRecords] = useState([]);
   const [search, setSearch] = useState("");
 
+  // Handle Search
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("https://jsonplaceholder.typicode.com/users");
-        setRecords(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, []);
+    const filtered = records.filter((data) =>
+      [
+        data.id.toString(),
+        data.name?.toLowerCase(),
+        data.username?.toLowerCase(),
+        data.email?.toLowerCase(),
+        data.phone?.toLowerCase(),
+        data.address?.city?.toLowerCase(),
+      ].some((field) => field?.includes(search.toLowerCase()))
+    );
+    setFilteredRecords(filtered);
+  }, [search, records]);
 
-  const handleSearchChange = (event) => {
-    setSearch(event.target.value);
-  };
-
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
-  };
-
-  const handleRowsPerPageChange = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(1); // Reset to page 1
-  };
-
-  const filteredRecords = records.filter((data) =>
-    [
-      data.id.toString(),
-      data.name.toLowerCase(),
-      data.username.toLowerCase(),
-      data.email.toLowerCase(),
-      data.phone.toLowerCase(),
-      data.address?.city?.toLowerCase(),
-    ].some((field) => field.includes(search.toLowerCase()))
-  );
-
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const paginatedRecords = filteredRecords.slice(startIndex, startIndex + rowsPerPage);
+  
+  useEffect(() => {
+    setRecords(dummyImageVerificationRecords);
+  },[])
 
   return (
-    <Box p={7} marginTop={4} >
-      <Box sx={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-       <Typography style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
-        <h2 style={{marginRight:'8px',color:'#34495e',fontFamily: "Outfit sans-serif"}}>Image Verify</h2>
-
-        {/* Rows per page */}
-        <div className="rows-per-page">
-          {/* <label>Show </label> */}
-          <FormControl sx={{ width: 100 }}>
-            <InputLabel>Rows</InputLabel>
-            <Select value={rowsPerPage} onChange={handleRowsPerPageChange} label="Rows">
-              {[6, 10, 15, 20].map((num) => (
-                <MenuItem key={num} value={num}>{num}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {/* <label> Entries</label> */}
-        </div>
+    <Box p={6} mt={6}>
+      {/* Header & Controls */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography
+          variant="h5"
+          sx={{ fontFamily: "Outfit, sans-serif", color: "#34495e", fontWeight: 600 }}
+        >
+          Image Verify
         </Typography>
 
-        <TextField
-          placeholder="Search record"
-          variant="outlined"
-          size="large"
-          value={search}
-          onChange={handleSearchChange}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start" style={{ marginRight: "8px" }}>
-                <FaSearch />
-              </InputAdornment>
-            ),
-          }}
-          style={{ width: "300px" }}
-        />
+        <Box display="flex" alignItems="center" gap={2}>
+
+          {/* Search Field */}
+          <TextField
+            placeholder="Search record"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <FaSearch />
+                </InputAdornment>
+              ),
+            }}
+            style={{ width: "300px" }}
+            variant="outlined"
+          />
+        </Box>
       </Box>
 
-      <TableContainer component={Paper} >
-        <Table  >
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Registration No</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Name</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Email Id</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Gender</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>User Type</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Image Status</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Notify</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedRecords.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>-</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.name}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.email}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>-</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>-</TableCell>
-                <Button  style={{backgroundColor:'#ffefcc',
-                  borderRadius:'5px',marginTop:'15px',textTransform:'capitalize'
-                }}>Upload</Button>
-                <TableCell>NA</TableCell>
-                <TableCell>
-                  <Button
-                    variant="text"
-                    color={row.isActive ? "success" : "error"}
-                    size="small"
-                    style={{ textTransform: "capitalize",fontSize:'16px' }}
-                  >
-                    {row.isActive ? "Active" : "Pending"}
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <Stack spacing={2} direction="row" justifySelf={"end"} alignItems="center" mt={3}>
-        <Pagination
-          count={Math.ceil(filteredRecords.length / rowsPerPage)}
-          page={currentPage}
-          onChange={handlePageChange}
-          shape="rounded"
-          color="primary"
-          siblingCount={1}
-          boundaryCount={1}
-        />
-      </Stack>
+      {/* Data Table */}
+      <DataTable
+        columns={getImageVerificationColumns()}
+        data={filteredRecords}
+        progressPending={false}
+        pagination
+        paginationPerPage={6}
+        paginationRowsPerPageOptions={[6, 10, 15, 20]}
+        paginationComponentOptions={{
+          rowsPerPageText: "Rows per page:",
+          rangeSeparatorText: "of",
+        }}
+        noDataComponent={
+          <Typography padding={3} textAlign="center">
+            No records found
+          </Typography>
+        }
+        customStyles={customStyles}
+      />
     </Box>
   );
 };

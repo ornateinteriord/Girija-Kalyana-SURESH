@@ -1,22 +1,14 @@
 import React, { useEffect, useState } from "react";
+import DataTable from "react-data-table-component";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TextField,
+  Box,
+  Typography,
   Select,
   MenuItem,
   Pagination,
   Stack,
   InputAdornment,
-  Box,
-  Typography,
 } from "@mui/material";
-import axios from "axios";
 import { FaSearch } from "react-icons/fa";
 import { getAllUserProfiles } from "../../api/Admin";
 
@@ -35,12 +27,6 @@ const SuccessData = () => {
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
-    setCurrentPage(1);
-  };
-
-  const handleRowsPerPageChange = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(1);
   };
 
   const filterCurrentRowData = users.filter((data) => {
@@ -71,45 +57,36 @@ const SuccessData = () => {
 
   return (
     <div style={{ padding: "20px", paddingLeft: "50px", paddingTop: "100px" }}>
-       <Box display="flex" justifyContent="space-between" marginBottom={2}>
-           <Typography style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
-           <Typography variant="h4" gutterBottom color="#34495e" fontWeight={600} marginRight={2} fontFamily={"Outfit sans-serif"}>
-             Success data
-           </Typography>
-           <Select
-               value={rowsPerPage}
-               onChange={handleRowsPerPageChange}
-               size="medium"
-               style={{width:'90px'}}
-               displayEmpty
-             >
-               {[5, 7, 10].map((size) => (
-                 <MenuItem key={size} value={size}>
-                   {size}
-                 </MenuItem>
-               ))}
-             </Select>
-           </Typography>
-           
-     
-             <TextField
-             placeholder="Search user"
-               label="Search"
-               variant="outlined"
-               value={search}
-               onChange={handleSearch}
-               size="medium"
-               style={{width:'300px'}}
-               InputProps={{
-                 startAdornment: (
-                   <InputAdornment position="start" style={{ marginRight: "8px" }}>
-                     <FaSearch />
-                   </InputAdornment>
-                 ),
-               }}
-             />
-            
-           </Box>
+      <Box display="flex" justifyContent="space-between" marginBottom={2}>
+        <Typography
+          variant="h4"
+          gutterBottom
+          color="#34495e"
+          fontWeight={600}
+          fontFamily={"Outfit sans-serif"}
+        >
+          Success Data
+        </Typography>
+
+        <Box display="flex" alignItems="center" gap={2}>
+          <TextField
+            placeholder="Search user"
+            label="Search"
+            variant="outlined"
+            value={search}
+            onChange={handleSearch}
+            size="medium"
+            style={{ width: "300px" }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start" style={{ marginRight: "8px" }}>
+                  <FaSearch />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+      </Box>
 
       <TableContainer component={Paper}>
         <Table>
