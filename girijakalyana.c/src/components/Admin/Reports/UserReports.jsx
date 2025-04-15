@@ -1,33 +1,22 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Button,
   Typography,
   Box,
   Grid,
-  Paper,
-  Pagination,
-  MenuItem,
-  Select,
   InputAdornment,
-  InputLabel,
 } from "@mui/material";
 import axios from "axios";
 import { FaSearch } from "react-icons/fa";
 import { getAllUserProfiles } from "../../api/Admin";
 import { toast } from "react-toastify";
 import { LoadingComponent } from "../../../App";
+import DataTable from "react-data-table-component";
+import { customStyles, getUserReportsColumns } from "../../../utils/DataTableColumnsProvider";
 
 const UserReports = () => {
   const { data: users = [], isLoading, isError, error } = getAllUserProfiles();
-  const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [search, setSearch] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -50,14 +39,7 @@ const UserReports = () => {
     setToDate(event.target.value);
   };
 
-  const handlePageChange = (event, newPage) => {
-    setCurrentPage(newPage - 1); // Adjust for Material-UI's 1-based page index
-  };
 
-  const handleRowsPerPageChange = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(0);
-  };
 
   const filteredRecords = users.filter((record) => {
     return (
@@ -70,7 +52,6 @@ const UserReports = () => {
     );
   });
 
-  const totalPages = Math.ceil(filteredRecords.length / rowsPerPage);
 
   return (
     <Box padding={2} paddingLeft={7} marginTop={8}>
@@ -143,19 +124,6 @@ const UserReports = () => {
             paddingRight: "90px",
           }}
         >
-          <InputLabel id="rows-per-page-label">Rows</InputLabel>
-          <Select
-            value={rowsPerPage}
-            onChange={handleRowsPerPageChange}
-            size="medium"
-            sx={{ width: "100px" }}
-          >
-            {[5, 10, 15, 20].map((size) => (
-              <MenuItem key={size} value={size}>
-                {size}
-              </MenuItem>
-            ))}
-          </Select>
 
           <Grid item xs={12} sm={6} md={3}>
             <TextField
@@ -180,98 +148,25 @@ const UserReports = () => {
         </Box>
       </Grid>
 
-      <Paper sx={{ marginTop: 3 }}>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell
-                  sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}
-                >
-                  Activation Date
-                </TableCell>
-                <TableCell
-                  sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}
-                >
-                  Registration No
-                </TableCell>
-                <TableCell
-                  sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}
-                >
-                  Name
-                </TableCell>
-                <TableCell
-                  sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}
-                >
-                  Gender
-                </TableCell>
-                <TableCell
-                  sx={{ fontFamily: "Outfit sans-serif", fontSize: "18px" }}
-                >
-                  Status
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredRecords
-                .slice(
-                  currentPage * rowsPerPage,
-                  (currentPage + 1) * rowsPerPage
-                )
-                .map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell
-                      sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
-                    >
-                      {row.registration_date}
-                    </TableCell>
-                    <TableCell
-                      sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
-                    >
-                      {row.registration_no}
-                    </TableCell>
-                    <TableCell
-                      sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
-                    >
-                      {row.first_name}
-                      {row.last_name}
-                    </TableCell>
-                    <TableCell
-                      sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
-                    >
-                      {row.gender}
-                    </TableCell>
-                    <TableCell
-                      sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
-                    >
-                      <Typography
-                        color={row.status === "active" ? "green" : "red"}
-                      >
-                        {row.status}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <Box
-          display="flex"
-          justifyContent="flex-end"
-          alignItems="center"
-          padding={2}
-        >
-          <Pagination
-            count={totalPages}
-            page={currentPage + 1} // Adjust for 1-based index
-            onChange={handlePageChange}
-            shape="rounded"
-            color="primary"
-          />
-        </Box>
-      </Paper>
-      {isLoading && <LoadingComponent/>}
+      <DataTable
+        columns={getUserReportsColumns()}
+        data={filteredRecords}
+        pagination
+        paginationPerPage={6}
+        paginationRowsPerPageOptions={[6, 10, 15, 20]}
+        paginationComponentOptions={{
+          rowsPerPageText: "Rows per page:",
+          rangeSeparatorText: "of",
+        }}
+          noDataComponent={
+            <Typography padding={3} textAlign="center">
+              No records found
+            </Typography>
+          }
+        customStyles={customStyles}
+        progressPending={isLoading}
+        progressComponent={<LoadingComponent />}
+      />
     </Box>
   );
 };

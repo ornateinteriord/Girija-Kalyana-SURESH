@@ -8,30 +8,19 @@ import {
   Button,
   Grid,
   TextField,
-  Select,
-  MenuItem,
-  Table,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Pagination,
   InputAdornment,
 } from "@mui/material";
 import { FaSearch, FaUsers } from "react-icons/fa";
 import axios from "axios";
+import DataTable from "react-data-table-component";
+import { customStyles, getReceiptVoucherColumns } from "../../../utils/DataTableColumnsProvider";
+import { LoadingComponent } from "../../../App";
 
 const ReceiptVoucher = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [records, setRecords] = useState([]);
   const [search, setSearch] = useState("");
 
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = records.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(records.length / rowsPerPage);
+ 
 
   // Fetch data
   useEffect(() => {
@@ -50,7 +39,7 @@ const ReceiptVoucher = () => {
   };
 
   // Filter rows based on search
-  const filteredRows = currentRows.filter((data) => {
+  const filteredRows = records.filter((data) => {
     return (
       search === "" ||
       data.id.toString().includes(search.toString()) ||
@@ -62,15 +51,6 @@ const ReceiptVoucher = () => {
     );
   });
 
-  // Handle pagination
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
-  };
-
-  const handleRowsPerPageChange = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(1);
-  };
 
   return (
     <Box sx={{ padding: 4,paddingLeft:'50px',marginTop:'50px' }}>
@@ -80,21 +60,6 @@ const ReceiptVoucher = () => {
                Receipt Vocher
              </Typography>
      
-             <Box display="flex" gap={2} alignItems="center">
-               <Select
-                 value={rowsPerPage}
-                 onChange={handleRowsPerPageChange}
-                 size="medium"
-                 sx={{ minWidth: 100 }}
-               >
-                 {[5, 10, 15, 20].map((size) => (
-                   <MenuItem key={size} value={size}>
-                     {size}
-                   </MenuItem>
-                 ))}
-               </Select>
-               
-             </Box>
              </Box>
      
              <TextField
@@ -142,51 +107,26 @@ const ReceiptVoucher = () => {
         ))}
       </Grid>
 
-      {/* Table */}
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>ID</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Name</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Username</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Email</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Phone</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>City</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredRows.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.id}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.name}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.username}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.email}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.phone}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.address.city}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* Pagination */}
-      <Box
-        sx={{
-          display: "flex",
-          justifySelf:'end',
-          alignItems: "center",
-          marginTop: 3,
+      <DataTable
+        columns={getReceiptVoucherColumns()}
+        data={filteredRows}
+        pagination
+        paginationPerPage={6}
+        paginationRowsPerPageOptions={[6, 10, 15, 20]}
+        paginationComponentOptions={{
+          rowsPerPageText: "Rows per page:",
+          rangeSeparatorText: "of",
         }}
-      >
-        <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={handlePageChange}
-          shape="rounded"
-          color="primary"
-        />
-      </Box>
+          noDataComponent={
+            <Typography padding={3} textAlign="center">
+              No records found
+            </Typography>
+          }
+        customStyles={customStyles}
+        progressPending={false}
+        progressComponent={<LoadingComponent />}
+      />
+
     </Box>
   );
 };

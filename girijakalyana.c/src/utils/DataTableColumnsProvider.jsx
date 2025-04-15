@@ -229,6 +229,101 @@ export const getResetPasswordColumns = (handleOpenDialog) =>  [
     },
   ];
 
+
+  export const getPromotersUserDataColumns = (handleAction) => [
+    {
+      name: "Promoter Name",
+      selector: (row) => row.name,
+      sortable: true,
+    },
+    {
+      name: "Promocode",
+      selector: (row) => "-",
+      sortable: true,
+    },
+    {
+      name: "Mobile",
+      selector: (row) => row.phone,
+      sortable: true,
+    },
+    {
+      name: "Assistance Users",
+      selector: (row) =>"-",
+      sortable: true,
+    },
+    {
+      name: "Total Users",
+      selector: (row) => "-",
+      sortable: true,
+    },
+    {
+      name: "Action",
+      cell: (row) => (
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{
+            textTransform: "capitalize",
+            background: "#34495e",
+          }}
+          onClick={() => handleAction(row)}
+        >
+          Perform Action
+        </Button>
+      ),
+    },
+  ];
+
+
+  export const getPromotersDataColumns = (handleStatusChange) => [
+    {
+      name: "Promoter Name",
+      selector: (row) => row.name,
+      sortable: true,
+    },
+    {
+      name: "Promoter Code",
+      selector: () => "-",
+      sortable: false,
+    },
+    {
+      name: "Mobile",
+      selector: (row) => row.phone,
+      sortable: true,
+    },
+    {
+      name: "Email ID",
+      selector: (row) => row.email,
+      sortable: true,
+    },
+    {
+      name: "Promoter Type",
+      selector: () => "-",
+      sortable: false,
+    },
+    {
+      name: "Status",
+      cell: (row) => (
+        <Typography color={row.status === "active" ? "green" : "orange"}>
+          {row.status === "active" ? "Active" : "Pending"}
+        </Typography>
+      ),
+      sortable: true,
+    },
+    {
+      name: "Change Status",
+      cell: (row) => (
+        <Button
+          variant="outlined"
+          color={row.status === "active" ? "error" : "success"}
+          onClick={() => handleStatusChange(row)}
+        >
+          {row.status === "active" ? "Inactive" : "Active"}
+        </Button>
+      ),
+    },
+  ];
+
 export const getUserTableColumns = (formatUserRole) =>  [
     {
       name: "Sl.No",
@@ -279,6 +374,86 @@ export const getUserTableColumns = (formatUserRole) =>  [
       name: "Last Login",
       selector: row => row.last_loggedin ? new Date(row.last_loggedin).toLocaleDateString() : 'Never',
       sortable: true,
+    },
+  ];
+
+  export const getPromotersEarningsColumns = (handlePayNow) => [
+    {
+      name: "Promoter Name",
+      selector: (row) => row.name,
+      sortable: true,
+    },
+    {
+      name: "Promoter Code",
+      selector: () => "-",
+      sortable: false,
+    },
+    {
+      name: "Total Earnings",
+      selector: () => "Rs. 50,000",
+      sortable: true,
+    },
+    {
+      name: "Paid",
+      selector: () => "Rs.",
+      sortable: false,
+    },
+    {
+      name: "Payable",
+      selector: () => "Rs.",
+      sortable: false,
+    },
+    {
+      name: "Action",
+      cell: (row) => (
+        <Button
+          variant="contained"
+          size="small"
+          onClick={() => handlePayNow(row)}
+        >
+          Pay Now
+        </Button>
+      ),
+    },
+  ];
+
+  export const getPromoterPaymentColumns = (handlePayNow) => [
+    {
+      name: "Promoter Name",
+      selector: (row) => row.name,
+      sortable: true,
+    },
+    {
+      name: "Promoter Code",
+      selector: () => "-",
+      sortable: false,
+    },
+    {
+      name: "Total Earnings",
+      selector: () => "Rs. 50,000",
+      sortable: true,
+    },
+    {
+      name: "Paid",
+      selector: () => "Rs. 30,000",
+      sortable: false,
+    },
+    {
+      name: "Payable",
+      selector: () => "Rs. 20,000",
+      sortable: false,
+    },
+    {
+      name: "Action",
+      cell: (row) => (
+        <Button
+          variant="contained"
+          size="small"
+          onClick={() => handlePayNow(row)}
+        >
+          Pay Now
+        </Button>
+      ),
     },
   ];
 
@@ -406,6 +581,278 @@ export const getUserDataColumns = (upgradeUserMutation, handleUpgrade) => [
       sortable: true,
     },
 
+  ];
+
+
+  export const getOnlineTransactionColumns = (showActive) => [
+    {
+      name: "Date",
+      selector: () => "06-01-2025",
+      sortable: true,
+    },
+    {
+      name: "UserName",
+      selector: (row) => row.username,
+      sortable: true,
+    },
+    {
+      name: "Registration No",
+      selector: (row) => row.id,
+      sortable: true,
+    },
+    {
+      name: "Bank Reference Number",
+      selector: (row) => row.phone,
+      sortable: true,
+    },
+    {
+      name: "Mode Of Payment",
+      selector: () => "-",
+      sortable: false,
+    },
+    {
+      name: "Amount",
+      selector: () => "Rs.2300",
+      sortable: true,
+    },
+    {
+      name: "Status",
+      cell: (row) => (
+        <Typography color={showActive ? "success.main" : "warning.main"}>
+          {showActive ? "TXN_Success" : "TXN_Pending"}
+        </Typography>
+      ),
+      sortable: true,
+    },
+  ];
+
+  export const getAssistanceOnlineTransactionDataColumns = () => [
+    {
+      name: "Date",
+      selector: (row) => row.date,
+      sortable: true,
+    },
+    {
+      name: "UserName",
+      selector: (row) => row.username,
+      sortable: true,
+    },
+    {
+      name: "Registration No",
+      selector: (row) => row.registration_no,
+      sortable: true,
+    },
+    {
+      name: "Bank Reference Number",
+      selector: (row) => row.bank_ref_no,
+      sortable: true,
+    },
+    {
+      name: "Mode Of Payment",
+      selector: (row) => row.mode,
+      sortable: true,
+    },
+    {
+      name: "Amount",
+      selector: (row) => row.amount,
+      sortable: true,
+    },
+    {
+      name: "Status",
+      cell: (row) => (
+        <Typography color={row.status === "TXN_SUCCESS" ? "green" : "red"}>
+          {row.status}
+        </Typography>
+      ),
+      sortable: true,
+    },
+  ];
+
+
+  export const getReceiptVoucherColumns = () => [
+    {
+      name: "ID",
+      selector: (row) => row.id,
+      sortable: true,
+    },
+    {
+      name: "Name",
+      selector: (row) => row.name,
+      sortable: true,
+    },
+    {
+      name: "Username",
+      selector: (row) => row.username,
+      sortable: true,
+    },
+    {
+      name: "Email",
+      selector: (row) => row.email,
+      sortable: true,
+    },
+    {
+      name: "Phone",
+      selector: (row) => row.phone,
+      sortable: true,
+    },
+    {
+      name: "City",
+      selector: (row) => row.address.city,
+      sortable: true,
+    },
+  ];
+
+
+  export const getUserReportsColumns = () => [
+    {
+      name: "Activation Date",
+      selector: (row) => row.registration_date,
+      sortable: true,
+    },
+    {
+      name: "Registration No",
+      selector: (row) => row.registration_no,
+      sortable: true,
+    },
+    {
+      name: "Name",
+      selector: (row) => `${row.first_name} ${row.last_name}`,
+      sortable: true,
+    },
+    {
+      name: "Gender",
+      selector: (row) => row.gender,
+      sortable: true,
+    },
+    {
+      name: "Status",
+      cell: (row) => (
+        <Typography color={row.status === "active" ? "green" : "red"}>
+          {row.status}
+        </Typography>
+      ),
+      sortable: true,
+    },
+  ];
+
+  export const getRenewalsReportColumns = () => [
+    {
+      name: "Transaction Date",
+      selector: () => "09-10-2024",
+      sortable: true,
+    },
+    {
+      name: "Registration No",
+      selector: (row) => row.id,
+      sortable: true,
+    },
+    {
+      name: "Name",
+      selector: (row) => row.name,
+      sortable: true,
+    },
+    {
+      name: "Gender",
+      selector: () => "-",
+      sortable: false,
+    },
+    {
+      name: "Status",
+      cell: (row, index) => (
+        <Typography
+          variant="body2"
+          color={index % 2 === 0 ? "success.main" : "error.main"}
+        >
+          {index % 2 === 0 ? "Active" : "Expires"}
+        </Typography>
+      ),
+      sortable: true,
+    },
+  ];
+
+  export const getReceiptsReportColumns = () => [
+    {
+      name: "Date",
+      selector: () => "03-01-2025",
+      sortable: true,
+    },
+    {
+      name: "Registration No",
+      selector: (row) => row.id,
+      sortable: true,
+    },
+    {
+      name: "UserName",
+      selector: (row) => row.username,
+      sortable: true,
+    },
+    {
+      name: "Bank Reference Number",
+      selector: (row) => row.phone,
+      sortable: true,
+    },
+    {
+      name: "Mode of Payment",
+      selector: () => "-",
+      sortable: false,
+    },
+    {
+      name: "Amount",
+      selector: () => "Rs.",
+      sortable: false,
+    },
+    {
+      name: "Status",
+      cell: (row) => (
+        <Typography
+          color={row.id % 2 === 0 ? "success.main" : "error.main"}
+          sx={{ fontFamily: "Outfit sans-serif", fontSize: "17px" }}
+        >
+          {row.id % 2 === 0 ? "Success" : "Pending"}
+        </Typography>
+      ),
+      sortable: true,
+    },
+  ];
+
+  export const getNotificationDataColumns = () => [
+    {
+      name: "News ID",
+      selector: (row) => row.id,
+      sortable: true,
+    },
+    {
+      name: "News Details",
+      selector: () => "-",
+      sortable: false,
+    },
+    {
+      name: "From Date",
+      selector: () => "12-01-2025",
+      sortable: true,
+    },
+    {
+      name: "To Date",
+      selector: () => "12-02-2025",
+      sortable: true,
+    },
+    {
+      name: "Type Of News",
+      selector: () => "-",
+      sortable: false,
+    },
+    {
+      name: "Status",
+      cell: (row, index) => (
+        <Typography
+          variant="body2"
+          color={index % 2 === 0 ? "green" : "orange"}
+        >
+          {index % 2 === 0 ? "Active" : "Pending"}
+        </Typography>
+      ),
+      sortable: true,
+    },
   ];
 
 
