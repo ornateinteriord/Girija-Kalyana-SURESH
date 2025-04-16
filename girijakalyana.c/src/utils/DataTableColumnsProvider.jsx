@@ -147,33 +147,33 @@ export const getImageVerificationColumns = () => [
 export const getRenewalsColumns = () => [
     {
       name: "Registration No",
-      selector: () => "-",
+      selector: (row) => row.registration_no,
       sortable: false,
     },
     {
       name: "Name",
-      selector: (row) => row.name,
+      selector: (row) => row.first_name,
       sortable: true,
     },
     {
       name: "Email Id",
-      selector: (row) => row.email,
+      selector: (row) => row.username,
       sortable: true,
     },
     {
       name: "Gender",
-      selector: () => "-",
+      selector: (row) => row.gender,
       sortable: false,
     },
     {
       name: "Expiry Date",
-      selector: () => "02-09-2025",
+      selector: (row) => row.expiry_date,
       sortable: true,
     },
     {
       name: "Status",
-      cell: () => (
-        <span style={{ color: "red", fontWeight: 500 }}>Pending</span>
+      cell: (row) => (
+        <span style={{ color: "red", fontWeight: 500 }}>{row.status}</span>
       ),
     },
     {
