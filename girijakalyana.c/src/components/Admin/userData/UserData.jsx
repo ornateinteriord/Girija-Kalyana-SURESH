@@ -134,7 +134,7 @@ const UserData = () => {
       </div>
 
       {/* DataTable */}
-      <Paper>
+      <Paper sx={{mt:2}}>
         <DataTable
           columns={getUserDataColumns(upgradeUserMutation ,handleUpgrade)}
           data={filteredRows}
