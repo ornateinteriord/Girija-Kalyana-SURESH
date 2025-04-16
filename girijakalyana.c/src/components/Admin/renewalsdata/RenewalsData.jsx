@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import DataTable from "react-data-table-component";
 import {
   Box,
@@ -10,38 +9,40 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
-
 import { LoadingComponent } from "../../../App";
 import { customStyles, getRenewalsColumns } from "../../../utils/DataTableColumnsProvider";
+import { getAllUserProfiles } from "../../api/Admin";
+import { toast } from "react-toastify";
 
 const RenewalsData = () => {
-  const [records, setRecords] = useState([]);
+   const {data:users =[],isLoading,isError,error} = getAllUserProfiles()
   const [search, setSearch] = useState("");
-  const [filteredRecords, setFilteredRecords] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("https://jsonplaceholder.typicode.com/users");
-        setRecords(response.data);
-        setFilteredRecords(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+
+ useEffect(() => {
+      if (isError) {
+        toast.error(error.message);
       }
-    };
-    fetchData();
-  }, []);
+    }, [isError, error]);
 
-  // Filter data when search or records change
-  useEffect(() => {
-    const filtered = records.filter((record) =>
-      Object.values(record)
-        .join(" ")
-        .toLowerCase()
-        .includes(search.toLowerCase())
-    );
-    setFilteredRecords(filtered);
-  }, [search, records]);
+ 
+
+    const filteredRecords = users.filter((record) => {
+      const isAdmin = record?.user_role?.toLowerCase() === "admin";
+      const isPending =   ["pending", "inactive", "expires"].includes(record?.status.toLowerCase()) 
+  
+      return (
+        !isAdmin &&
+        isPending && // Only include pending users
+        [
+          record.registration_no?.toString().toLowerCase(),
+          record.first_name?.toLowerCase(),
+          record.username?.toLowerCase(),
+          record.expiry_date?.toString().toLowerCase(),
+          
+        ].some((field) => field?.includes(search.toLowerCase()))
+      );
+    });
 
 
   return (
@@ -93,7 +94,7 @@ const RenewalsData = () => {
             </Typography>
           }
         customStyles={customStyles}
-        progressPending={false}
+        progressPending={isLoading}
         progressComponent={<LoadingComponent />}
       />
     </Box>
