@@ -20,19 +20,17 @@ import {
 import axios from "axios";
 import { FaAd, FaSearch } from "react-icons/fa";
 import { FaBandage } from "react-icons/fa6";
+import DataTable from "react-data-table-component";
+import { customStyles, getNotificationDataColumns } from "../../../utils/DataTableColumnsProvider";
+import { LoadingComponent } from "../../../App";
 
 const NotificationData = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(6);
+
   const [records, setRecords] = useState([]);
   const [search, setSearch] = useState("");
   const [showAddNews, setShowAddNews] = useState(false);
 
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = records.slice(indexOfFirstRow, indexOfLastRow);
 
-  const totalPages = Math.ceil(records.length / rowsPerPage);
 
   // Fetch data
   useEffect(() => {
@@ -48,7 +46,7 @@ const NotificationData = () => {
   }, []);
 
   // Handle Search
-  const filterCurrentRowData = currentRows.filter((data) =>
+  const filterCurrentRowData = records.filter((data) =>
     search === null ||
     data.id.toString().includes(search.toString()) ||
     data.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -61,15 +59,7 @@ const NotificationData = () => {
     setSearch(event.target.value);
   };
 
-  // Handle Pagination
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
-  };
-
-  const handleRowsPerPageChange = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(1);
-  };
+  
 
   // Popup Handlers
   const handleClosePopup = () => setShowAddNews(false);
@@ -80,20 +70,6 @@ const NotificationData = () => {
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography display={'flex'} alignItems={'center'} gap={0.5}>
         <Typography variant="h4" color="#34495e" fontFamily={'Outfit sans-serif'}>Notification Data</Typography>
-        <Box display="flex" alignItems="center">
-       
-       <Select
-         value={rowsPerPage}
-         onChange={handleRowsPerPageChange}
-         sx={{ mx: 2, width: 80 }}
-       >
-         <MenuItem value={5}>5</MenuItem>
-         <MenuItem value={10}>10</MenuItem>
-         <MenuItem value={15}>15</MenuItem>
-         <MenuItem value={20}>20</MenuItem>
-       </Select>
-    
-     </Box>
      <Button
           variant="contained"
           
@@ -126,50 +102,25 @@ const NotificationData = () => {
       </Box>
       </Box>
 
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>News ID</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>News Details</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>From Date</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>To Date</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Type Of News</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filterCurrentRowData.map((row, index) => (
-              <TableRow key={row.id}>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{row.id}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}} >-</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>12-01-2025</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>12-02-2025</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>-</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>
-                  <Typography
-                    variant="body2"
-                    color={index % 2 === 0 ? "green" : "orange"}
-                  >
-                    {index % 2 === 0 ? "Active" : "Pending"}
+       <DataTable
+              columns={getNotificationDataColumns()}
+              data={filterCurrentRowData}
+              pagination
+              paginationPerPage={6}
+              paginationRowsPerPageOptions={[6, 10, 15, 20]}
+              paginationComponentOptions={{
+                rowsPerPageText: "Rows per page:",
+                rangeSeparatorText: "of",
+              }}
+                noDataComponent={
+                  <Typography padding={3} textAlign="center">
+                    No records found
                   </Typography>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <Box display="flex" justifySelf={'end'} alignItems="center" mt={2}>
-        
-        <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={handlePageChange}
-          shape="rounded"
-          color="primary"
-        />
-      </Box>
+                }
+              customStyles={customStyles}
+              progressPending={false}
+              progressComponent={<LoadingComponent />}
+            />
 
       {/* Add News Modal */}
       <Modal open={showAddNews} onClose={handleClosePopup}>

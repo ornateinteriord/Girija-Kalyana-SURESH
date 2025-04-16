@@ -1,9 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
 import { Box, CircularProgress, Dialog, DialogContent, Typography } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import './App.css';
 import ProfileProvider from './components/usecontext/ProfileProvider';
 import { ToastContainer } from 'react-toastify';

@@ -421,7 +421,7 @@ const handleProfileDialogClose = () => {
           className="main-content"
           style={{
             paddingLeft: isSidebarOpen ? '280px' : '0px', // Adjust paddingLeft
-            paddingTop: isSidebarOpen ? '10px' : '',
+            paddingTop: isSidebarOpen ? '10px' : '10px',
             transition: 'padding-left 0.3s ease',
           }}
         >

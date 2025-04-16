@@ -1,155 +1,102 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
   Box,
-  Button,
+  Typography,
   Select,
   MenuItem,
   TextField,
   InputAdornment,
-  Stack,
-  Pagination,
   Paper,
+  Stack,
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
-import axios from "axios";
+import { getAllUserProfiles } from "../../api/Admin";
+import { LoadingComponent } from "../../../App";
+import { toast } from "react-toastify";
+import DataTable from "react-data-table-component";
+import { customStyles, getAssistancePendingColumns } from "../../../utils/DataTableColumnsProvider";
 
 const PendingData = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(7);
-  const [records, setRecords] = useState([]);
+  const {data:users =[],isLoading,isError,error} = getAllUserProfiles()
   const [search, setSearch] = useState("");
 
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("https://jsonplaceholder.typicode.com/users");
-        setRecords(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      if (isError) {
+        toast.error(error.message);
       }
-    };
-    fetchData();
-  }, []);
+    }, [isError, error]);
 
-  const handleSearch = (event) => {
-    setSearch(event.target.value);
+
+
+
+
+  const filteredRecords = users.filter((record) => {
+    const isAdmin = record?.user_role?.toLowerCase() === "admin";
+    const isPending = record?.status?.toLowerCase() === "pending"; // Check if status is "pending"
+
+    return (
+      !isAdmin &&
+      isPending && // Only include pending users
+      [
+        record.registration_no?.toString().toLowerCase(),
+        record.first_name?.toLowerCase(),
+        record.username?.toLowerCase(),
+        record.mobile_no?.toString().toLowerCase(),
+        record.caste?.toString().toLowerCase(),
+        record.type_of_user?.toString().toLowerCase(),
+      ].some((field) => field?.includes(search.toLowerCase()))
+    );
+  });
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
   };
 
-  const handlePageChange = (event, newPage) => {
-    setCurrentPage(newPage);
-  };
-
-  const handleRowsPerPageChange = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(1);
-  };
-
-  const filteredRecords = records.filter((record) =>
-    [
-      record.id.toString(),
-      record.name.toLowerCase(),
-      record.username.toLowerCase(),
-      record.email.toLowerCase(),
-      record.phone.toLowerCase(),
-    ].some((field) => field.includes(search.toLowerCase()))
-  );
-
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const paginatedRecords = filteredRecords.slice(startIndex, startIndex + rowsPerPage);
 
   return (
     <Box p={5} marginTop={6}>
-      
-           <Box display="flex" justifyContent="space-between" marginBottom={2}>
-           <Typography style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
-           <Typography variant="h4" gutterBottom color="#34495e" fontWeight={600} marginRight={2} fontFamily={'Outfit sans-serif'}>
-             Pending data
-           </Typography>
-           <Select
-               value={rowsPerPage}
-               onChange={handleRowsPerPageChange}
-               size="medium"
-               style={{width:'90px'}}
-               displayEmpty
-             >
-               {[5, 7, 10].map((size) => (
-                 <MenuItem key={size} value={size}>
-                   {size}
-                 </MenuItem>
-               ))}
-             </Select>
-           </Typography>
-           
-     
-             <TextField
-             placeholder="Search user"
-               label="Search"
-               variant="outlined"
-               value={search}
-               onChange={handleSearch}
-               size="medium"
-               style={{width:'300px'}}
-               InputProps={{
-                 startAdornment: (
-                   <InputAdornment position="start" style={{ marginRight: "8px" }}>
-                     <FaSearch />
-                   </InputAdornment>
-                 ),
-               }}
-             />
-            
-           </Box>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h4" color="#34495e" fontWeight={600} fontFamily="Outfit sans-serif">
+          Pending Data
+        </Typography>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Registration No</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Name</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Email</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Phone</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>Caste</TableCell>
-              <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'18px'}}>User Type</TableCell>
-              {/* <TableCell>Action</TableCell> */}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedRecords.map((record) => (
-              <TableRow key={record.id}>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.id}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.name}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.email}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>{record.phone}</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>-</TableCell>
-                <TableCell sx={{fontFamily:"Outfit sans-serif",fontSize:'17px'}}>Free/Silver User</TableCell>
-                {/* <TableCell>
-                  <Button variant="contained" color="success">
-                    Active
-                  </Button>
-                </TableCell> */}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Stack spacing={2} direction="row" alignItems="center" justifySelf={"end"} mt={3}>
-        <Pagination
-          count={Math.ceil(filteredRecords.length / rowsPerPage)}
-          page={currentPage}
-          onChange={handlePageChange}
-          shape="rounded"
-          color="primary"
-          siblingCount={1}
-          boundaryCount={1}
+        <Box display="flex" alignItems="center" gap={2}>
+          <TextField
+            size="small"
+            label="Search"
+            placeholder="Search user"
+            value={search}
+            onChange={handleSearch}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <FaSearch />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+      </Box>
+
+      <Paper>
+        <DataTable
+          columns={getAssistancePendingColumns()}
+          data={filteredRecords}
+          customStyles={customStyles}
+          pagination
+          paginationPerPage={6}
+          paginationRowsPerPageOptions={[6, 10, 15, 20]}
+          paginationComponentOptions={{
+            rowsPerPageText: 'Rows per page:',
+            rangeSeparatorText: 'of',
+            noRowsPerPage: false,
+          }}
+          noDataComponent={<Typography padding={3}>No data available</Typography>}
+          progressPending={isLoading}
+          progressComponent={<LoadingComponent />}
         />
-      </Stack>
+      </Paper>
     </Box>
   );
 };
