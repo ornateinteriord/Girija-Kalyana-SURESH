@@ -20,8 +20,11 @@ import { FaSearch } from "react-icons/fa";
 import { getAllUserProfiles, UserResetPassword } from "../../api/Admin";
 import { LoadingComponent } from "../../../App";
 import { toast } from "react-toastify";
-import { customStyles, getResetPasswordColumns } from "../../../utils/DataTableColumnsProvider";
-
+import {
+  customStyles,
+  getResetPasswordColumns,
+} from "../../../utils/DataTableColumnsProvider";
+import "./ResetPassword.scss";
 
 const ResetPassword = () => {
   const [search, setSearch] = useState("");
@@ -87,17 +90,13 @@ const ResetPassword = () => {
     }
   };
 
-
-
   return (
     <div className="reset-password-user" style={{ padding: "20px" }}>
       <div className="firsthead">
         <Typography
           variant="h4"
-          gutterBottom
-          color="#34495e"
           fontWeight={600}
-          marginBottom={2}
+          color="#34495e"
           fontFamily={"Outfit sans-serif"}
         >
           Reset Password
@@ -122,7 +121,7 @@ const ResetPassword = () => {
         </div>
       </div>
 
-      <Paper>
+      <Paper sx={{ mt: 2 }}>
         <DataTable
           columns={getResetPasswordColumns(handleOpenDialog)}
           data={filteredRecords}
@@ -182,7 +181,11 @@ const ResetPassword = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="error" disabled={isPending}>
+          <Button
+            onClick={handleCloseDialog}
+            color="error"
+            disabled={isPending}
+          >
             Cancel
           </Button>
           <Button

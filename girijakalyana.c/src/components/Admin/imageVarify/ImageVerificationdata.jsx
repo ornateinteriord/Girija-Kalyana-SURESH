@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
-import {
-  Box,
-  Typography,
-  TextField,
-  InputAdornment,
-} from "@mui/material";
+import { Box, Typography, TextField, InputAdornment } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
-import { customStyles, getImageVerificationColumns } from "../../../utils/DataTableColumnsProvider";
-
+import {
+  customStyles,
+  getImageVerificationColumns,
+} from "../../../utils/DataTableColumnsProvider";
 
 const dummyImageVerificationRecords = [
   {
@@ -81,24 +78,29 @@ const ImageVerificationData = () => {
     setFilteredRecords(filtered);
   }, [search, records]);
 
-  
   useEffect(() => {
     setRecords(dummyImageVerificationRecords);
-  },[])
+  }, []);
 
   return (
     <Box p={6} mt={6}>
       {/* Header & Controls */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography
-          variant="h5"
-          sx={{ fontFamily: "Outfit, sans-serif", color: "#34495e", fontWeight: 600 }}
+          variant="h4"
+          fontWeight={600}
+          color="#34495e"
+          fontFamily={"Outfit sans-serif"}
         >
-          Image Verify
+          Image Verification
         </Typography>
 
         <Box display="flex" alignItems="center" gap={2}>
-
           {/* Search Field */}
           <TextField
             placeholder="Search record"
