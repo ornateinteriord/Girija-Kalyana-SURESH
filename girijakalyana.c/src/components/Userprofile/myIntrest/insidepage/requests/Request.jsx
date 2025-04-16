@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -12,6 +12,7 @@ import {
 import TokenService from "../../../../token/tokenService";
 import toast from "react-hot-toast";
 import InterestCard from "../../../intrestCard/IntrestCard";
+import { LoadingComponent } from "../../../../../App";
 
 const Requests = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,8 +23,16 @@ const Requests = () => {
     data: receivedInterests = [],
     isLoading,
     isError,
+    error,
     refetch
   } = useGetReceivedInterests(recipientRegistrationNo);
+
+
+   useEffect(() => {
+      if (isError) {
+        toast.error(error.message);
+      }
+    }, [isError, error]);
 
   const { mutate: updateInterest } = useUpdateInterestStatus();
 
@@ -52,22 +61,7 @@ const Requests = () => {
   const currentUsers = receivedInterests.slice(indexOfFirst, indexOfLast);
   const pageCount = Math.ceil(receivedInterests.length / itemsPerPage);
 
-  if (isLoading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Box sx={{ padding: 3, textAlign: "center" }}>
-        <Typography color="error">Error loading requests</Typography>
-      </Box>
-    );
-  }
-
+  
   return (
     <Box sx={{ padding: 3 }}>
       <Box
@@ -104,6 +98,7 @@ const Requests = () => {
           />
         </Box>
       )}
+      {isLoading && <LoadingComponent/>}
     </Box>
   );
 };

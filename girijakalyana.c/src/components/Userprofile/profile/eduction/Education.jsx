@@ -12,6 +12,7 @@ import { useGetMemberDetails, useUpdateProfile } from "../../../api/User/useGetP
 import TokenService from "../../../token/tokenService";
 import toast from "react-hot-toast";
 import rawJsonData from "../eduction/jsondata/data.json";
+import { LoadingComponent } from "../../../../App";
 
 // Merge array of JSON objects into one object
 const jsonData = rawJsonData.reduce((acc, curr) => ({ ...acc, ...curr }), {});
@@ -31,8 +32,15 @@ const Education = () => {
   const [showCustomIncome, setShowCustomIncome] = useState(false);
   const [showCustomCountry, setShowCustomCountry] = useState(false);
 
-  const { data: userProfile, isLoading: profileLoading, isError: profileError } = useGetMemberDetails(registerNo);
+  const { data: userProfile, isLoading, isError,error } = useGetMemberDetails(registerNo);
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+
+
+   useEffect(() => {
+      if (isError) {
+        toast.error(error.message);
+      }
+    }, [isError, error]);
 
   useEffect(() => {
     if (userProfile) {
@@ -96,21 +104,6 @@ const Education = () => {
     setShowCustomCountry(false);
   };
 
-  if (profileLoading) {
-    return (
-      <Box display="flex" justifyContent="center" p={4}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (profileError) {
-    return (
-      <Box display="flex" justifyContent="center" p={4}>
-        <Typography color="error">Failed to load education data</Typography>
-      </Box>
-    );
-  }
 
   const textFieldStyle = { width: "450px" };
 
@@ -269,6 +262,7 @@ const Education = () => {
           </Box>
         </form>
       </Stack>
+      {isLoading && <LoadingComponent/>}
     </Box>
   );
 };

@@ -15,6 +15,7 @@ import rawJsonData from "../eduction/jsondata/data.json";
 import toast from "react-hot-toast";
 import { useGetMemberDetails, useUpdateProfile } from "../../../api/User/useGetProfileDetails";
 import TokenService from "../../../token/tokenService";
+import { LoadingComponent } from "../../../../App";
 
 const datas = rawJsonData.reduce((acc, curr) => ({ ...acc, ...curr }), {});
 
@@ -32,9 +33,16 @@ const ParentsPrefer = () => {
     education_preference: ""
   });
 
-  const { data: userProfile, isLoading: profileLoading, isError: profileError } = useGetMemberDetails(registerNo);
+  const { data: userProfile, isLoading, isError,error } = useGetMemberDetails(registerNo);
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
 
+
+
+   useEffect(() => {
+      if (isError) {
+        toast.error(error.message);
+      }
+    }, [isError, error]);
 
   useEffect(() => {
 
@@ -72,21 +80,7 @@ const ParentsPrefer = () => {
     });
   };
 
-  if (profileLoading) {
-    return (
-      <Box display="flex" justifyContent="center" p={4}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (profileError) {
-    return (
-      <Box display="flex" justifyContent="center" p={4}>
-        <Typography color="error">Failed to load preference data</Typography>
-      </Box>
-    );
-  }
+  
 
   return (
     <Box
@@ -283,6 +277,7 @@ const ParentsPrefer = () => {
           {isUpdating ? <CircularProgress size={24} /> : "Save"}
         </Button>
       </Box>
+      {isLoading && <LoadingComponent/>}
     </Box>
   );
 };

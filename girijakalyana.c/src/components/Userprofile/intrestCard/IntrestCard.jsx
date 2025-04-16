@@ -10,45 +10,22 @@ import {
 } from "@mui/material";
 import { useGetMemberDetails } from "../../api/User/useGetProfileDetails";
 import profileimg from "../../../assets/profile.jpg";
+import { LoadingComponent } from "../../../App";
+import { toast } from "react-toastify";
 
 const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
   const {
     data: senderDetails,
     isLoading,
     isError,
+    error
   } = useGetMemberDetails(senderRefNo);
 
-  if (isLoading) {
-    return (
-      <Box
-        sx={{
-          width: 270,
-          height: 380,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (isError || !senderDetails) {
-    return (
-      <Box
-        sx={{
-          width: 270,
-          height: 380,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Typography color="error">Failed to load user</Typography>
-      </Box>
-    );
-  }
+   useEffect(() => {
+     if (isError) {
+       toast.error(error.message);
+     }
+   }, [isError, error]);
 
   return (
     <Card
@@ -135,6 +112,7 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
           </Button>
         </Box>
       </CardContent>
+      {isLoading && <LoadingComponent/>}
     </Card>
   );
 };
