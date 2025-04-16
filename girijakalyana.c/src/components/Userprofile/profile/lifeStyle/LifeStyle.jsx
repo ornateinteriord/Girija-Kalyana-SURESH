@@ -9,6 +9,8 @@ import {
 } from "@mui/material";
 import { useGetMemberDetails, useUpdateProfile } from "../../../api/User/useGetProfileDetails";
 import TokenService from "../../../token/tokenService";
+import { LoadingComponent } from "../../../../App";
+import { toast } from "react-toastify";
 
 const LifeStyle = () => {
   const registerNo = TokenService.getRegistrationNo();
@@ -24,8 +26,9 @@ const LifeStyle = () => {
 
   const { 
     data: userProfile, 
-    isLoading: profileLoading, 
-    isError: profileError 
+    isLoading, 
+    isError,
+    error 
   } = useGetMemberDetails(registerNo);
 
   // Update profile mutation
@@ -65,17 +68,11 @@ const LifeStyle = () => {
     });
   };
 
-  if (profileLoading) return (
-    <Box display="flex" justifyContent="center" p={4}>
-      <CircularProgress />
-    </Box>
-  );
-
-  if (profileError) return (
-    <Box display="flex" justifyContent="center" p={4}>
-      <Typography color="error">Failed to load LifeStyle data</Typography>
-    </Box>
-  );
+  useEffect(() => {
+     if (isError) {
+       toast.error(error.message);
+     }
+   }, [isError, error]);
 
   return (
     <Box sx={{ fontFamily: "Outfit, sans-serif", padding: "16px", width: "80%" }}>
@@ -204,6 +201,7 @@ const LifeStyle = () => {
           {isUpdating ? <CircularProgress size={24} /> : 'Save'}
         </Button>
       </Box>
+      {isLoading && <LoadingComponent/>}
     </Box>
   );
 };

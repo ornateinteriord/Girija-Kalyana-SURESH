@@ -14,6 +14,7 @@ import TokenService from "../../token/tokenService";
 
 import HomeUserTable from "../../userupgrade/HomeUserTable";
 import { useGetMemberDetails } from "../../api/User/useGetProfileDetails";
+import { LoadingComponent } from "../../../App";
 
 const UserDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,17 +24,19 @@ const UserDashboard = () => {
   
   const {
     data: userProfile,
-    isLoading: profileLoading,
-    isError: profileError,
-    refetch: refetchProfile,
+    isLoading,
+    isError,
+    error,
+    
   } = useGetMemberDetails(registerNo);
 
  
+  useEffect(() => {
+    if (isError) {
+      toast.error(error.message);
+    }
+  }, [isError, error]);
 
-  const handleRefresh = () => {
-    refetchProfile();
-    toast.success("Data refreshed successfully");
-  };
 
   // Dummy array to mimic profile card layout (replace later)
   const dummyProfiles = []; // keep empty or fill with mock data if needed
@@ -47,26 +50,7 @@ const UserDashboard = () => {
     setCurrentPage(value);
   };
 
-  if (profileLoading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
-        <CircularProgress size={60} />
-      </Box>
-    );
-  }
-
-  if (profileError) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {profileError?.message || "Failed to load data"}
-        </Alert>
-        <Button variant="contained" onClick={handleRefresh} sx={{ mt: 2 }}>
-          Retry
-        </Button>
-      </Box>
-    );
-  }
+  
 
   return (
     <Box
@@ -216,6 +200,7 @@ const ProfileCard = ({ profile }) => (
         <Typography>Occupation</Typography>
       </Box>
     </Box>
+    {isLoading && <LoadingComponent/>}
   </Box>
 );
 

@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 
 import TokenService from "../../../token/tokenService";
 import { useGetMemberDetails, useUpdateProfile } from "../../../api/User/useGetProfileDetails";
+import { LoadingComponent } from "../../../../App";
 
 
 const About = () => {
@@ -37,14 +38,19 @@ const About = () => {
   // Fetch profile data
   const { 
     data: userProfile, 
-    isLoading: profileLoading, 
-    isError: profileError 
+    isLoading, 
+    isError,
+    error
   } = useGetMemberDetails(registerNo);
 
   // Update profile mutation
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
 
-
+  useEffect(() => {
+    if (isError) {
+      toast.error(error.message);
+    }
+  }, [isError, error]);
   const handleReset = () => {
     setFormData({
       first_name: '',
@@ -83,18 +89,6 @@ const About = () => {
   };
 
 
-
-  if (profileLoading) return (
-    <Box display="flex" justifyContent="center" p={4}>
-      <CircularProgress />
-    </Box>
-  );
-
-  if (profileError) return (
-    <Box display="flex" justifyContent="center" p={4}>
-      <Typography color="error">Failed to load About data</Typography>
-    </Box>
-  );
 
   return (
     <Box sx={{
@@ -275,6 +269,7 @@ const About = () => {
           </Button>
         </Box>
       )}
+      {isLoading && <LoadingComponent/>}
     </Box>
   );
 };
