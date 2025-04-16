@@ -6,10 +6,8 @@ import {
   MenuItem,
   FormControl,
   Typography,
-  InputAdornment,
-  Paper,
   Box,
-  Stack
+  CircularProgress
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
 import { getAllUserProfiles } from "../../api/Admin";
