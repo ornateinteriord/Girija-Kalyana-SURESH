@@ -1,104 +1,107 @@
-import React, { useEffect, useState, useContext } from "react";
-import { Box, Card, CardContent, CardMedia, Typography, Pagination, Button } from "@mui/material";
-import axios from "axios";
+import React, { useState } from "react";
+import {
+  Box,
+  Typography,
+  Pagination,
+  CircularProgress
+} from "@mui/material";
+import {
+  useGetReceivedInterests,
+  useUpdateInterestStatus
+} from "../../../../api/User/useGetProfileDetails";
+import TokenService from "../../../../token/tokenService";
 import toast from "react-hot-toast";
-import { InterestContext } from "../../UserContext/IntrestProvider";
-
-const API_BASE_URL = "http://localhost:5000/api";
+import InterestCard from "../../../intrestCard/IntrestCard";
 
 const Requests = () => {
-  const { acceptedUsers } = useContext(InterestContext);
-  const [interestedUsers, setInterestedUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
-  const [validPageCount, setValidPageCount] = useState(1);
 
-  useEffect(() => {
-    fetchInterestedUsers();
-  }, [acceptedUsers, currentPage]);
+  const recipientRegistrationNo = TokenService.getRegistrationNo();
+  const {
+    data: receivedInterests = [],
+    isLoading,
+    isError,
+    refetch
+  } = useGetReceivedInterests(recipientRegistrationNo);
 
-  const fetchInterestedUsers = async () => {
-    try {
-      const userData = sessionStorage.getItem("userData");
-      if (!userData) return;
-      const { _id: loggedInUserId } = JSON.parse(userData);
+  const { mutate: updateInterest } = useUpdateInterestStatus();
 
-      const response = await axios.get(`${API_BASE_URL}/interested-users/${loggedInUserId}`);
-      const filteredUsers = response.data.filter(user => !acceptedUsers.some(acc => acc._id === user._id));
-
-      const pageCount = Math.ceil(filteredUsers.length / itemsPerPage) || 1;
-      setValidPageCount(pageCount);
-
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
-
-      if (paginatedUsers.length === 0 && currentPage > 1) {
-        setCurrentPage(prev => Math.max(prev - 1, 1));
+  const handleInterestResponse = (senderRefNo, recipientRefNo, isAccepted) => {
+    updateInterest(
+      {
+        senderRegistrationNo: senderRefNo,
+        recipientRegistrationNo,
+        status: isAccepted ? "accepted" : "rejected"
+      },
+      {
+        onSuccess: () => {
+          toast.success(`Request ${isAccepted ? "accepted" : "rejected"} successfully`);
+          refetch();
+        },
+        onError: (error) => {
+          toast.error(error.response?.data?.message || "Failed to update request");
+        }
       }
-
-      setInterestedUsers(paginatedUsers);
-    } catch (error) {
-      console.error("Error fetching interested users:", error);
-    }
+    );
   };
 
-  const handleInterestResponse = async (user, accept) => {
-    try {
-      const userData = sessionStorage.getItem("userData");
-      if (!userData) return;
-      const { _id: loggedInUserId } = JSON.parse(userData);
+  // Pagination logic
+  const indexOfLast = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const currentUsers = receivedInterests.slice(indexOfFirst, indexOfLast);
+  const pageCount = Math.ceil(receivedInterests.length / itemsPerPage);
 
-      const response = await axios.post(`${API_BASE_URL}/accept-interest`, {
-        userId: loggedInUserId,
-        targetUserId: user._id,
-        accept,
-      });
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
-      if (response.data.success) {
-        toast.success(accept ? "Request Accepted Successfully!" : "Request Rejected Successfully!");
-        setInterestedUsers(prevUsers => prevUsers.filter(u => u._id !== user._id));
-      }
-    } catch (error) {
-      console.error("Error updating interest status:", error);
-    }
-  };
+  if (isError) {
+    return (
+      <Box sx={{ padding: 3, textAlign: "center" }}>
+        <Typography color="error">Error loading requests</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ padding: 3 }}>
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "flex-start", marginTop: 1 }}>
-        {interestedUsers.map(user => (
-          <Card key={user._id} sx={{ width: 270, height: 380, borderRadius: 1, boxShadow: 3, textAlign: "center", position: "relative", background: 'black', color: '#fff' }}>
-            <CardMedia component="img" height="210px" image={user.profileImg || "/default-placeholder.png"} alt="user-dp" sx={{ borderRadius: "1%" }} />
-            <CardContent>
-              <Box display={'flex'} justifyContent={'space-between'}>
-              <Typography variant="h6" fontWeight="bold" sx={{ color: '#fff' }}>{user.firstName} {user.lastName}</Typography>
-              <Typography fontWeight={550} sx={{ color: '#fff' }}>{user.address || "N/A"}</Typography>
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
-               <Box display={'flex'} flexDirection={'column'}>
-                <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>{user.age || "N/A"}</Typography>
-                <Typography variant="caption" sx={{ color: "#fff" }}>Age</Typography>
-                  </Box>
-                  <Box display={'flex'} flexDirection={'column'}>
-                <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>{user.height || "N/A"}</Typography>
-                <Typography variant="caption" sx={{ color: "#fff" }}>Height</Typography>
-                  </Box>
-                <Box display={'flex'} flexDirection={'column'}>
-                <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>{user.registrationNumber || "N/A"}</Typography>
-                <Typography variant="caption" sx={{ color: "#fff" }}>RegNo</Typography>
-                  </Box>
-              </Box>
-              <Box display={'flex'} gap={1}>
-              <Button fullWidth variant="contained" sx={{ marginTop: 1, background: '#34495e', color: '#fff' }} onClick={() => handleInterestResponse(user, true)}>Accept</Button>
-              <Button fullWidth variant="outlined" sx={{ marginTop: 1, borderColor: '#ff4d4d', color: '#ff4d4d' }} onClick={() => handleInterestResponse(user, false)}>Reject</Button>
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 3,
+          justifyContent: currentUsers.length > 0 ? "flex-start" : "center",
+          marginTop: 1
+        }}
+      >
+        {currentUsers.length === 0 ? (
+          <Typography variant="h6">No pending requests found</Typography>
+        ) : (
+          currentUsers.map((user) => (
+            <InterestCard
+              key={user._id}
+              senderRefNo={user.senderRegistrationNo}
+              recipientRefNo={recipientRegistrationNo}
+              handleResponse={handleInterestResponse}
+            />
+          ))
+        )}
       </Box>
-      {validPageCount > 1 && (
-        <Box sx={{ display: "flex", justifyContent: "flex-start", marginTop: 4 }}>
-          <Pagination count={validPageCount} page={currentPage} onChange={(event, page) => setCurrentPage(page)} shape="rounded" color="primary" />
+
+      {pageCount > 1 && (
+        <Box sx={{ display: "flex", justifyContent: "center", marginTop: 4 }}>
+          <Pagination
+            count={pageCount}
+            page={currentPage}
+            onChange={(_, page) => setCurrentPage(page)}
+            shape="rounded"
+            color="primary"
+          />
         </Box>
       )}
     </Box>

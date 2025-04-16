@@ -52,8 +52,6 @@ const FamilyPop = ({ userDetails }) => {
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Subcaste</TableCell>
                 <TableCell>{userDetails?.subcaste || "N/A"}</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Subcaste</TableCell>
-                <TableCell>{userDetails?.subcaste || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Gotra</TableCell>
@@ -64,8 +62,6 @@ const FamilyPop = ({ userDetails }) => {
                 <TableCell>{userDetails?.rashi || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold" }}>Rashi</TableCell>
-                <TableCell>{userDetails?.rashi || "N/A"}</TableCell>
               </TableRow>
             </TableBody>
           </Table>

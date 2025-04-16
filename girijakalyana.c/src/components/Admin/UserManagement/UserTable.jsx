@@ -3,7 +3,8 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
   TextField, Pagination, Stack, InputAdornment, MenuItem, Select, FormControl,
   Typography,
-  Box
+  Box,
+  CircularProgress
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
 import { getAllUserProfiles, } from "../../api/Admin";
