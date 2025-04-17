@@ -7,7 +7,9 @@ import {
   FormControl,
   Typography,
   Box,
-  CircularProgress
+  Stack,
+  InputAdornment,
+  Paper
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
 import { getAllUserProfiles } from "../../api/Admin";
