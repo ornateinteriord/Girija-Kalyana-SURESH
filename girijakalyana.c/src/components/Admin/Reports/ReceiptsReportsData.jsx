@@ -60,16 +60,12 @@ const ReceiptsReportsData = () => {
   };
 
   return (
-    <Box padding={3} paddingLeft={7} marginTop={8}>
+    <Box padding={3} marginTop={8}>
       <Typography
         variant="h4"
-        gutterBottom
-        sx={{
-          color: "#34495e",
-          fontWeight: 600,
-          fontFamily: "Outfit sans-serif",
-        }}
-        marginBottom={3}
+        color="#34495e"
+        fontFamily={"Outfit sans-serif"}
+        sx={{ textAlign: { xs: "center", sm: "left" } }}
       >
         Receipts Reports
       </Typography>
@@ -81,21 +77,39 @@ const ReceiptsReportsData = () => {
         flexDirection={"row"}
         justifyContent={"space-between"}
         marginTop={1}
-        marginLeft={2}
       >
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            label="Search"
+            variant="outlined"
+            fullWidth
+            value={search}
+            onChange={handleSearchChange}
+            sx={{ width: { xs: "100%", sm: "auto", md: "auto" }, mb: "20px" }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start" style={{ marginRight: "8px" }}>
+                  <FaSearch />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             gap: "10px",
-            marginRight: "10px",
+            paddingLeft: "16px",
+            width: { xs: "100%", sm: "auto", md: "auto" },
+            flexDirection: { xs: "column", sm: "row" },
           }}
         >
           <TextField
             label="From Date"
             type="date"
             InputLabelProps={{ shrink: true }}
-            sx={{ marginRight: "10px" }}
+            sx={{ width: { xs: "100%", sm: "auto", md: "auto" } }}
             value={fromDate}
             onChange={handleFromDateChange}
           />
@@ -106,8 +120,9 @@ const ReceiptsReportsData = () => {
             InputLabelProps={{ shrink: true }}
             value={toDate}
             onChange={handleToDateChange}
+            sx={{ width: { xs: "100%", sm: "auto", md: "auto" } }}
           />
-
+        
           <Button
             variant="contained"
             color="primary"
@@ -119,37 +134,6 @@ const ReceiptsReportsData = () => {
           >
             Submit
           </Button>
-        </Box>
-
-        <Box
-          marginRight={7}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: "7px",
-            paddingRight: "90px",
-          }}
-        >
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              label="Search"
-              variant="outlined"
-              fullWidth
-              value={search}
-              onChange={handleSearchChange}
-              sx={{ width: "320px", display: "flex" }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment
-                    position="start"
-                    style={{ marginRight: "8px" }}
-                  >
-                    <FaSearch />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
         </Box>
       </Grid>
 
