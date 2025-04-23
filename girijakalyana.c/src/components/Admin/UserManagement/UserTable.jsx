@@ -9,7 +9,9 @@ import {
   Box,
   Stack,
   InputAdornment,
-  Paper
+  Paper,
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
 import { getAllUserProfiles } from "../../api/Admin";
@@ -17,8 +19,10 @@ import { LoadingComponent } from "../../../App";
 import toast from "react-hot-toast";
 import { customStyles, getUserTableColumns } from "../../../utils/DataTableColumnsProvider";
 
-
 const UserTable = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const { data: users = [], isLoading, isError, error } = getAllUserProfiles();
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,23 +107,45 @@ const UserTable = () => {
     setFilteredUsers(filtered);
   };
 
-
   const paginationComponentOptions = {
     rowsPerPageText: 'Show',
     rangeSeparatorText: 'of',
     noRowsPerPage: false,
   };
 
+
+
   return (
-    <div style={{ padding: "20px", marginTop: "60px", fontFamily: "Outfit, sans-serif", marginLeft: '20px' }}>
-      <Typography variant="h4" fontWeight={600} color="#34495e" fontFamily={"Outfit sans-serif"} marginBottom={3}>
+    <Box sx={{ 
+      padding: { xs: 2, sm: 3, md: 4 },
+      marginTop: { xs: '60px', sm: '60px' },
+      fontFamily: "Outfit, sans-serif",
+      marginLeft: { xs: 0, sm: '20px' },
+      width: '100%',
+      boxSizing: 'border-box'
+    }}>
+      <Typography 
+        variant="h4"
+        fontWeight={600} 
+        color="#34495e" 
+        fontFamily={"Outfit sans-serif"} 
+        marginBottom={3}
+        sx={{ textAlign: isMobile ? 'center' : 'left' }}
+      >
         User Table
       </Typography>
       
       {/* Filter Options */}
-      <Stack direction="row" spacing={2} mb={2} justifyContent={'space-between'}>
-        <Box>
+      <Stack 
+        direction={{ xs: "column", md: "row" }} 
+        spacing={2} 
+        mb={2} 
+        justifyContent={'space-between'}
+        alignItems={{ xs: 'stretch', md: 'center' }}
+      >
+        <Box sx={{ width: { xs: '100%', md: 'auto' } }}>
           <TextField
+            fullWidth={isMobile}
             placeholder="Search by username or reference"
             label="Search"
             variant="outlined"
@@ -132,17 +158,29 @@ const UserTable = () => {
                 </InputAdornment>
               ),
             }}
-            style={{ width: "300px" }}
+            sx={{ 
+              width: { xs: '100%', sm: '300px' },
+              marginBottom: { xs: 0, md: 0 }
+            }}
             fontFamily={"Outfit sans-serif"}
           />
         </Box>
         
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <FormControl style={{ minWidth: 200 }} fontFamily={"Outfit sans-serif"}>
+        <Box sx={{ 
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          gap: 2,
+          width: { xs: '100%', md: 'auto' }
+        }}>
+          <FormControl sx={{ 
+            minWidth: { xs: '100%', sm: 200 },
+            fontFamily: "Outfit sans-serif"
+          }}>
             <Select 
               value={selectedStatus} 
               onChange={(e) => setSelectedStatus(e.target.value)}
               sx={{ height: '50px' }}
+              fullWidth={isMobile}
             >
               <MenuItem value="status">Status</MenuItem>
               <MenuItem value="active">Active</MenuItem>
@@ -151,11 +189,15 @@ const UserTable = () => {
               <MenuItem value="expires">Expires</MenuItem>
             </Select>
           </FormControl>
-          <FormControl style={{ minWidth: 200 }} fontFamily={"Outfit sans-serif"}>
+          <FormControl sx={{ 
+            minWidth: { xs: '100%', sm: 200 },
+            fontFamily: "Outfit sans-serif"
+          }}>
             <Select 
               value={selectedUserType} 
               onChange={handleUserTypeChange}
               sx={{ height: '50px' }}
+              fullWidth={isMobile}
             >
               <MenuItem value="all">All Users</MenuItem>
               <MenuItem value="premium">Premium Users</MenuItem>
@@ -188,7 +230,7 @@ const UserTable = () => {
           highlightOnHover
         />
       </Paper>
-    </div>
+    </Box>
   );
 };
 

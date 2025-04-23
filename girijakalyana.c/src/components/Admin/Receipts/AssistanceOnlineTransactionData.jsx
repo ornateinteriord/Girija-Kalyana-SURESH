@@ -54,13 +54,13 @@ const AssistanceOnlineTransactionData = () => {
   });
 
   return (
-    <Box sx={{ padding: 4, paddingLeft: "50px", marginTop: "50px" }}>
+    <Box sx={{ padding: 4, marginTop: "50px" }}>
       <Typography
         variant="h4"
-        sx={{ marginBottom: 3 }}
         color="#34495e"
         fontWeight={600}
         fontFamily={"Outfit sans-serif"}
+        sx={{textAlign:{xs:"center",sm:"left"},mb:"20px"}}
       >
         Assistance Transaction
       </Typography>
@@ -80,7 +80,7 @@ const AssistanceOnlineTransactionData = () => {
           variant="outlined"
           value={search}
           onChange={handleSearch}
-          style={{ width: "300px" }}
+          sx={{ width: { xs: '100%',sm:"auto", md: 'auto' },mb:"20px" }}
           InputProps={{
             startAdornment: (
               <InputAdornment>

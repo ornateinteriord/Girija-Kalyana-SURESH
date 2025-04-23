@@ -61,13 +61,12 @@ const RenewalsReportsData = () => {
   };
 
   return (
-    <Box padding={3} paddingLeft={7} marginTop={8}>
+    <Box padding={3}  marginTop={8}>
       <Typography
         variant="h4"
-        gutterBottom
         color="#34495e"
         fontFamily={"Outfit sans-serif"}
-        marginBottom={3}
+        sx={{ textAlign: { xs: "center", sm: "left" },}}
       >
         Renewals Reports
       </Typography>
@@ -79,14 +78,35 @@ const RenewalsReportsData = () => {
         flexDirection={"row"}
         justifyContent={"space-between"}
         marginTop={1}
-        marginLeft={2}
+
       >
+        
+        <Grid item xs={12} sm={6} md={3}>
+            <TextField
+              label="Search"
+              variant="outlined"
+              fullWidth
+              value={search}
+              onChange={handleSearchChange}
+              sx={{ width: { xs: "100%", sm: "auto", md: "auto" }, mb: "20px" }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment
+                    position="start"
+                    style={{ marginRight: "8px" }}
+                  >
+                    <FaSearch />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             gap: "10px",
-            marginRight: "10px",
+            paddingLeft:"16px"
           }}
         >
           <TextField
@@ -118,36 +138,8 @@ const RenewalsReportsData = () => {
           </Button>
         </Box>
 
-        <Box
-          marginRight={7}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: "7px",
-            paddingRight: "90px",
-          }}
-        >
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              label="Search"
-              variant="outlined"
-              fullWidth
-              value={search}
-              onChange={handleSearchChange}
-              sx={{ width: "320px", display: "flex" }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment
-                    position="start"
-                    style={{ marginRight: "8px" }}
-                  >
-                    <FaSearch />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-        </Box>
+        
+       
       </Grid>
 
       <DataTable

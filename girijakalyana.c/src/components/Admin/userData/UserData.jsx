@@ -92,34 +92,24 @@ const UserData = () => {
 
   return (
     <div className="upgrade-user">
-      <div className="fist-head">
-        <Typography display="flex" alignItems="center">
+      
           <Typography
             variant="h4"
             fontWeight={600}
             color="#34495e"
             fontFamily={"Outfit sans-serif"}
+            marginBottom={3}
+            sx={{textAlign:{xs:"center",sm:"left"}}}
           >
             Users Upgrade
           </Typography>
-        </Typography>
+        
+     
         <div className="search-div">
-          <FormControl style={{ minWidth: 200 }} fontFamily={"Outfit sans-serif"}>
-            <Select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              sx={{ height: "50px" }}
-            >
-              <MenuItem value="status">Status</MenuItem>
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="inactive">Inactive</MenuItem>
-              <MenuItem value="pending">Pending</MenuItem>
-              <MenuItem value="expires">Expires</MenuItem>
-            </Select>
-          </FormControl>
           <TextField
             label="Search"
             id="search"
+            sx={{ width: { xs: '100%',sm:"auto", md: 'auto' } }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -130,8 +120,30 @@ const UserData = () => {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search user"
           />
+          <FormControl  sx={{ 
+      width: { xs: '100%', sm: '200px' },
+      fontFamily: '"Outfit", sans-serif'
+    }} fontFamily={"Outfit sans-serif"}>
+            <Select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              sx={{ 
+                height: "50px",
+                width: '100%',
+                '& .MuiSelect-select': { 
+                  display: 'flex',
+                  alignItems: 'center'
+                }
+              }}
+            >
+              <MenuItem value="status">Status</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+              <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="expires">Expires</MenuItem>
+            </Select>
+          </FormControl>
         </div>
-      </div>
 
       {/* DataTable */}
       <Paper sx={{mt:2}}>

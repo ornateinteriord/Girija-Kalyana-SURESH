@@ -54,11 +54,8 @@ const PayToPromoterData = () => {
   };
 
   return (
-    <Box sx={{ padding: 4, paddingLeft: "50px", paddingTop: "85px" }}>
+    <Box sx={{ padding: 4,  paddingTop: "85px" }}>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" marginBottom={2}>
-        {/* Rows Per Page Selector */}
-        <Box display="flex" alignItems="center">
           <Typography
             variant="h4"
             gutterBottom
@@ -66,10 +63,10 @@ const PayToPromoterData = () => {
             fontWeight={600}
             marginRight={2}
             fontFamily={"Outfit sans-serif"}
+            sx={{textAlign:{xs:"center",sm:"left"},mb:"20px"}}
           >
             Pay to Promoters
           </Typography>
-        </Box>
 
         {/* Search Field */}
         <TextField
@@ -78,8 +75,7 @@ const PayToPromoterData = () => {
           variant="outlined"
           value={search}
           onChange={handleSearch}
-          size="medium"
-          style={{ width: "300px" }}
+          sx={{ width: { xs: '100%',sm:"auto", md: 'auto' },mb:"20px" }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start" style={{ marginRight: "8px" }}>
@@ -88,7 +84,7 @@ const PayToPromoterData = () => {
             ),
           }}
         />
-      </Box>
+      
 
       {/* Table */}
       <DataTable

@@ -53,38 +53,32 @@ const PromotersData = () => {
   });
 
   return (
-    <Box padding={4} marginTop={7} paddingLeft={8}>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Box display="flex" justifyContent="space-between" marginBottom={2}>
-          <Typography
-            variant="h4"
-            fontWeight={600}
-            color="#34495e"
-            marginRight={1}
-            fontFamily={"Outfit sans-serif"}
-          >
-            Promoters
-          </Typography>
-
-          <Box display="flex" gap={2} alignItems="center"></Box>
-        </Box>
-
-        <TextField
-          label="search"
-          size="medium"
-          variant="outlined"
-          placeholder="Search"
-          value={search}
-          onChange={handleSearchChange}
-          sx={{ width: "300px" }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start" style={{ marginRight: "8px" }}>
-                <FaSearch />
-              </InputAdornment>
-            ),
-          }}
-        />
+    <Box padding={4} marginTop={7} >
+      <Typography
+        variant="h4"
+        fontWeight={600}
+        color="#34495e"
+        sx={{ textAlign: { xs: "center", sm: "left" }, mb: "10px" }}
+        fontFamily={"Outfit sans-serif"}
+      >
+        Promoters
+      </Typography>
+    <Box display="flex" alignItems="center" gap={2}>
+      <TextField
+        label="search"
+        variant="outlined"
+        placeholder="Search"
+        value={search}
+        onChange={handleSearchChange}
+        sx={{ width: { xs: "100%", sm: "auto", md: "auto" } }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start" style={{ marginRight: "8px" }}>
+              <FaSearch />
+            </InputAdornment>
+          ),
+        }}
+      />
       </Box>
 
       <RadioGroup

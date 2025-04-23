@@ -46,14 +46,15 @@ const RenewalsData = () => {
 
 
   return (
-    <Box padding={2} marginTop={8} paddingLeft={6}>
-      <Box display="flex" justifyContent="space-between" marginBottom={2}>
+    <Box padding={2} marginTop={8} >
+      
         <Typography
           variant="h4"
           gutterBottom
           color="#34495e"
           fontWeight={600}
           fontFamily={"Outfit sans-serif"}
+          sx={{textAlign:{xs:"center",sm:"left"}}}
         >
           Renewals
         </Typography>
@@ -66,7 +67,8 @@ const RenewalsData = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             size="medium"
-            style={{ width: "300px" }}
+            
+            sx={{ width: { xs: '100%',sm:"auto", md: 'auto' } }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start" style={{ marginRight: "8px" }}>
@@ -76,7 +78,7 @@ const RenewalsData = () => {
             }}
           />
         </Box>
-      </Box>
+     
 
       <DataTable
         columns={getRenewalsColumns()}
