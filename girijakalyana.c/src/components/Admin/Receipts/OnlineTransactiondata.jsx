@@ -39,13 +39,14 @@ const OnlineTransactionData = () => {
   });
 
   return (
-    <Box p={2} paddingLeft={7} marginTop={8}>
+    <Box p={2}  marginTop={8}>
       <Typography
         variant="h4"
         gutterBottom
         color="#34495e"
         fontWeight={600}
         fontFamily={"Outfit sans-serif"}
+        sx={{textAlign:{xs:"center",sm:"left"},mb:"20px"}}
       >
         Online Transaction
       </Typography>
@@ -60,8 +61,7 @@ const OnlineTransactionData = () => {
           variant="outlined"
           onChange={handleSearch}
           value={search}
-          sx={{ width: "300px" }}
-          style={{ width: "300px" }}
+          sx={{ width: { xs: '100%',sm:"auto", md: 'auto' },mb:"20px" }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start" style={{ marginRight: "8px" }}>

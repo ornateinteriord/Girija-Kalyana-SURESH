@@ -85,17 +85,13 @@ const ImageVerificationData = () => {
   return (
     <Box p={6} mt={6}>
       {/* Header & Controls */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
+      
         <Typography
           variant="h4"
           fontWeight={600}
           color="#34495e"
           fontFamily={"Outfit sans-serif"}
+          sx={{textAlign:{xs:"center",sm:"left"},mb:"10px"}}
         >
           Image Verification
         </Typography>
@@ -113,11 +109,10 @@ const ImageVerificationData = () => {
                 </InputAdornment>
               ),
             }}
-            style={{ width: "300px" }}
+            sx={{ width: { xs: '100%',sm:"auto", md: 'auto' } }}
             variant="outlined"
           />
         </Box>
-      </Box>
 
       {/* Data Table */}
       <DataTable

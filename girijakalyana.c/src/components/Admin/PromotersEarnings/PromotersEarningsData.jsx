@@ -54,36 +54,26 @@ const PromotersEarningsData = () => {
   };
 
   return (
-    <Box sx={{ padding: 4, paddingLeft: "40px", paddingTop: "80px" }}>
+    <Box sx={{ padding: 4, paddingTop: "80px" }}>
       {/* Header */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
-        <Box display="flex" justifyContent="space-between" marginBottom={2}>
-          <Typography
+
+      <Typography
             variant="h4"
             fontWeight={600}
             color="#34495e"
             fontFamily={"Outfit sans-serif"}
+            sx={{textAlign:{xs:"center",sm:"left"},mb:"20px"}}
           >
             Promoters Earning
           </Typography>
 
-          <Box display="flex" gap={2} alignItems="center">
-          </Box>
-        </Box>
-
         <TextField
           label="search"
-          size="medium"
           variant="outlined"
           placeholder="Search"
           value={search}
           onChange={handleSearchChange}
-          sx={{ width: "300px" }}
+          sx={{ width: { xs: '100%',sm:"auto", md: 'auto' },mb:"20px" }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start" style={{ marginRight: "8px" }}>
@@ -92,7 +82,7 @@ const PromotersEarningsData = () => {
             ),
           }}
         />
-      </Box>
+     
 
       {/* Table */}
       <DataTable

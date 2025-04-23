@@ -92,12 +92,13 @@ const ResetPassword = () => {
 
   return (
     <div className="reset-password-user" style={{ padding: "20px" }}>
-      <div className="firsthead">
+      
         <Typography
           variant="h4"
           fontWeight={600}
           color="#34495e"
           fontFamily={"Outfit sans-serif"}
+          sx={{textAlign:{xs:"center",sm:"left"},mb:"10px"}}
         >
           Reset Password
         </Typography>
@@ -110,6 +111,7 @@ const ResetPassword = () => {
             onChange={handleSearch}
             placeholder="Search records"
             autoComplete="off"
+            sx={{ width: { xs: '100%',sm:"auto", md: 'auto' } }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start" style={{ marginRight: "8px" }}>
@@ -119,7 +121,7 @@ const ResetPassword = () => {
             }}
           />
         </div>
-      </div>
+     
 
       <Paper sx={{ mt: 2 }}>
         <DataTable

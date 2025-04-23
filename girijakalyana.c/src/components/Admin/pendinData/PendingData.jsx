@@ -14,22 +14,20 @@ import { getAllUserProfiles } from "../../api/Admin";
 import { LoadingComponent } from "../../../App";
 import { toast } from "react-toastify";
 import DataTable from "react-data-table-component";
-import { customStyles, getAssistancePendingColumns } from "../../../utils/DataTableColumnsProvider";
+import {
+  customStyles,
+  getAssistancePendingColumns,
+} from "../../../utils/DataTableColumnsProvider";
 
 const PendingData = () => {
-  const {data:users =[],isLoading,isError,error} = getAllUserProfiles()
+  const { data: users = [], isLoading, isError, error } = getAllUserProfiles();
   const [search, setSearch] = useState("");
 
-
   useEffect(() => {
-      if (isError) {
-        toast.error(error.message);
-      }
-    }, [isError, error]);
-
-
-
-
+    if (isError) {
+      toast.error(error.message);
+    }
+  }, [isError, error]);
 
   const filteredRecords = users.filter((record) => {
     const isAdmin = record?.user_role?.toLowerCase() === "admin";
@@ -53,30 +51,33 @@ const PendingData = () => {
     setSearch(e.target.value);
   };
 
-
   return (
     <Box p={5} marginTop={6}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h4" color="#34495e" fontWeight={600} fontFamily="Outfit sans-serif">
-          Pending Data
-        </Typography>
+      <Typography
+        variant="h4"
+        color="#34495e"
+        fontWeight={600}
+        fontFamily="Outfit sans-serif"
+        sx={{ textAlign: { xs: "center", sm: "left" }, mb: "10px" }}
+      >
+        Pending Data
+      </Typography>
 
-        <Box display="flex" alignItems="center" gap={2}>
-          <TextField
-            size="small"
-            label="Search"
-            placeholder="Search user"
-            value={search}
-            onChange={handleSearch}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FaSearch />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
+      <Box display="flex" alignItems="center" gap={2}>
+        <TextField
+          label="Search"
+          placeholder="Search user"
+          value={search}
+          onChange={handleSearch}
+          sx={{ width: { xs: "100%", sm: "auto", md: "auto" } }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <FaSearch />
+              </InputAdornment>
+            ),
+          }}
+        />
       </Box>
 
       <Paper>
@@ -88,11 +89,13 @@ const PendingData = () => {
           paginationPerPage={6}
           paginationRowsPerPageOptions={[6, 10, 15, 20]}
           paginationComponentOptions={{
-            rowsPerPageText: 'Rows per page:',
-            rangeSeparatorText: 'of',
+            rowsPerPageText: "Rows per page:",
+            rangeSeparatorText: "of",
             noRowsPerPage: false,
           }}
-          noDataComponent={<Typography padding={3}>No data available</Typography>}
+          noDataComponent={
+            <Typography padding={3}>No data available</Typography>
+          }
           progressPending={isLoading}
           progressComponent={<LoadingComponent />}
         />

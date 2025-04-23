@@ -51,15 +51,9 @@ const PromotersUsersData = () => {
  
 
   return (
-    <Box p={3} marginTop={8} paddingLeft={7}>
-      <Box display="flex" justifyContent="space-between" marginBottom={1}>
-        <Typography
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+    <Box p={3} marginTop={8} >
+
+        
           <Typography
             variant="h4"
             gutterBottom
@@ -67,17 +61,18 @@ const PromotersUsersData = () => {
             fontWeight={600}
             marginRight={2}
             fontFamily={"Outfit sans-serif"}
+            sx={{ textAlign: { xs: "center", sm: "left" }, mb: "10px" }}
           >
             Promoters Users
           </Typography>
-        </Typography>
-
+      <Box display="flex" alignItems="center" gap={2}>
         <TextField
           label="Search"
           placeholder="Search user"
           variant="outlined"
           value={search}
           onChange={handleSearchChange}
+          sx={{ width: { xs: "100%", sm: "auto", md: "auto" },mb:"20px" }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -85,7 +80,7 @@ const PromotersUsersData = () => {
               </InputAdornment>
             ),
           }}
-          style={{ width: "300px" }}
+          
         />
       </Box>
 

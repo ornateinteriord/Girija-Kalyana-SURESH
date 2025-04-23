@@ -14,8 +14,10 @@ import {
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
 import axios from "axios";
-import { customStyles, getPromoterTableColumns } from "../../../utils/DataTableColumnsProvider";
-
+import {
+  customStyles,
+  getPromoterTableColumns,
+} from "../../../utils/DataTableColumnsProvider";
 
 const PromotersUsers = () => {
   const [records, setRecords] = useState([]);
@@ -45,7 +47,7 @@ const PromotersUsers = () => {
   };
 
   const filteredRows = records.filter((row) => {
-    const matchesSearch = 
+    const matchesSearch =
       search === "" ||
       row.id.toString().includes(search) ||
       row.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -53,31 +55,56 @@ const PromotersUsers = () => {
       row.email.toLowerCase().includes(search.toLowerCase()) ||
       row.phone.toLowerCase().includes(search.toLowerCase()) ||
       row.address?.city?.toLowerCase().includes(search.toLowerCase());
-    
+
     // In a real app, you would filter by user type here
     const matchesFilter = filterType === "All Users" || true;
-    
+
     return matchesSearch && matchesFilter;
   });
 
-
   return (
-    <Box p={3} paddingLeft={7} marginTop={8}>
-      <Typography 
-        variant="h4" 
-        gutterBottom 
-        color="#34495e" 
-        fontWeight={600} 
+    <Box p={3} marginTop={8}>
+      <Typography
+        variant="h4"
+        gutterBottom
+        color="#34495e"
+        fontWeight={600}
         fontFamily={"Outfit sans-serif"}
+        sx={{textAlign:{xs:"center",sm:"left"}}}
       >
         Promoter Users
       </Typography>
-      
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Box display="flex" alignItems="center">          
-          <FormControl sx={{ width: 140 }}>
+
+      <Box
+        display="flex"
+        flexDirection={{ xs: "column", sm: "row" }} // Stack vertically on small screens, row on larger
+        justifyContent="space-between"
+        alignItems={{ xs: "stretch", sm: "center" }} // Stretch on small, center on larger
+        gap={2} // Add gap between items when stacked
+        mb={2}
+      >
+         
+          <TextField
+            label="Search"
+            variant="outlined"
+            value={search}
+            onChange={handleSearchChange}
+            sx={{ width: { xs: "100%", sm: "auto", md: "auto" } }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start" style={{ marginRight: "8px" }}>
+                  <FaSearch />
+                </InputAdornment>
+              ),
+            }}
+          />
+        
+          <FormControl  sx={{ 
+      width: { xs: '100%', sm: '200px' },
+      fontFamily: '"Outfit", sans-serif'
+    }}>
             <InputLabel>Filter Users</InputLabel>
-            <Select 
+            <Select
               value={filterType}
               onChange={handleFilterChange}
               label="Filter Users"
@@ -88,25 +115,6 @@ const PromotersUsers = () => {
               <MenuItem value="free">Free Users</MenuItem>
             </Select>
           </FormControl>
-        </Box>
-        
-        <Box>
-          <TextField
-            label="Search"
-            variant="outlined"
-            value={search}
-            onChange={handleSearchChange}
-            size="medium"
-            style={{ width: '300px' }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start" style={{ marginRight: "8px" }}>
-                  <FaSearch />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
       </Box>
 
       <Paper>
@@ -118,8 +126,8 @@ const PromotersUsers = () => {
           paginationPerPage={5}
           paginationRowsPerPageOptions={[5, 10, 15, 20]}
           paginationComponentOptions={{
-            rowsPerPageText: 'Rows per page:',
-            rangeSeparatorText: 'of',
+            rowsPerPageText: "Rows per page:",
+            rangeSeparatorText: "of",
           }}
           noDataComponent={
             <Typography padding={3} textAlign="center">
