@@ -6,14 +6,20 @@ import {
   TextField,
   Typography,
   Box,
-  InputAdornment,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   CircularProgress,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
 } from '@mui/material';
-import { Link,} from 'react-router-dom';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useLoginMutation } from '../api/Auth';
 
@@ -21,6 +27,7 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // State for mobile menu
   const [loginData, setLoginData] = useState({ username: '', password: '' });
   const [registerData, setRegisterData] = useState({
     firstName: '',
@@ -39,21 +46,16 @@ const Navbar = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
-
   const { mutate: login, isPending: isLoginPending } = useLoginMutation();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    
     if (!loginData.username || !loginData.password) {
       toast.error('Both username and password are required');
       return;
     }
-    
     login(loginData);
   };
-
-
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -80,42 +82,40 @@ const Navbar = () => {
     setRegisterData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
+
+  const menuItems = [
+    { text: 'Home', path: '/' },
+    { text: 'Service', path: '/service' },
+    { text: 'About Us', path: '/about' },
+    { text: 'Privacy Policy', path: '/privacy-policy' },
+    { text: 'Contact Us', path: '/contact' },
+  ];
+
   return (
     <div className="navbar-main-container">
       <div className="navbar-container">
         <div className="navbar">
+          <IconButton
+            className="menu-button"
+            onClick={toggleMobileMenu}
+            sx={{ display: { xs: 'flex', md: 'none' }, color: '#fff' }}
+          >
+            {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+          </IconButton>
           <h3>Girija❤️Kalyana</h3>
-          <div className="menu">
+          <div className="menu desktop-menu">
             <ul>
-              <li>
-                <Link className="link" to="/">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link className="link" to="/service">
-                  Service
-                </Link>
-              </li>
-              <li>
-                <Link className="link" to="/about">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link className="link" to="/privacy-policy">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link className="link" to="/contact">
-                  Contact Us
-                </Link>
-              </li>
+              {menuItems.map((item) => (
+                <li key={item.text}>
+                  <Link className="link" to={item.path}>
+                    {item.text}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
           <Typography>
-            {/* Simplified for now - you can add auth status checks later */}
             <Button
               variant="contained"
               size="large"
@@ -135,6 +135,39 @@ const Navbar = () => {
           </Typography>
         </div>
       </div>
+
+      {/* Mobile Menu Drawer */}
+      <Drawer
+        anchor="left"
+        open={mobileMenuOpen}
+        onClose={toggleMobileMenu}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: '250px',
+            background: '#182848',
+            color: '#fff',
+          },
+        }}
+      >
+        <Box sx={{ padding: '20px' }}>
+          <Typography variant="h6" sx={{ marginBottom: '20px' }}>
+            Menu
+          </Typography>
+          <List>
+            {menuItems.map((item) => (
+              <ListItem
+                key={item.text}
+                onClick={toggleMobileMenu}
+                sx={{ padding: '10px 0' }}
+              >
+                <Link className="link mobile-link" to={item.path}>
+                  <ListItemText primary={item.text} />
+                </Link>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </Drawer>
 
       {/* Login/Register Dialog */}
       <Dialog open={open} onClose={handleClose}>
@@ -256,7 +289,7 @@ const Navbar = () => {
           ) : (
             <form onSubmit={handleLogin} style={{ width: '100%', height: '90%', padding: '40px 20px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
               <TextField
-                sx={{ width: '400px' }}
+                sx={{ width: { xs: '100%', sm: '400px' } }}
                 label="Enter Username"
                 name="username"
                 value={loginData.username}
@@ -266,7 +299,7 @@ const Navbar = () => {
                 required
               />
               <TextField
-                sx={{ width: '400px', marginBottom: '20px' }}
+                sx={{ width: { xs: '100%', sm: '400px' }, marginBottom: '20px' }}
                 label="Enter Password"
                 name="password"
                 value={loginData.password}
@@ -303,7 +336,6 @@ const Navbar = () => {
         </Box>
       </Dialog>
 
-
       {/* Forgot Password Dialog */}
       <Dialog open={openForgotPassword} onClose={handleCloseForgotPassword}>
         <Box
@@ -314,7 +346,7 @@ const Navbar = () => {
           }}
           sx={{
             padding: '20px',
-            width: '400px',
+            width: { xs: '100%', sm: '400px' },
             display: 'flex',
             flexDirection: 'column',
             gap: '20px',
