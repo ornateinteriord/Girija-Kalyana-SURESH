@@ -21,7 +21,6 @@ const RenewalsReportsData = () => {
   const [search, setSearch] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
- 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,7 +46,6 @@ const RenewalsReportsData = () => {
     );
   });
 
-
   const handleFromDateChange = (event) => {
     setFromDate(event.target.value);
   };
@@ -61,12 +59,12 @@ const RenewalsReportsData = () => {
   };
 
   return (
-    <Box padding={3}  marginTop={8}>
+    <Box padding={3} marginTop={8}>
       <Typography
         variant="h4"
         color="#34495e"
         fontFamily={"Outfit sans-serif"}
-        sx={{ textAlign: { xs: "center", sm: "left" },}}
+        sx={{ textAlign: { xs: "center", sm: "left" } }}
       >
         Renewals Reports
       </Typography>
@@ -78,42 +76,39 @@ const RenewalsReportsData = () => {
         flexDirection={"row"}
         justifyContent={"space-between"}
         marginTop={1}
-
       >
-        
         <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              label="Search"
-              variant="outlined"
-              fullWidth
-              value={search}
-              onChange={handleSearchChange}
-              sx={{ width: { xs: "100%", sm: "auto", md: "auto" }, mb: "20px" }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment
-                    position="start"
-                    style={{ marginRight: "8px" }}
-                  >
-                    <FaSearch />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
+          <TextField
+            label="Search"
+            variant="outlined"
+            fullWidth
+            value={search}
+            onChange={handleSearchChange}
+            sx={{ width: { xs: "100%", sm: "auto", md: "auto" }, mb: "20px" }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start" style={{ marginRight: "8px" }}>
+                  <FaSearch />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             gap: "10px",
-            paddingLeft:"16px"
+            paddingLeft: "16px",
+            width: { xs: "100%", sm: "auto", md: "auto" },
+            flexDirection: { xs: "column", sm: "row" },
           }}
         >
           <TextField
             label="From Date"
             type="date"
             InputLabelProps={{ shrink: true }}
-            sx={{ marginRight: "10px" }}
+            sx={{ width: { xs: "100%", sm: "auto", md: "auto" } }}
             value={fromDate}
             onChange={handleFromDateChange}
           />
@@ -124,6 +119,7 @@ const RenewalsReportsData = () => {
             InputLabelProps={{ shrink: true }}
             value={toDate}
             onChange={handleToDateChange}
+            sx={{ width: { xs: "100%", sm: "auto", md: "auto" } }}
           />
 
           <Button
@@ -137,9 +133,6 @@ const RenewalsReportsData = () => {
             Submit
           </Button>
         </Box>
-
-        
-       
       </Grid>
 
       <DataTable
