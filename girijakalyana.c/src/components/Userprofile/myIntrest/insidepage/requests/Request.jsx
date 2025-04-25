@@ -46,7 +46,6 @@ const Requests = () => {
     );
   };
 
-  // Pagination logic
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
   const currentUsers = receivedInterests.slice(indexOfFirst, indexOfLast);
