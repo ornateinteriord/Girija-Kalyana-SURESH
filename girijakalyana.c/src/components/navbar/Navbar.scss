@@ -95,7 +95,8 @@ h3 {
   }
 
   h3 {
-    font-size: 20px;
+    width: 100%;
+    text-align: left;
   }
 
   .login-button {
@@ -107,10 +108,10 @@ h3 {
 }
 
 @media (max-width: 480px) {
-  h3 {
-    font-size: 18px;
+ 
+  .menu-button{
+    margin-left: -10px;
   }
-
   .navbar-container {
     height: 60px;
   }

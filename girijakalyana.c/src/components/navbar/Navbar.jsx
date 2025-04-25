@@ -101,7 +101,7 @@ const Navbar = () => {
             onClick={toggleMobileMenu}
             sx={{ display: { xs: 'flex', md: 'none' }, color: '#fff' }}
           >
-            {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+            {mobileMenuOpen ? <CloseIcon  /> : <MenuIcon />}
           </IconButton>
           <h3>Girija❤️Kalyana</h3>
           <div className="menu desktop-menu">
@@ -120,9 +120,9 @@ const Navbar = () => {
               variant="contained"
               size="large"
               onClick={handleOpen}
-              style={{
+              sx={{
                 backgroundColor: 'black',
-                marginRight: '25px',
+                
                 width: '150px',
                 color: '#fff',
                 fontWeight: 700,
@@ -149,10 +149,12 @@ const Navbar = () => {
           },
         }}
       >
-        <Box sx={{ padding: '20px' }}>
-          <Typography variant="h6" sx={{ marginBottom: '20px' }}>
-            Menu
+        <Box sx={{ padding: '15px' }}>
+          <Typography variant="h6" sx={{ marginBottom: '10px',display:"flex",alignItems:"center",justifyContent:"space-between" }}>
+          <h4>Girija❤️Kalyana</h4>
+            <IconButton   onClick={toggleMobileMenu} ><CloseIcon sx={{color:"#fff"}}/></IconButton>
           </Typography>
+
           <List>
             {menuItems.map((item) => (
               <ListItem
