@@ -66,37 +66,6 @@ const premiumUsersCount = users.filter(user => user?.type_of_user?.toLowerCase()
           />
         ))}
       </div>
-
-      {/* Recent Register Section
-      <div className="dash-board-bottom">
-        <div className="dash-board-bottom-main">
-          <div className="heading-div">
-            <p>Recent Register</p>
-          </div> */}
-          {/* <div className="list-div">
-            <p>Registration No</p>
-            <p>Name</p>
-            <p>Email</p>
-            <p>Phone</p>
-          </div>
-          <div className="data-fetching">
-            {error ? (
-              <div className="error-message">{error}</div>
-            ) : (
-              <div className="data-div">
-                {users.map((user) => (
-                  <ul key={user.id}>
-                    <li>{user.id}</li>
-                    <li>{user.username}</li>
-                    <li>{user.email}</li>
-                    <li>{user.phone}</li>
-                  </ul>
-                ))}
-              </div>
-            )}
-          </div> */}
-        {/* </div> */}
-      {/* </div> */}
       {isLoading && <LoadingComponent/>}
     </div>
   );

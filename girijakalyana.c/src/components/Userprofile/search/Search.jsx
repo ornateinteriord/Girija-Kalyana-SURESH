@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   TextField,
@@ -17,44 +17,50 @@ import {
 import { FaSearch, FaHeart } from "react-icons/fa";
 import axios from "axios";
 import "./search.scss";
+import { useGetAllUsersProfiles } from "../../api/User/useGetProfileDetails";
+import { LoadingComponent } from "../../../App";
 
 const Search = () => {
+  const {data:users=[],isLoading,isError,error} = useGetAllUsersProfiles()
   const [searchQuery, setSearchQuery] = useState("");
   const [profiles, setProfiles] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [selectedProfile, setSelectedProfile] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const handleSearch = async () => {
-    setLoading(true);
-    setError(null);
-    setProfiles([]);
 
-    try {
-      const response = await axios.get("http://localhost:5000/api/search", {
-        params: { searchQuery },
-      });
-
-      if (response.data.length === 0) {
-        setError("No profiles found matching your preferences.");
-      } else {
-        setProfiles(response.data);
+ useEffect(() => {
+      if (isError) {
+        toast.error(error.message);
       }
-    } catch (err) {
-      setError("Error fetching profiles. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+    }, [isError, error]);
+    
   const handleLikeToggle = (id, index) => {
     const updatedProfiles = [...profiles];
     updatedProfiles[index].like = !updatedProfiles[index].like;
     setProfiles(updatedProfiles);
   };
-
+ 
   const handleViewMore = (profile) => {
     setSelectedProfile(profile);
+  };
+
+  const handleSearch = () => {
+    if (!searchQuery.trim()) {
+      setProfiles([]); // Return empty array if search is empty
+      return;
+    }
+    setIsSearching(true);
+    const filteredProfiles = users.filter((profile) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        profile?.first_name?.toString().toLowerCase().includes(query) ||
+        profile?.registration_no?.toString().toLowerCase().includes(query) ||
+        profile?.username?.toString().toLowerCase().includes(query) ||
+        profile?.mobile_no?.toString().toLowerCase().includes(query)
+      );
+    });
+    setProfiles(filteredProfiles);
+    setIsSearching(false);
   };
 
   return (
@@ -68,7 +74,7 @@ const Search = () => {
           <TextField
             fullWidth
             variant="outlined"
-            placeholder="Search by First or Last Name"
+            placeholder="Search by Name, Email or Phone"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             sx={{ maxWidth: "400px" }}
@@ -96,8 +102,8 @@ const Search = () => {
           </Button>
         </Box>
 
-        {loading && <CircularProgress sx={{ display: "block", mx: "auto", my: 2 }} />}
-        {error && <Typography color="error">{error}</Typography>}
+
+        {isSearching && <LoadingComponent />}
 
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 5, justifyContent: "flex-start", alignItems: "start", marginTop: 2 }}>
           {profiles.map((profile, index) => (
@@ -111,54 +117,54 @@ const Search = () => {
                 textAlign: "center",
                 cursor: "pointer",
                 position: "relative",
-                background: "black",
-                color: "#fff",
+                background: "#fff",
+                color: "black",
               }}
             >
               <CardMedia
                 component="img"
                 height="230px"
-                image={profile.profileImg || "https://via.placeholder.com/150"}
+                image={profile?.profileImg || "https://via.placeholder.com/150"}
                 alt="Profile"
                 sx={{ borderRadius: "1%" }}
               />
 
               <CardContent>
                 <Box display="flex" justifyContent="space-between">
-                  <Typography variant="h6" fontWeight="bold" sx={{ color: "#fff" }}>
-                    {profile.firstName} {profile.lastName}
+                  <Typography variant="h6" fontWeight="bold" sx={{ color: "black" }}>
+                    {profile?.first_name} {profile.last_name}
                   </Typography>
                   <FaHeart
                     size={28}
-                    style={{ cursor: "pointer", color: profile.like ? "red" : "#fff" }}
-                    onClick={() => handleLikeToggle(profile._id, index)}
+                    style={{ cursor: "pointer", color: profile.like ? "red" : "black" }}
+                    onClick={() => handleLikeToggle(profile?.registration_no, index)}
                   />
                 </Box>
-                <Typography fontWeight={550} sx={{ color: "#fff" }}>
-                  {profile.address || "N/A"}
+                <Typography fontWeight={550} sx={{ color: "black" }}>
+                  {profile?.address || "N/A"}
                 </Typography>
                 <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 1 }}>
                   <Box>
-                    <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>
-                      {profile.parentPrefer?.toAge || "N/A"}
+                    <Typography variant="body1" fontWeight="bold" sx={{ color: "black" }}>
+                      {profile?.to_age_preference || "N/A"}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: "#fff" }}>
+                    <Typography variant="caption" sx={{ color: "black" }}>
                       Age
                     </Typography>
                   </Box>
                   <Box>
-                    <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>
-                      {profile.parentPrefer?.toHeight || "N/A"}
+                    <Typography variant="body1" fontWeight="bold" sx={{ color: "black" }}>
+                      {profile?.to_height_preference || "N/A"}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: "#fff" }}>
+                    <Typography variant="caption" sx={{ color: "black" }}>
                       Height
                     </Typography>
                   </Box>
                   <Box>
-                    <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>
+                    <Typography variant="body1" fontWeight="bold" sx={{ color: "black" }}>
                       {index + 1}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: "#fff" }}>
+                    <Typography variant="caption" sx={{ color: "black" }}>
                       Reg No
                     </Typography>
                   </Box>
@@ -175,6 +181,7 @@ const Search = () => {
             </Card>
           ))}
         </Box>
+        {isLoading && <LoadingComponent/>}
       </Box>
 
       {/* POPUP DIALOG */}
@@ -191,7 +198,7 @@ const Search = () => {
       <DialogTitle 
         sx={{ textAlign: "center", fontWeight: "bold", fontSize: "1.8rem", backgroundColor: "#34495e", color: "#fff" }}
       >
-        {selectedProfile.firstName} {selectedProfile.lastName}
+        {selectedProfile?.first_name} {selectedProfile?.last_name}
       </DialogTitle>
 
       <DialogContent>
@@ -200,7 +207,7 @@ const Search = () => {
           {/* Profile Image */}
           <Box sx={{ textAlign: "center" }}>
             <img 
-              src={selectedProfile.profileImg || "https://via.placeholder.com/150"} 
+              src={selectedProfile?.profileImg || "https://via.placeholder.com/150"} 
               alt="Profile"
               style={{
                 width: "160px",
@@ -218,19 +225,19 @@ const Search = () => {
           <Box sx={{alignItems:'center',display:'flex'}}>
           <Box sx={{ textAlign: "start", width: "100%" }}>
             <Typography variant="body1" sx={{ fontSize: "1.1rem", mb: 1 }}>
-              <strong> Address:</strong> {selectedProfile.address || "N/A"}
+              <strong> Address:</strong> {selectedProfile?.address || "N/A"}
             </Typography>
             <Typography variant="body1" sx={{ fontSize: "1.1rem", mb: 1 }}>
-              <strong> DOB:</strong> {selectedProfile.dob || "N/A"}
+              <strong> DOB:</strong> {selectedProfile?.dob || "N/A"}
             </Typography>
             <Typography variant="body1" sx={{ fontSize: "1.1rem", mb: 1 }}>
-              <strong> Gender:</strong> {selectedProfile.gender || "N/A"}
+              <strong> Gender:</strong> {selectedProfile?.gender || "N/A"}
             </Typography>
             <Typography variant="body1" sx={{ fontSize: "1.1rem", mb: 1 }}>
-              <strong> Height:</strong> {selectedProfile.parentPrefer?.toHeight || "N/A"}
+              <strong> Height:</strong> {selectedProfile?.to_height_preference || "N/A"}
             </Typography>
             <Typography variant="body1" sx={{ fontSize: "1.1rem", mb: 1 }}>
-              <strong> Age:</strong> {selectedProfile.parentPrefer?.toAge || "N/A"}
+              <strong> Age:</strong> {selectedProfile?.to_age_preference || "N/A"}
             </Typography>
           </Box>
           </Box>

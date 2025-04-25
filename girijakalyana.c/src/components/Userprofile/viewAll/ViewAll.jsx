@@ -25,6 +25,7 @@ import PreferencePop from "./popupContent/preferencePop/PreferencePop";
 import { useExpressInterest, useGetAllUsersProfiles, useGetInterestStatus } from "../../api/User/useGetProfileDetails";
 import TokenService from "../../token/tokenService";
 import { useSnackbar } from "notistack";
+import { LoadingComponent } from "../../../App";
 
 const itemsPerPage = 8;
 const tabLabels = ["About", "Family", "Education", "LifeStyle", "Preference"];
@@ -37,7 +38,7 @@ const ViewAll = () => {
   const [interestStatus, setInterestStatus] = useState({});
   const { enqueueSnackbar } = useSnackbar();
 
-  const { data: users = [], isLoading, error } = useGetAllUsersProfiles();
+  const { data: users = [], isLoading,isError, error } = useGetAllUsersProfiles();
   const loggedInUserId = TokenService.getRegistrationNo();
 
  // Replace the current hook usage with this:
@@ -196,9 +197,6 @@ const expressInterestMutation = useExpressInterest();
     );
   };
 
-  if (isLoading) return <Box display="flex" justifyContent="center" alignItems="center" height="80vh"><CircularProgress /></Box>;
-
-  if (error) return <Box display="flex" justifyContent="center" alignItems="center" height="80vh"><Typography color="error">Error loading profiles: {error.message}</Typography></Box>;
 
   return (
     <Box sx={{ p: 2, backgroundColor: "#f9f9f9" }}>
@@ -274,6 +272,7 @@ const expressInterestMutation = useExpressInterest();
           <Pagination count={Math.ceil(filteredUsers.length / itemsPerPage)} page={currentPage} onChange={(e, page) => setCurrentPage(page)} color="primary" shape="rounded" />
         </Box>
       )}
+      {isLoading && <LoadingComponent/>}
     </Box>
   );
 };

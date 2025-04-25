@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -9,19 +9,24 @@ import {
   CircularProgress
 } from "@mui/material";
 import { useGetInterestStatus } from "../../../api/User/useGetProfileDetails";
+import { toast } from "react-toastify";
+import { LoadingComponent } from "../../../../App";
 // import { useGetSentInterests } from "../../../api/User/useGetProfileDetails";
 
 const Sent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
 
-  const { data: sentInterests, isLoading, error } = useGetInterestStatus({
+  const { data: sentInterests, isLoading,isError, error } = useGetInterestStatus({
     page: currentPage,
     limit: itemsPerPage
   });
 
-  if (isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}><CircularProgress /></Box>;
-  if (error) return <Typography color="error" sx={{ mt: 5, textAlign: 'center' }}>Error loading data</Typography>;
+   useEffect(() => {
+      if (isError) {
+        toast.error(error.message);
+      }
+    }, [isError, error]);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -34,7 +39,7 @@ const Sent = () => {
       ) : (
         <>
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-            {sentInterests.data.map(interest => (
+            {sentInterests?.data?.map(interest => (
               <InterestCard 
                 key={interest._id}
                 profile={interest.recipient}
@@ -43,10 +48,10 @@ const Sent = () => {
             ))}
           </Box>
 
-          {sentInterests.totalPages > 1 && (
+          {sentInterests?.totalPages > 1 && (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
               <Pagination
-                count={sentInterests.totalPages}
+                count={sentInterests?.totalPages}
                 page={currentPage}
                 onChange={(e, page) => setCurrentPage(page)}
               />
@@ -79,6 +84,7 @@ const InterestCard = ({ profile, interestDate }) => (
         <Typography variant="body2">Occupation: {profile.occupation || 'N/A'}</Typography>
       </Box>
     </CardContent>
+    {isLoading && <LoadingComponent/>}
   </Card>
 );
 

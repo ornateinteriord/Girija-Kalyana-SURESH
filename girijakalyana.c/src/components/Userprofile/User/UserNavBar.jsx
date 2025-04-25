@@ -32,6 +32,8 @@ import useStore from "../../../store";
 
 import TokenService from "../../token/tokenService";
 import { useGetMemberDetails } from "../../api/User/useGetProfileDetails";
+import { toast } from "react-toastify";
+import { LoadingComponent } from "../../../App";
 
 const drawerWidth = 240;
 
@@ -52,10 +54,18 @@ const UserNavBar = () => {
 
   const {
     data: userProfile,
-    isLoading: profileLoading,
-    isError: profileError,
-    refetch: refetchProfile,
+    isLoading,
+    isError,
+    error
+   
   } = useGetMemberDetails(registerNo);
+
+
+   useEffect(() => {
+      if (isError) {
+        toast.error(error.message);
+      }
+    }, [isError, error]);
 
   useEffect(() => {
     if (userProfile) {
@@ -110,8 +120,7 @@ const UserNavBar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  if (profileLoading) return <div>Loading...</div>;
-  if (profileError) return <div>Error loading profile</div>;
+
 
   return (
     <>
@@ -308,6 +317,7 @@ const UserNavBar = () => {
             <Toolbar />
             <Outlet />
           </Box>
+          {isLoading && <LoadingComponent/>}
         </Box>
       </ThemeProvider>
     </>

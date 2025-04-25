@@ -11,6 +11,7 @@ import {
 import toast from "react-hot-toast";
 import { useGetMemberDetails, useUpdateProfile } from "../../../api/User/useGetProfileDetails";
 import TokenService from "../../../token/tokenService";
+import { LoadingComponent } from "../../../../App";
 
 
 
@@ -38,9 +39,16 @@ const FamilyReligious = () => {
     sister_elder_married: ''
   });
 
-  const { data: userProfile, isLoading: profileLoading, isError: profileError } =
+  const { data: userProfile, isLoading, isError,error } =
     useGetMemberDetails(registerNo);
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+
+
+   useEffect(() => {
+      if (isError) {
+        toast.error(error.message);
+      }
+    }, [isError, error]);
 
   useEffect(() => {
     if (userProfile) {
@@ -88,21 +96,7 @@ const FamilyReligious = () => {
       })
   };
 
-  if (profileLoading) {
-    return (
-      <Box display="flex" justifyContent="center" p={4}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (profileError) {
-    return (
-      <Box display="flex" justifyContent="center" p={4}>
-        <Typography color="error">Failed to load profile data</Typography>
-      </Box>
-    );
-  }
+ 
 
   return (
     <Box
@@ -222,6 +216,7 @@ const FamilyReligious = () => {
           </Button>
         </Box>
       )}
+      {isLoading && <LoadingComponent/>}
     </Box>
   );
 };
