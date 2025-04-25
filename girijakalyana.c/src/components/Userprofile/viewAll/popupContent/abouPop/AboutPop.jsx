@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 
 const AboutPop = ({ userDetails }) => {
+  
   if (!userDetails || Object.keys(userDetails).length === 0) {
     return <Typography>No user details available.</Typography>;
   }

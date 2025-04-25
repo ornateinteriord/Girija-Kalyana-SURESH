@@ -47,14 +47,14 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
         sx={{ borderRadius: "12px", padding: "50px 50px 0" }}
       />
       <CardContent>
-        <Box display={"flex"} justifyContent={"space-between"}>
-          <Typography variant="h6" fontWeight="bold">
+        {/* <Box display={"flex"} justifyContent={"space-between"}> */}
+          <Typography fontSize={18} fontWeight="bold" textAlign={'start'}>
             {senderDetails?.first_name} {senderDetails?.last_name}
           </Typography>
-          <Typography fontWeight={550}>
+          <Typography fontWeight={550}  textAlign={'start'}>
             {senderDetails?.address || "N/A"}
           </Typography>
-        </Box>
+        {/* </Box> */}
         <Box
           sx={{
             display: "flex",
