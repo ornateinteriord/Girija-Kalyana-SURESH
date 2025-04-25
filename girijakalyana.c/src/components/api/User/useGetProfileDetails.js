@@ -47,7 +47,6 @@ export const useUpdateProfile = () => {
     },
     onSuccess: (response) => {
       if (response?.success) {
-        toast.success(response.message);
         queryClient.invalidateQueries({ queryKey: ["userDetails", reg_No] });
       }
     },
@@ -76,12 +75,18 @@ export const useExpressInterest = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["interestStatus"]);
+      toast.success('Interest expressed successfully!');
+      queryClient.invalidateQueries(['interestStatus']);
     },
-    onError: (err) => {
-      const errorMessage = err.response?.data?.message;
-      toast.error(errorMessage);
-    },
+    onError: (error) => {
+      const errorMessage = error?.response?.data?.message || error.message;
+
+      if (errorMessage.includes('already expressed') || errorMessage.includes('Interest already exists')) {
+        toast.info('You have already expressed interest to this user.');
+      } else {
+        toast.error('Failed to express interest. Please try again.');
+      }
+    }
   });
 };
 
@@ -134,11 +139,34 @@ export const useUpdateInterestStatus = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["interestStatus"]);
+      toast.success('Interest updated successfully!');
+      queryClient.invalidateQueries(['interestStatus']);
+      queryClient.invalidateQueries(['interests']);
     },
-    onError: (err) => {
-      const errorMessage = err.response?.data?.message;
-      toast.error(errorMessage);
+    onError: (error) => {
+      toast.error('Failed to update interest. Please try again.');
+    }
+  });
+};
+
+export const useGetAcceptedInterests = (recipientRegistrationNo) => {
+  return useQuery({
+    queryKey: ["acceptedInterests", recipientRegistrationNo],
+    queryFn: async () => {
+      const response = await get(`/api/user/interest/accepted/${recipientRegistrationNo}`);
+      
+      // if (!response || response.length === 0) {
+      //   toast.info("No accepted interests found.");
+      // } else {
+      //   toast.success("Accepted interests loaded successfully.");
+      // }
+
+      return response;
     },
+    enabled: !!recipientRegistrationNo,
+    staleTime: 1000 * 60 * 5,
+    onError: (error) => {
+      toast.error(error?.message || "Failed to fetch accepted interests.");
+    }
   });
 };

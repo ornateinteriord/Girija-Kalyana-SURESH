@@ -1,134 +1,125 @@
-import React, { useEffect, useState } from "react";
-import { Box, Card, CardContent, CardMedia, Typography, Button } from "@mui/material";
-import axios from "axios";
+import React, { useState } from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Button,
+  Grid,
+  CircularProgress,
+  Pagination
+} from "@mui/material";
 import placeholderImg from "../../../myIntrest/insidepage/accepted/mathes.jpeg";
-import toast from "react-hot-toast";
-const API_BASE_URL = "http://localhost:5000/api";
+import TokenService from "../../../../token/tokenService";
+import { useNavigate } from "react-router-dom";
+import { useGetAcceptedInterests } from "../../../../api/User/useGetProfileDetails";
 
 const Accepted = () => {
-    const [acceptedUsers, setAcceptedUsers] = useState([]);
+  const registrationNo = TokenService.getRegistrationNo();
+  const { data = [], isLoading } = useGetAcceptedInterests(registrationNo);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchAcceptedUsers = async () => {
-            try {
-                const userData = sessionStorage.getItem("userData");
-                if (!userData) return;
-                const parsedUserData = JSON.parse(userData);
-                const loggedInUserId = parsedUserData._id;
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
+  const totalItems = data.length;
 
-                const response = await axios.get(`${API_BASE_URL}/accepted-users/${loggedInUserId}`);
-                setAcceptedUsers(response.data);
-            } catch (error) {
-                console.error("Error fetching accepted users:", error);
-            }
-        };
+  const handlePageChange = (_, value) => {
+    setCurrentPage(value);
+  };
 
-        fetchAcceptedUsers();
-    }, []);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
 
-   
-const handleRemoveUser = async (userId) => {
-    try {
-        const userData = sessionStorage.getItem("userData");
-        if (!userData) return;
-        const parsedUserData = JSON.parse(userData);
-        const loggedInUserId = parsedUserData._id;
-
-        await axios.post(`${API_BASE_URL}/remove-accepted`, {
-            userId: loggedInUserId,
-            targetUserId: userId,
-        });
-
-        setAcceptedUsers(acceptedUsers.filter(user => user._id !== userId));
-        toast.success("User removed successfully!");
-    } catch (error) {
-        console.error("Error removing connection:", error);
-    }
-};
-
+  if (isLoading) {
     return (
-        <Box sx={{ padding: 3, backgroundColor: "aliceblue" }}>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "flex-start" }}>
-                {acceptedUsers.length > 0 ? (
-                    acceptedUsers.map((user, index) => (
-                        <Card 
-                            key={user._id} 
-                            sx={{ 
-                                width: "270px",
-                                height: "380px", 
-                                borderRadius: 1, 
-                                boxShadow: 3, 
-                                textAlign: "center", 
-                                backgroundColor: "black", 
-                                color: "white",
-                                cursor: "pointer",
-                                position: "relative",
-                            }}
-                        >
-                            <CardMedia 
-                                component="img" 
-                                alt="User Profile" 
-                                height="210px" 
-                                image={user.profileImg || placeholderImg} 
-                                sx={{ objectFit: "cover", borderRadius: "1%" }} 
-                            />
-                            <CardContent>
-                                <Box display="flex" justifyContent="space-between">
-                                    <Typography variant="h6" fontWeight="bold">
-                                        {user.firstName} {user.lastName}
-                                    </Typography>
-                                    <Typography fontWeight={550}>
-                                        {user.address || "N/A"}
-                                    </Typography>
-                                </Box>
-                                <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2}}>
-                                    <Box>
-                                        <Typography variant="body1" fontWeight="bold">
-                                            {user.age || "N/A"}
-                                        </Typography>
-                                        <Typography variant="caption">
-                                            Age
-                                        </Typography>
-                                    </Box>
-                                    <Box>
-                                        <Typography variant="body1" fontWeight="bold">
-                                            {user.height || "N/A"}
-                                        </Typography>
-                                        <Typography variant="caption">
-                                            Height
-                                        </Typography>
-                                    </Box>
-                                    <Box>
-                                        <Typography variant="body1" fontWeight="bold">
-                                            {user.registrationNumber || "N/A"}
-                                        </Typography>
-                                        <Typography variant="caption">
-                                            Reg No
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                                
-                                <Button
-                                fullWidth
-                                    variant="contained"                   
-                                    sx={{ marginTop: 0.5 ,textTransform:"none",
-                                        height:'40px',background:'red',color:'#fff',fontWeight:'600px',fontSize:'18px' }}
-                                    onClick={() => handleRemoveUser(user._id)}
-                                >
-                                    Remove 
-                                </Button>
-                              
-                            </CardContent>
-                        </Card>
-                    ))
-                ) : (
-                    <Typography variant="h6" textAlign="center" sx={{ color: "black" }}>
-                        No accepted users yet.
-                    </Typography>
-                )}
-            </Box>
-        </Box>
+      <Box display="flex" justifyContent="center" mt={5}>
+        <CircularProgress />
+      </Box>
     );
+  }
+
+  return (
+    <Box sx={{ padding: 3, backgroundColor: "aliceblue" }}>
+      <Grid container spacing={4}>
+        {currentItems.map((item, index) => {
+          const user = item.sender || {};
+          return (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+              <Card
+                sx={{
+                  width: 260,
+                  height: 370,
+                  borderRadius: 2,
+                  boxShadow: 6,
+                  textAlign: "center",
+                  backgroundColor: "#f4f4f9",
+                  color: "black",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  "&:hover": {
+                    transform: "scale(1.02)",
+                    boxShadow: 12,
+                  },
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  alt="User"
+                  height="190"
+                  image={user.profileImg || placeholderImg}
+                />
+                <CardContent>
+                  <Typography fontSize={18} fontWeight="bold" sx={{ color: "#333", textAlign: "start" }}>
+                    {user?.first_name} {user?.last_name}
+                  </Typography>
+                  <Typography sx={{ color: "#666", fontSize: "16px", textAlign: "start" }} mb={0}>
+                    {user.address || "N/A"}
+                  </Typography>
+                  <Box display="flex" justifyContent="space-between" mt={1}>
+                    <Typography sx={{ color: "#666", fontSize: 13 }}>Age: {user?.age || "N/A"}</Typography>
+                    <Typography sx={{ color: "#666", fontSize: 13 }}>Height: {user?.height || "N/A"}</Typography>
+                  </Box>
+                  <Typography sx={{ color: "#666", fontSize: 13 }} mt={0.5}>
+                    Ref No: {user?.registration_no || item.senderRegistrationNo}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    sx={{
+                      mt: 1,
+                      background: "#2196F3",
+                      "&:hover": { background: "#1976D2" },
+                    }}
+                  >
+                    Accepted
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          );
+        })}
+      </Grid>
+
+      <Box
+  sx={{
+    display: "flex",
+    justifyContent: "end",
+    alignItems: "center",
+    marginTop: 4,
+    gap: 2,
+  }}
+>
+  <Pagination
+    count={Math.ceil(totalItems / itemsPerPage)}
+    page={currentPage}
+    onChange={handlePageChange}
+    shape="rounded"
+    color="primary"
+  />
+</Box>
+    </Box>
+  );
 };
 
 export default Accepted;

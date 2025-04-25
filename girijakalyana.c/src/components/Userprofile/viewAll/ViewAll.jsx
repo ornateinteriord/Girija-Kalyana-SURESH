@@ -41,8 +41,9 @@ const ViewAll = () => {
   const { data: users = [], isLoading,isError, error } = useGetAllUsersProfiles();
   const loggedInUserId = TokenService.getRegistrationNo();
 
-  const expressInterestMutation = useExpressInterest();
-  const { mutateAsync: checkInterestStatus } = useGetInterestStatus();
+ // Replace the current hook usage with this:
+const { mutateAsync: checkInterestStatus } = useGetInterestStatus();
+const expressInterestMutation = useExpressInterest();
 
   const filteredUsers = useMemo(
     () => users.filter(user => user.registration_no !== loggedInUserId && user.user_role !== "Admin"),
@@ -53,83 +54,94 @@ const ViewAll = () => {
     () => filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage),
     [filteredUsers, currentPage]
   );
-
   useEffect(() => {
-      if (isError) {
-        toast.error(error.message);
-      }
-    }, [isError, error]);
-
-  useEffect(() => {
+    console.log('Running initial status fetch');
     if (!filteredUsers.length || !loggedInUserId) return;
-
+  
     const fetchStatuses = async () => {
+      // console.log('Fetching statuses for all users');
       const statusMap = {};
       await Promise.all(
         filteredUsers.map(async (user) => {
           try {
+            // console.log(`Fetching status for user ${user._id}`);
             const res = await checkInterestStatus({
               senderRegistrationNo: loggedInUserId,
               recipientRegistrationNo: user.registration_no
             });
+            console.log(`Status for ${user._id}:`, res);
             statusMap[user._id] = res;
-          } catch {
+          } catch (error) {
+            // console.error(`Error fetching status for ${user._id}:`, error);
             statusMap[user._id] = { status: "none" };
           }
         })
       );
+      // console.log('Final status map:', statusMap);
       setInterestStatus(statusMap);
     };
-
+  
     fetchStatuses();
   }, [filteredUsers, loggedInUserId, checkInterestStatus]);
   const handleOpenDialog = useCallback(async (user) => {
-    console.log('Opening dialog for user:', user._id); // Debug
     setSelectedUser(user);
     try {
-      console.log('Fetching interest status...'); // Debug
-      const status = await checkInterestStatus({
-        senderRegistrationNo: loggedInUserId,
-        recipientRegistrationNo: user.registration_no
-      });
-      console.log('Received status:', status); // Debug
-      setInterestStatus(prev => {
-        const newStatus = { ...prev, [user._id]: status };
-        console.log('Updated interestStatus:', newStatus); // Debug
-        return newStatus;
-      });
+      if (loggedInUserId && user.registration_no) {
+        const status = await checkInterestStatus({
+          senderRegistrationNo: loggedInUserId,
+          recipientRegistrationNo: user.registration_no
+        });
+        setInterestStatus(prev => ({ ...prev, [user._id]: status }));
+      }
     } catch (error) {
-      console.error('Error fetching status:', error); // Debug
-      enqueueSnackbar("Failed to check interest status", { variant: "error" });
+      console.error('Error fetching status:', error);
       setInterestStatus(prev => ({ ...prev, [user._id]: { status: "none" } }));
     }
     setOpenDialog(true);
-  }, [checkInterestStatus, loggedInUserId, enqueueSnackbar]);
-
+  }, [checkInterestStatus, loggedInUserId]);
+  
   const handleExpressInterest = useCallback(async (userMongoId) => {
     const recipient = filteredUsers.find(user => user._id === userMongoId);
-    if (!recipient) return;
+    if (!recipient || !loggedInUserId) return;
   
     try {
-      await expressInterestMutation.mutateAsync({
-        senderRegistrationNo: loggedInUserId, // this is a registration_no
-        recipientRegistrationNo: recipient.registration_no,
-        message: "I'd like to connect with you!"
-      });
-  
+      // Optimistically update the status to "pending"
       setInterestStatus(prev => ({
         ...prev,
         [userMongoId]: { status: "pending" }
       }));
   
+      // Send the interest request
+      await expressInterestMutation.mutateAsync({
+        senderRegistrationNo: loggedInUserId,
+        recipientRegistrationNo: recipient.registration_no,
+        message: "I'd like to connect with you!"
+      });
+  
+      // Verify the actual status after sending
+      const statusResponse = await checkInterestStatus({
+        senderRegistrationNo: loggedInUserId,
+        recipientRegistrationNo: recipient.registration_no
+      });
+  
+      // Update with the actual status from API
+      setInterestStatus(prev => ({
+        ...prev,
+        [userMongoId]: statusResponse
+      }));
+  
       enqueueSnackbar("Interest expressed successfully!", { variant: "success" });
     } catch (error) {
+      // Revert on error
+      setInterestStatus(prev => ({
+        ...prev,
+        [userMongoId]: { status: "none" }
+      }));
       enqueueSnackbar(error?.response?.data?.message || "Failed to express interest", {
         variant: "error"
       });
     }
-  }, [filteredUsers, loggedInUserId, expressInterestMutation, enqueueSnackbar]);
-  
+  }, [filteredUsers, loggedInUserId, expressInterestMutation, checkInterestStatus, enqueueSnackbar]);
   const renderDialogContent = () => {
     if (!selectedUser) return null;
 
@@ -145,7 +157,8 @@ const ViewAll = () => {
   };
 
   const renderUserCard = (user) => {
-    const currentStatus = interestStatus[user._id]?.status || "none";
+    const currentStatus = interestStatus[user.recipientRegistrationNo]?.status || "none";
+    console.log(currentStatus,"status")
     const age = user.age || calculateAge(user.date_of_birth);
 
     return (
@@ -168,6 +181,8 @@ const ViewAll = () => {
             <ProfileInfo label="Religion" value={user.religion || "N/A"} />
             <ProfileInfo label="Caste" value={user.caste || "N/A"} />
           </Box>
+
+          
           <Button
             fullWidth
             variant="outlined"
@@ -226,23 +241,25 @@ const ViewAll = () => {
                 <Typography variant="body1" fontWeight="bold">Verified Profile</Typography>
               </Box>
               <Box sx={{ display: "flex", gap: 2 }}>
-    <Button
-      variant="contained"
-      color={
-        interestStatus[selectedUser?._id]?.status === "pending" ? "warning" :
-        interestStatus[selectedUser?._id]?.status === "accepted" ? "success" :
-        interestStatus[selectedUser?._id]?.status === "rejected" ? "error" : "primary"
-      }
-      onClick={() => handleExpressInterest(selectedUser._id)}
-      disabled={interestStatus[selectedUser?._id]?.status !== "none" || expressInterestMutation.isLoading}
-      startIcon={expressInterestMutation.isLoading ? <CircularProgress size={20} /> : <FaHeart />}
-    >
-      {
-        interestStatus[selectedUser?._id]?.status === "pending" ? "Interest Pending" :
-        interestStatus[selectedUser?._id]?.status === "accepted" ? "Connected!" :
-        interestStatus[selectedUser?._id]?.status === "rejected" ? "Rejected" : "Express Interest"
-      }
-    </Button>
+              <Button
+  variant="contained"
+  color={
+    interestStatus[selectedUser?._id]?.status === "pending" ? "warning" : // Fix: Use selectedUser._id
+    interestStatus[selectedUser?._id]?.status === "accepted" ? "success" :
+    interestStatus[selectedUser?._id]?.status === "rejected" ? "error" : "primary"
+  }
+  onClick={() => handleExpressInterest(selectedUser._id)}
+  disabled={interestStatus[selectedUser?._id]?.status !== "none" || expressInterestMutation.isLoading}
+  startIcon={expressInterestMutation.isLoading ? <CircularProgress size={20} /> : <FaHeart />}
+>
+  {
+    interestStatus[selectedUser?._id]?.status === "pending" ? "Interest Pending" :
+    interestStatus[selectedUser?._id]?.status === "accepted" ? "Connected!" :
+    interestStatus[selectedUser?._id]?.status === "rejected" ? "Rejected" : "Express Interest"
+  }
+</Button>
+
+
     <Button variant="outlined" onClick={() => setOpenDialog(false)}>Close</Button>
   </Box>
 </Box>

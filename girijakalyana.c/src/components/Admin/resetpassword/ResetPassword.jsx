@@ -3,10 +3,6 @@ import DataTable from "react-data-table-component";
 import {
   TextField,
   InputAdornment,
-  FormControl,
-  Select,
-  MenuItem,
-  InputLabel,
   Typography,
   Button,
   Dialog,
@@ -14,7 +10,7 @@ import {
   DialogContent,
   DialogTitle,
   Paper,
-  Stack,
+  
 } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
 import { getAllUserProfiles, UserResetPassword } from "../../api/Admin";
@@ -24,7 +20,7 @@ import {
   customStyles,
   getResetPasswordColumns,
 } from "../../../utils/DataTableColumnsProvider";
-import "./ResetPassword.scss";
+import "./Resetpassword.scss";
 
 const ResetPassword = () => {
   const [search, setSearch] = useState("");
