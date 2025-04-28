@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './App.css';
 import ProfileProvider from './components/usecontext/ProfileProvider';
 import { ToastContainer } from 'react-toastify';
+import ProtectedRoute from './components/roterProtector/RouterProtector';
 
 // Create a query client with default options
 const queryClient = new QueryClient({
@@ -110,6 +111,7 @@ const App = () => {
             <Route path="/contact" element={<ContactUs />} />
 
             {/* Admin Routes */}
+            <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>
             <Route path="/admin" element={<AdminDashboard />}>
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="user-table" element={<UserTable />} />
@@ -132,8 +134,10 @@ const App = () => {
               <Route path="receiptsreports" element={<ReceiptsReportsData />} />
               <Route path="notification" element={<NotificationData />} />
             </Route>
+            </Route>
 
             {/* User Routes */}
+            <Route element={<ProtectedRoute allowedRoles={["FreeUser","PremiumUser","SilverUser"]} />}>
             <Route path="/user" element={<UserNavBar />}>
               <Route path="userDashboard" element={<UserDashboard />} />
               <Route path="profile" element={<Profile />} />
@@ -141,6 +145,7 @@ const App = () => {
               <Route path="myintrest" element={<MyInterest />} />
               <Route path="viewAll" element={<ViewAll />} />
               <Route path="search" element={<Search />} />
+            </Route>
             </Route>
 
             {/* 404 Route */}

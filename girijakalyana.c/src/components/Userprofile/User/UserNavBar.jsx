@@ -25,7 +25,7 @@ import {
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { FaDashcube, FaUsersViewfinder } from "react-icons/fa6";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import UserDashboard from "../userdDashboard/UserDashboard";
 import { convertFromBase64 } from "../profile/photo/Photos";
 import useStore from "../../../store";
@@ -56,16 +56,14 @@ const UserNavBar = () => {
     data: userProfile,
     isLoading,
     isError,
-    error
-   
+    error,
   } = useGetMemberDetails(registerNo);
 
-
-   useEffect(() => {
-      if (isError) {
-        toast.error(error.message);
-      }
-    }, [isError, error]);
+  useEffect(() => {
+    if (isError) {
+      toast.error(error.message);
+    }
+  }, [isError, error]);
 
   useEffect(() => {
     if (userProfile) {
@@ -89,7 +87,8 @@ const UserNavBar = () => {
   const handleLogout = () => {
     navigation("/");
     setAnchorEl(null);
-    localStorage.clear();
+    TokenService.removeToken();
+    window.dispatchEvent(new Event("storage"));
   };
 
   const handleDashboardClick = () => {
@@ -120,8 +119,6 @@ const UserNavBar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-
-
   return (
     <>
       <ThemeProvider theme={theme}>
@@ -137,7 +134,7 @@ const UserNavBar = () => {
               height: "60px",
             }}
           >
-            <Toolbar>
+            <Toolbar sx={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <IconButton
                 edge="start"
                 color="inherit"
@@ -146,15 +143,20 @@ const UserNavBar = () => {
               >
                 <FaBars />
               </IconButton>
-
-              <Typography
-                variant="h5"
-                noWrap
-                component="div"
-                sx={{ flexGrow: 1 }}
-              >
-                Girija❤️Kalyana
-              </Typography>
+            
+            <Box sx={{textAlign:"left" ,width:"100%"}}>
+              <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+                <Typography
+                  variant="h5"
+                  noWrap
+                  component="div"
+                  
+                  sx={{ flexGrow: 1 }}
+                >
+                  Girija❤️Kalyana
+                </Typography>
+              </Link>
+              </Box>
 
               <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
                 <Typography
@@ -317,7 +319,7 @@ const UserNavBar = () => {
             <Toolbar />
             <Outlet />
           </Box>
-          {isLoading && <LoadingComponent/>}
+          {isLoading && <LoadingComponent />}
         </Box>
       </ThemeProvider>
     </>
