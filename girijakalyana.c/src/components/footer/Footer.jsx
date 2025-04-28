@@ -4,20 +4,20 @@ import { FaFacebookF, FaTwitter, FaLinkedinIn, FaYoutube } from "react-icons/fa"
 
 function Footer() {
   return (
-    <>
-      <footer className="footer">
-        <div className="container">
-          <div className="section">
-            <h2 className="heading">Girija Kalyana</h2>
-            <p className="text">
+    <footer className="footer">
+      <div className="footer-container">
+        <div className="footer-grid">
+          <div className="footer-section">
+            <h2 className="footer-heading">Girija Kalyana</h2>
+            <p className="footer-text">
               A Superior Matrimony Service. Register and find your special
               someone matches within your community.
             </p>
           </div>
 
-          <div className="section">
-            <h3 className="subheading about">About Company</h3>
-            <ul className="list about">
+          <div className="footer-section">
+            <h3 className="footer-heading">About Company</h3>
+            <ul className="footer-list">
               <li>About Us</li>
               <li>Promoter</li>
               <li>Contact Us</li>
@@ -27,46 +27,46 @@ function Footer() {
             </ul>
           </div>
 
-          <div className="section ">
-            <h3 className="subheading contact">Contact Us</h3>
-            <p className="text contact">Email: contactusgirijakalyana@gmail.com</p>
-            <p className="text contact">Email: enquirygirijakalyana@gmail.com</p>
-            <p className="text contact">Call Us: 9148824442</p>
+          <div className="footer-section">
+            <h3 className="footer-heading">Contact Us</h3>
+            <p className="footer-text">Email: contactusgirijakalyana@gmail.com</p>
+            <p className="footer-text">Email: enquirygirijakalyana@gmail.com</p>
+            <p className="footer-text">Call Us: 9148824442</p>
           </div>
 
-          <div className="section">
-            <h3 className="subheading">Subscribe to Newsletter</h3>
+          <div className="footer-section">
+            <h3 className="footer-heading">Subscribe to Newsletter</h3>
             <input
               type="email"
               placeholder="Enter your email address"
-              className="input"
+              className="footer-input"
             />
-            <button className="button">Subscribe</button>
+            <button className="footer-button">Subscribe</button>
           </div>
         </div>
 
-        <div className="social-media">
-          <div className="icons">
-            <a href="#" target="_blank" className="icon facebook">
+        <div className="footer-social">
+          <div className="social-icons">
+            <a href="#" target="_blank" rel="noopener noreferrer" className="social-icon facebook">
               <FaFacebookF />
             </a>
-            <a href="#" target="_blank" className="icon twitter">
+            <a href="#" target="_blank" rel="noopener noreferrer" className="social-icon twitter">
               <FaTwitter />
             </a>
-            <a href="#" target="_blank" className="icon linkedin">
+            <a href="#" target="_blank" rel="noopener noreferrer" className="social-icon linkedin">
               <FaLinkedinIn />
             </a>
-            <a href="#" target="_blank" className="icon youtube">
+            <a href="#" target="_blank" rel="noopener noreferrer" className="social-icon youtube">
               <FaYoutube />
             </a>
           </div>
         </div>
         
-        <div className="copyright">
-          Copyright © 2021 Ornate Pvt Ltd.
+        <div className="footer-copyright">
+          Copyright © {new Date().getFullYear()} Ornate Pvt Ltd.
         </div>
-      </footer>
-    </>
+      </div>
+    </footer>
   );
 }
 

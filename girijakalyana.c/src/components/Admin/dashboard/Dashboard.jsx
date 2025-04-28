@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import "./dashboard.scss";
 import { getAllUserProfiles } from "../../api/Admin";
 import { LoadingComponent } from "../../../App";
+import { toast } from "react-toastify";
 
 // Reusable Card Component
 const DashboardCard = ({ count, label, icon, link, style }) => {

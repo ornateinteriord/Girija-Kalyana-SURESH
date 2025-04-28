@@ -1,62 +1,77 @@
-import React, { useState } from 'react';
-import './Navbar.scss';
+import React, { useEffect, useState } from "react";
+import "./Navbar.scss";
 import {
   Button,
   Dialog,
   TextField,
   Typography,
   Box,
-  InputAdornment,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   CircularProgress,
-} from '@mui/material';
-import { Link,} from 'react-router-dom';
-import toast from 'react-hot-toast';
-import { useLoginMutation } from '../api/Auth';
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useLoginMutation } from "../api/Auth";
+import useAuth from "../hook/UseAuth";
+import TokenService from "../token/tokenService";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
-  const [loginData, setLoginData] = useState({ username: '', password: '' });
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // State for mobile menu
+  const [loginData, setLoginData] = useState({ username: "", password: "" });
   const [registerData, setRegisterData] = useState({
-    firstName: '',
-    lastName: '',
-    gender: '',
-    dob: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    mobile: '',
+    firstName: "",
+    lastName: "",
+    gender: "",
+    dob: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    mobile: "",
   });
-  const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const { isLoggedIn } = useAuth();
+  const navigation = useNavigate();
+  const location = useLocation();
+  const { openDialog } = location.state || {};
 
   const { mutate: login, isPending: isLoginPending } = useLoginMutation();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    
     if (!loginData.username || !loginData.password) {
-      toast.error('Both username and password are required');
+      toast.error("Both username and password are required");
       return;
     }
-    
     login(loginData);
   };
 
-
-
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  useEffect(() => {
+    if (openDialog) {
+      setOpen(true);
+    }
+  }, [openDialog]);
+
 
   const handleToggleForm = () => setIsRegister((prev) => !prev);
 
@@ -64,10 +79,10 @@ const Navbar = () => {
   const handleCloseForgotPassword = () => {
     setOpenForgotPassword(false);
     setOtpSent(false);
-    setEmail('');
-    setOtp('');
-    setNewPassword('');
-    setConfirmPassword('');
+    setEmail("");
+    setOtp("");
+    setNewPassword("");
+    setConfirmPassword("");
   };
 
   const handleChangeLogin = (e) => {
@@ -80,78 +95,160 @@ const Navbar = () => {
     setRegisterData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
+
+  const menuItems = [
+    { text: "Home", path: "/" },
+    { text: "Service", path: "/service" },
+    { text: "About Us", path: "/about" },
+    { text: "Privacy Policy", path: "/privacy-policy" },
+    { text: "Contact Us", path: "/contact" },
+  ];
+
+  const handleLogout = () => {
+      navigation("/");
+      TokenService.removeToken();
+      window.dispatchEvent(new Event("storage"));
+    };
+
   return (
     <div className="navbar-main-container">
       <div className="navbar-container">
         <div className="navbar">
+          <IconButton
+            className="menu-button"
+            onClick={toggleMobileMenu}
+            sx={{ display: { xs: "flex", md: "none" }, color: "#fff" }}
+          >
+            {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+          </IconButton>
           <h3>Girija❤️Kalyana</h3>
-          <div className="menu">
+          <div className="menu desktop-menu">
             <ul>
-              <li>
-                <Link className="link" to="/">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link className="link" to="/service">
-                  Service
-                </Link>
-              </li>
-              <li>
-                <Link className="link" to="/about">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link className="link" to="/privacy-policy">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link className="link" to="/contact">
-                  Contact Us
-                </Link>
-              </li>
+              {menuItems.map((item) => (
+                <li key={item.text}>
+                  <Link className="link" to={item.path}>
+                    {item.text}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
-          <Typography>
-            {/* Simplified for now - you can add auth status checks later */}
-            <Button
-              variant="contained"
-              size="large"
-              onClick={handleOpen}
-              style={{
-                backgroundColor: 'black',
-                marginRight: '25px',
-                width: '150px',
-                color: '#fff',
-                fontWeight: 700,
-                height: '42px',
-                textTransform: 'capitalize',
-              }}
-            >
-              Login
-            </Button>
-          </Typography>
+          {isLoggedIn ? (
+            <Typography>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={handleLogout} // Add your logout handler
+                sx={{
+                  backgroundColor: "black",
+                  width: "150px",
+                  color: "#fff",
+                  fontWeight: 700,
+                  height: "42px",
+                  textTransform: "capitalize",
+                  "&:hover": {
+                    backgroundColor: "#333333",
+                  },
+                }}
+              >
+                Logout
+              </Button>
+            </Typography>
+          ) : (
+            <Typography>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={handleOpen} // Your existing login handler
+                sx={{
+                  backgroundColor: "black",
+                  width: "150px",
+                  color: "#fff",
+                  fontWeight: 700,
+                  height: "42px",
+                  textTransform: "capitalize",
+                  "&:hover": {
+                    backgroundColor: "#333333",
+                  },
+                }}
+              >
+                Login
+              </Button>
+            </Typography>
+          )}
         </div>
       </div>
 
+      {/* Mobile Menu Drawer */}
+      <Drawer
+        anchor="left"
+        open={mobileMenuOpen}
+        onClose={toggleMobileMenu}
+        sx={{
+          "& .MuiDrawer-paper": {
+            width: "250px",
+            background: "#182848",
+            color: "#fff",
+          },
+        }}
+      >
+        <Box sx={{ padding: "15px" }}>
+          <Typography
+            variant="h6"
+            sx={{
+              marginBottom: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <h4>Girija❤️Kalyana</h4>
+            <IconButton onClick={toggleMobileMenu}>
+              <CloseIcon sx={{ color: "#fff" }} />
+            </IconButton>
+          </Typography>
+
+          <List>
+            {menuItems.map((item) => (
+              <ListItem
+                key={item.text}
+                onClick={toggleMobileMenu}
+                sx={{ padding: "10px 0" }}
+              >
+                <Link className="link mobile-link" to={item.path}>
+                  <ListItemText primary={item.text} />
+                </Link>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </Drawer>
+
       {/* Login/Register Dialog */}
+      {openDialog && (
       <Dialog open={open} onClose={handleClose}>
         <Box
           sx={{
-            padding: '20px',
-            maxWidth: '600px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            padding: "20px",
+            maxWidth: "600px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
-          <Typography variant="h4" textAlign="center" fontWeight={700} color="#34495e" mt={1} mb={1}>
-            {isRegister ? 'Create Your Account' : 'Login'}
+          <Typography
+            variant="h4"
+            textAlign="center"
+            fontWeight={700}
+            color="#34495e"
+            mt={1}
+            mb={1}
+          >
+            {isRegister ? "Create Your Account" : "Login"}
           </Typography>
           {isRegister ? (
-            <form style={{ width: '100%' }}>
+            <form style={{ width: "100%" }}>
               <Box display="flex" gap={2} flexWrap="wrap" marginBottom={1.5}>
                 <TextField
                   style={{ flex: 1 }}
@@ -242,21 +339,31 @@ const Navbar = () => {
                 variant="contained"
                 type="submit"
                 sx={{
-                  background: '#34495e',
-                  width: '50%',
-                  display: 'flex',
-                  justifySelf: 'center',
-                  marginBottom: '15px',
-                  marginTop: '15px',
+                  background: "#34495e",
+                  width: "50%",
+                  display: "flex",
+                  justifySelf: "center",
+                  marginBottom: "15px",
+                  marginTop: "15px",
                 }}
               >
                 Create Account
               </Button>
             </form>
           ) : (
-            <form onSubmit={handleLogin} style={{ width: '100%', height: '90%', padding: '40px 20px', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+            <form
+              onSubmit={handleLogin}
+              style={{
+                width: "100%",
+                height: "90%",
+                padding: "40px 20px",
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
+              }}
+            >
               <TextField
-                sx={{ width: '400px' }}
+                sx={{ width: { xs: "100%", sm: "400px" } }}
                 label="Enter Username"
                 name="username"
                 value={loginData.username}
@@ -266,7 +373,10 @@ const Navbar = () => {
                 required
               />
               <TextField
-                sx={{ width: '400px', marginBottom: '20px' }}
+                sx={{
+                  width: { xs: "100%", sm: "400px" },
+                  marginBottom: "20px",
+                }}
                 label="Enter Password"
                 name="password"
                 value={loginData.password}
@@ -276,7 +386,11 @@ const Navbar = () => {
                 margin="normal"
                 required
               />
-              <Typography sx={{ color: '#1976d2', cursor: 'pointer' }} mb={1.5} onClick={handleOpenForgotPassword}>
+              <Typography
+                sx={{ color: "#1976d2", cursor: "pointer" }}
+                mb={1.5}
+                onClick={handleOpenForgotPassword}
+              >
                 Forgot Password?
               </Typography>
               <Button
@@ -284,26 +398,31 @@ const Navbar = () => {
                 type="submit"
                 disabled={isLoginPending}
                 sx={{
-                  width: '250px',
-                  background: '#34495e',
+                  width: "250px",
+                  background: "#34495e",
                 }}
               >
-                {isLoginPending ? <CircularProgress size={24} color="inherit" /> : 'Login'}
+                {isLoginPending ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Login"
+                )}
               </Button>
             </form>
           )}
           <Typography
             variant="body2"
             textAlign="center"
-            sx={{ cursor: 'pointer', color: '#1976d2', marginBottom: '10px' }}
+            sx={{ cursor: "pointer", color: "#1976d2", marginBottom: "10px" }}
             onClick={handleToggleForm}
           >
-            {isRegister ? 'Already have an account? Login' : "Don't have an account? Register"}
+            {isRegister
+              ? "Already have an account? Login"
+              : "Don't have an account? Register"}
           </Typography>
         </Box>
       </Dialog>
-
-
+         )}
       {/* Forgot Password Dialog */}
       <Dialog open={openForgotPassword} onClose={handleCloseForgotPassword}>
         <Box
@@ -313,11 +432,11 @@ const Navbar = () => {
             otpSent ? handleResetPassword() : handleSendOtp();
           }}
           sx={{
-            padding: '20px',
-            width: '400px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '20px',
+            padding: "20px",
+            width: { xs: "100%", sm: "400px" },
+            display: "flex",
+            flexDirection: "column",
+            gap: "20px",
           }}
         >
           {!otpSent ? (
@@ -338,9 +457,9 @@ const Navbar = () => {
                 type="submit"
                 variant="contained"
                 sx={{
-                  width: '150px',
-                  alignSelf: 'center',
-                  background: '#34495e',
+                  width: "150px",
+                  alignSelf: "center",
+                  background: "#34495e",
                 }}
               >
                 Send OTP
@@ -386,11 +505,11 @@ const Navbar = () => {
                 type="submit"
                 variant="contained"
                 sx={{
-                  width: '190px',
-                  padding: '10px',
-                  alignSelf: 'center',
-                  background: '#34495e',
-                  marginTop: '10px',
+                  width: "190px",
+                  padding: "10px",
+                  alignSelf: "center",
+                  background: "#34495e",
+                  marginTop: "10px",
                 }}
               >
                 Reset Password
@@ -399,12 +518,17 @@ const Navbar = () => {
           )}
           <Button
             onClick={handleCloseForgotPassword}
-            sx={{ alignSelf: 'center', color: '#1976d2', '&:hover': { backgroundColor: 'transparent' } }}
+            sx={{
+              alignSelf: "center",
+              color: "#1976d2",
+              "&:hover": { backgroundColor: "transparent" },
+            }}
           >
             Cancel
           </Button>
         </Box>
       </Dialog>
+    
     </div>
   );
 };

@@ -4,7 +4,7 @@ import './AdminDashboard.css';
 import { FaHome, FaUser, FaUsers, FaServer, FaReceipt, FaBars, FaChevronDown, FaChevronUp, FaDashcube, FaIdBadge } from 'react-icons/fa';
 import { TbMessageReportFilled } from 'react-icons/tb';
 import { IoIosNotifications } from 'react-icons/io';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { Collapse, List, ListItem, ListItemText, IconButton, Typography, Menu, MenuItem, Avatar, Badge, Dialog, DialogTitle, DialogContent, TextField, Button, DialogActions } from '@mui/material';
 import { IoMdNotifications } from "react-icons/io";
@@ -195,7 +195,7 @@ const handleProfileDialogClose = () => {
           <IconButton onClick={toggleSidebar}>
             <FaBars style={{ color: '#fff', fontSize: '1.8rem' }} />
           </IconButton>
-          <h2 className="navtxt">Admin Dashboard</h2>
+          <Link to="/"  style={{ textDecoration: "none", color: "inherit" }}><h2 className="navtxt">Admin Dashboard</h2></Link>
         </div>
         <div className="nav-right">
         <Badge color="error" variant="dot"  >
