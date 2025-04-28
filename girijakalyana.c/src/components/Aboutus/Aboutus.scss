@@ -1,134 +1,162 @@
 .about-us-container {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 5vw, 3.125rem); // Responsive padding
+  max-width: 1200px;
+  margin-top: 80px;
+  font-family: "Outfit sans-serif";
+
+  /* Section 1: Intro About Us */
+  .about-us-intro {
     display: flex;
     flex-direction: column;
-    gap: 50px;
-    margin: 0 auto;
-    padding: 50px;
-    max-width: 1200px;
-    margin-top: 80px;
-    font-family: "Outfit sans-serif";
-    /* Section 1: Intro About Us */
-    .about-us-intro {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 30px;
-  
-      .about-us-text {
-        flex: 1;
-  
-        .highlight-text {
-          font-size: 22px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
 
+    @media (min-width: 768px) {
+      flex-direction: row;
+    }
 
-          color: #2a9d8f !important;
+    .about-us-text {
+      flex: 1;
+      order: 1;
+      text-align: center;
 
-          font-weight: bold;
-          text-transform: uppercase;
-        }
-  
-        .main-heading {
-          font-size: 36px;
-          font-weight: 700;
-
-          margin: 10px 0;
-          color: #264653;
-        }
-        .headingh3{
-          color: rgb(105, 44, 44);
-
-          margin: 5px 0;
-          color: #264653 !important;
-          text-align: start !important;
-        }
-        .headingh3{
-          color: rgb(105, 44, 44) !important;
-
-        }
-  
-        p {
-          font-size: 16px;
-          margin-bottom: 20px;
-
-          color: #6c757d;
-
-          color: #6c757d !important;
-
-        }
-  
-        .learn-more-btn {
-          padding: 10px 20px;
-          font-size: 14px;
-          font-weight: bold;
-          color: #fff;
-          background-color: #e76f51;
-          border: none;
-          border-radius: 5px;
-
-          text-align: end !important;
-
-          cursor: pointer;
-  
-          &:hover {
-            background-color: #d1493f;
-          }
-        }
+      @media (min-width: 768px) {
+        text-align: left;
+        order: 0;
       }
-  
-      .about-us-image {
-        flex: 1;
-        text-align: center;
-  
-        img {
-          width: 100%;
-          max-width: 400px;
-          border-radius: 10px;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+      .highlight-text {
+        font-size: clamp(1rem, 2vw, 1.375rem);
+        color: #2a9d8f !important;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
+      .main-heading {
+        font-size: clamp(1.75rem, 4vw, 2.25rem);
+        font-weight: 700;
+        margin: 10px 0;
+        color: #264653;
+        line-height: 1.2;
+      }
+
+      .headingh3 {
+        color: rgb(105, 44, 44) !important;
+        margin: 5px 0;
+        font-size: clamp(1.125rem, 2vw, 1.25rem);
+        text-align: inherit;
+      }
+
+      p {
+        font-size: clamp(0.875rem, 2vw, 1rem);
+        margin-bottom: 20px;
+        color: #6c757d !important;
+        line-height: 1.6;
+      }
+
+      .learn-more-btn {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: bold;
+        color: #fff;
+        background-color: #e76f51;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        display: inline-block;
+
+        &:hover {
+          background-color: #d1493f;
         }
       }
     }
-  
-    /* Section 2: What We Do */
-    .about-us-services {
+
+    .about-us-image {
+      flex: 1;
       text-align: center;
-  
-      .section-title {
-        font-size: 28px;
-        font-weight: 600;
-        margin-bottom: 30px;
-        color: #264653;
+      order: 0;
+
+      @media (min-width: 768px) {
+        order: 1;
       }
-  
-      .services-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-  
-        .service-card {
-          background: #f4f4f4;
-          padding: 20px;
-          border-radius: 8px;
-          text-align: center;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  
-          h4 {
-            font-size: 18px;
-            color: #264653;
-            margin-bottom: 10px;
-          }
-  
-          p {
-            font-size: 14px;
-            color: #6c757d;
-          }
-  
-          &:hover {
-            background: #e9ecef;
-            transform: translateY(-5px);
-            transition: 0.3s;
-          }
+
+      img {
+        width: 100%;
+        max-width: 400px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        height: auto;
+      }
+    }
+  }
+
+  /* Section 2: What We Do */
+  .about-us-services {
+    text-align: center;
+
+    .section-title {
+      font-size: clamp(1.5rem, 3vw, 1.75rem);
+      font-weight: 600;
+      margin-bottom: 30px;
+      color: #264653;
+      @media (max-width: 900px){
+        text-align: center;
+      }
+
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+      gap: 20px;
+
+      .service-card {
+        background: #f4f4f4;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        min-height: 100%;
+
+        h4 {
+          font-size: clamp(1rem, 2vw, 1.125rem);
+          color: #264653;
+          margin-bottom: 10px;
+        }
+
+        p {
+          font-size: clamp(0.8125rem, 1.5vw, 0.875rem);
+          color: #6c757d;
+          line-height: 1.5;
+        }
+
+        &:hover {
+          background: #e9ecef;
+          transform: translateY(-5px);
         }
       }
     }
   }
-  
+
+  // Mobile-specific adjustments
+  @media (max-width: 480px) {
+    gap: 30px;
+    padding: 1rem;
+    margin-top: 60px;
+
+    .about-us-intro {
+      gap: 20px;
+    }
+
+    .services-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+}
