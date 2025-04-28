@@ -8,11 +8,39 @@ import wall1 from '../../assets/wallpaper/wall1.jpg';
 import card4 from '../../assets/card4.jpg';
 import wall2 from '../../assets/wallpaper/wall2.jpg';
 import Navbar from "../navbar/Navbar";
+import useAuth from "../hook/UseAuth";
+import TokenService from "../token/tokenService";
+import { useNavigate } from "react-router-dom";
 
 const HeroSlider = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const navigate = useNavigate()
+  const { isLoggedIn } = useAuth();
+
+  const handleGetStarted = () => {
+    const role = TokenService.getRole();
+    
+    if (!isLoggedIn) {
+      navigate("/",{ state: { openDialog: true } }); 
+      return;
+    }
+
+    switch (role) {
+      case "FreeUser":
+      case "PremiumUser":
+      case "SilverUser":
+      case "Assistance":
+        navigate("/user/userDashboard");
+        break;
+      case "Admin":
+        navigate("/admin/dashboard");
+        break;
+      default:
+        navigate("/",{ state: { openDialog: true } });
+    }
+  };
 
   const images = [
     {
@@ -131,6 +159,7 @@ const HeroSlider = () => {
               fontSize: isMobile ? '0.875rem' : '1rem'
             }}  
             fontFamily={'Outfit, sans-serif'}
+            onClick={handleGetStarted}
           >
             Get Started
           </Button>

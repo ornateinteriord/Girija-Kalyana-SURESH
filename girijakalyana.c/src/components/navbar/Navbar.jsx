@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Navbar.scss";
 import {
   Button,
@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useLoginMutation } from "../api/Auth";
 import useAuth from "../hook/UseAuth";
@@ -49,6 +49,8 @@ const Navbar = () => {
   const [error, setError] = useState("");
   const { isLoggedIn } = useAuth();
   const navigation = useNavigate();
+  const location = useLocation();
+  const { openDialog } = location.state || {};
 
   const { mutate: login, isPending: isLoginPending } = useLoginMutation();
 
@@ -63,6 +65,13 @@ const Navbar = () => {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  useEffect(() => {
+    if (openDialog) {
+      setOpen(true);
+    }
+  }, [openDialog]);
+
 
   const handleToggleForm = () => setIsRegister((prev) => !prev);
 
@@ -217,6 +226,7 @@ const Navbar = () => {
       </Drawer>
 
       {/* Login/Register Dialog */}
+      {openDialog && (
       <Dialog open={open} onClose={handleClose}>
         <Box
           sx={{
@@ -412,7 +422,7 @@ const Navbar = () => {
           </Typography>
         </Box>
       </Dialog>
-
+         )}
       {/* Forgot Password Dialog */}
       <Dialog open={openForgotPassword} onClose={handleCloseForgotPassword}>
         <Box
@@ -518,6 +528,7 @@ const Navbar = () => {
           </Button>
         </Box>
       </Dialog>
+    
     </div>
   );
 };
