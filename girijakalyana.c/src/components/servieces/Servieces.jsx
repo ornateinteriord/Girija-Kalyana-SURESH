@@ -3,15 +3,12 @@ import { LuNewspaper, LuCoffee } from "react-icons/lu";
 import { IoSearchOutline, IoCallOutline } from "react-icons/io5";
 import { TbUsers } from "react-icons/tb";
 import { GrBook } from "react-icons/gr";
-import rightArrow from "../../assets/rightArrow.png"
-import "./Servieces.scss";
-import Navbar from "../navbar/Navbar";
-import { FaCircleChevronRight } from "react-icons/fa6";
 import { FaArrowAltCircleRight } from "react-icons/fa";
+import Navbar from "../navbar/Navbar";
 import Footer from "../footer/Footer";
+import "./Servieces.scss";
 
-
-const Servieces= () => {
+const Services = () => {
   const services = [
     {
       icon: <LuNewspaper style={{ fontSize: "40px", color: "#fff" }} />,
@@ -52,31 +49,29 @@ const Servieces= () => {
 
   return (
     <>
-    <Navbar/>
-    <div className="servicebody">
-      <h2>ASSISTED SERVICE ADVANTAGES</h2>
-      <div className="service-grid">
-        {services.map((service, index) => (
-          <div className="service-card" key={index}>
-            <div className="icon-wrapper">{service.icon}</div>
-            <h3>{service.title}</h3>
-            <p style={{color:'#fff'}}>{service.description}</p>
-            {index < services.length - 1 && (
-              <FaArrowAltCircleRight className="arrow-icon"/>
-              // <img src={} alt="Arrow Down" className="arrow-icon" />
-            )}
-          </div>
-        ))}
+      <Navbar />
+      <div className="servicebody">
+        <h2>ASSISTED SERVICE ADVANTAGES</h2>
+        <div className="service-grid">
+          {services.map((service, index) => (
+            <div className="service-card" key={index}>
+              <div className="icon-wrapper">{service.icon}</div>
+              <h3>{service.title}</h3>
+              <p style={{ color: '#fff' }}>{service.description}</p>
+              {index < services.length - 1 && (
+                <FaArrowAltCircleRight className="arrow-icon" />
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="happydiv">
+          <p id="happy">Happy Assisted Marriages</p>
+          <p>Assistance Service will be Started Shortly!</p>
+        </div>
       </div>
-      <div className="happydiv">
-        <p id="happy">Happy Assisted Marriages</p>
-        <p>Assistance Service will be Started Shortly!</p>
-      </div>
-    </div>
-    <Footer/>
-   </>
+      <Footer />
+    </>
   );
 };
 
-
-export default Servieces;
+export default Services;
