@@ -12,12 +12,13 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  useMediaQuery,
 } from "@mui/material";
 import { AiOutlineClose } from "react-icons/ai";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000/api/membership"; // Update this URL if needed
+const API_BASE_URL = "http://localhost:5000/api/membership";
 
 const membershipOptions = [
   { 
@@ -47,6 +48,8 @@ const HomeUserTable = ({ userId }) => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [open, setOpen] = useState(false);
   const [currentMembership, setCurrentMembership] = useState(null);
+  const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
+  const isMediumScreen = useMediaQuery((theme) => theme.breakpoints.between("sm", "md"));
 
   useEffect(() => {
     const fetchMembership = async () => {
@@ -126,28 +129,71 @@ const HomeUserTable = ({ userId }) => {
   };
 
   return (
-    <Box>
-      <Container sx={{ mb: 0, mt: 0 }}>
-        <Box textAlign="center" mb={1}>
-          <Typography variant="h5" fontWeight={700} color="primary">
+    <Box sx={{ width: "100%", overflowX: "hidden" }}>
+      <Container sx={{ 
+        mb: 0, 
+        mt: 0,
+        px: isSmallScreen ? 1 : 3,
+        maxWidth: isSmallScreen ? "100%" : "lg"
+      }}>
+        <Box textAlign="center" mb={3}>
+          <Typography 
+            variant={isSmallScreen ? "h6" : "h5"} 
+            fontWeight={700} 
+            color="primary"
+            sx={{ fontSize: isSmallScreen ? "1.5rem" : "2rem" }}
+          >
             Upgrade Your Membership
           </Typography>
-          <Typography variant="subtitle1" color="textSecondary" mt={1}>
-            Choose your plan and enjoy **exclusive benefits** tailored for you!
+          <Typography 
+            variant="subtitle1" 
+            color="textSecondary" 
+            mt={1}
+            sx={{ fontSize: isSmallScreen ? "0.9rem" : "1rem" }}
+          >
+            Choose your plan and enjoy <strong>exclusive benefits</strong> tailored for you!
           </Typography>
         </Box>
 
         {currentMembership && (
-          <Box sx={{border:'1px solid black',padding:'10px',borderRadius:'10px',background:'black'}} textAlign="center" mb={2} display={'flex'} alignItems={'center'} justifyContent={'space-around'}>
-            <Typography variant="h6" sx={{ fontWeight: "bold", color: "#fff" }}>
+          <Box 
+            sx={{
+              border: '1px solid black',
+              padding: isSmallScreen ? '8px' : '10px',
+              borderRadius: '10px',
+              background: 'black',
+              mb: 3,
+              display: 'flex',
+              flexDirection: isSmallScreen ? 'column' : 'row',
+              alignItems: 'center',
+              justifyContent: 'space-around',
+              gap: isSmallScreen ? 1 : 0
+            }}
+          >
+            <Typography 
+              variant={isSmallScreen ? "subtitle1" : "h6"} 
+              sx={{ fontWeight: "bold", color: "#fff", textAlign: isSmallScreen ? 'center' : 'left' }}
+            >
               Current Plan: <span style={{ color: "#fff" }}>{currentMembership.type}</span>
             </Typography>
-            <Typography variant="h6" sx={{ color: "#fff" ,fontWeight:'bold'}}>
+            <Typography 
+              variant={isSmallScreen ? "subtitle1" : "h6"} 
+              sx={{ color: "#fff", fontWeight: 'bold', textAlign: isSmallScreen ? 'center' : 'left' }}
+            >
               Price: {currentMembership.price}
             </Typography>
             <Button
               variant="outlined"
-              sx={{ fontSize:'16px', fontWeight: "bold",background:'red',color:'#fff',textTransform:'capitalize',border:'none' }}
+              sx={{ 
+                fontSize: isSmallScreen ? '14px' : '16px', 
+                fontWeight: "bold",
+                background: 'red',
+                color: '#fff',
+                textTransform: 'capitalize',
+                border: 'none',
+                width: isSmallScreen ? '100%' : 'auto',
+                mt: isSmallScreen ? 1 : 0
+              }}
               onClick={handleRemoveMembership}
             >
               Remove Membership
@@ -155,9 +201,28 @@ const HomeUserTable = ({ userId }) => {
           </Box>
         )}
 
-        <Grid container spacing={4} justifyContent="center" display={'flex'}>
+        <Grid 
+          container 
+          spacing={isSmallScreen ? 2 : 4} 
+          justifyContent="center"
+          sx={{ 
+            padding: isSmallScreen ? '0 8px' : 0,
+            marginLeft: isSmallScreen ? '-8px' : 0 
+          }}
+        >
           {membershipOptions.map((option) => (
-            <Grid item xs={12} sm={6} md={4} key={option.type}>
+            <Grid 
+              item 
+              xs={12} 
+              sm={6} 
+              md={4} 
+              key={option.type}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                maxWidth: isSmallScreen ? '100%' : '400px'
+              }}
+            >
               <Card 
                 sx={{ 
                   p: 0, 
@@ -167,14 +232,23 @@ const HomeUserTable = ({ userId }) => {
                   position: "relative",
                   overflow: "hidden",
                   background: option.gradient,
-                  color: "#fff"
+                  color: "#fff",
+                  width: '100%',
+                  maxWidth: '400px'
                 }}
               >
-                <CardContent>
-                  <Typography variant="h5" fontWeight={700}>
+                <CardContent sx={{ p: isSmallScreen ? 2 : 3 }}>
+                  <Typography 
+                    variant={isSmallScreen ? "h6" : "h5"} 
+                    fontWeight={700}
+                    sx={{ fontSize: isSmallScreen ? '1.25rem' : '1.5rem' }}
+                  >
                     {option.type} Membership
                   </Typography>
-                  <Typography variant="h6" sx={{ mt: 0, opacity: 0.9 }}>
+                  <Typography 
+                    variant={isSmallScreen ? "subtitle1" : "h6"} 
+                    sx={{ mt: 0, opacity: 0.9 }}
+                  >
                     {option.price}
                   </Typography>
                   <Button
@@ -186,6 +260,8 @@ const HomeUserTable = ({ userId }) => {
                       fontWeight: "bold",
                       borderRadius: "20px",
                       textTransform: "capitalize",
+                      fontSize: isSmallScreen ? '0.875rem' : '1rem',
+                      padding: isSmallScreen ? '6px 16px' : '8px 22px',
                       "&:hover": { backgroundColor: "#eee" },
                     }}
                     onClick={() => handleUpgrade(option)}
@@ -199,35 +275,91 @@ const HomeUserTable = ({ userId }) => {
         </Grid>
       </Container>
 
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontSize: "22px", fontWeight: 700, textAlign: "center", p: 3 }}>
+      <Dialog 
+        open={open} 
+        onClose={handleClose} 
+        maxWidth="sm" 
+        fullWidth
+        fullScreen={isSmallScreen}
+      >
+        <DialogTitle 
+          sx={{ 
+            fontSize: isSmallScreen ? "1.25rem" : "1.5rem", 
+            fontWeight: 700, 
+            textAlign: "center", 
+            p: isSmallScreen ? 2 : 3 
+          }}
+        >
           {selectedPlan?.type} Membership
-          <IconButton sx={{ position: "absolute", right: 15, top: 15 }} onClick={handleClose}>
-            <AiOutlineClose size={24} />
+          <IconButton 
+            sx={{ 
+              position: "absolute", 
+              right: isSmallScreen ? 8 : 15, 
+              top: isSmallScreen ? 8 : 15 
+            }} 
+            onClick={handleClose}
+          >
+            <AiOutlineClose size={isSmallScreen ? 20 : 24} />
           </IconButton>
         </DialogTitle>
         
-        <DialogContent dividers>
-          <Typography variant="h6" gutterBottom sx={{ textAlign: "center", mb: 2 }}>
+        <DialogContent dividers sx={{ p: isSmallScreen ? 2 : 3 }}>
+          <Typography 
+            variant={isSmallScreen ? "h6" : "h5"} 
+            gutterBottom 
+            sx={{ 
+              textAlign: "center", 
+              mb: 2,
+              fontSize: isSmallScreen ? '1.1rem' : '1.25rem'
+            }}
+          >
             Benefits of {selectedPlan?.type} Plan:
           </Typography>
-          <ul>
+          <Box component="ul" sx={{ pl: isSmallScreen ? 2 : 3, mb: 0 }}>
             {selectedPlan?.benefits.map((benefit, index) => (
-              <Typography key={index} variant="body1" component="li" sx={{ fontSize: "16px" }}>
+              <Typography 
+                key={index} 
+                variant="body1" 
+                component="li" 
+                sx={{ 
+                  fontSize: isSmallScreen ? "0.9rem" : "1rem",
+                  mb: 1
+                }}
+              >
                 {benefit}
               </Typography>
             ))}
-          </ul>
+          </Box>
         </DialogContent>
 
-        <DialogActions sx={{ flexDirection: "column", alignItems: "center", pb: 3 }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
+        <DialogActions 
+          sx={{ 
+            flexDirection: "column", 
+            alignItems: "center", 
+            p: isSmallScreen ? 2 : 3,
+            pt: 1
+          }}
+        >
+          <Typography 
+            variant={isSmallScreen ? "h6" : "h5"} 
+            sx={{ 
+              fontWeight: "bold", 
+              mb: 1,
+              fontSize: isSmallScreen ? '1.1rem' : '1.25rem'
+            }}
+          >
             Total: {selectedPlan?.price}
           </Typography>
           <Button
             variant="contained"
             color="success"
-            sx={{ fontWeight: "bold", fontSize: "18px", borderRadius: "12px", padding: "8px 24px" }}
+            sx={{ 
+              fontWeight: "bold", 
+              fontSize: isSmallScreen ? "1rem" : "1.125rem", 
+              borderRadius: "12px", 
+              padding: isSmallScreen ? "6px 20px" : "8px 24px",
+              width: isSmallScreen ? '100%' : 'auto'
+            }}
             onClick={handleConfirmUpgrade}
           >
             Proceed to Pay
