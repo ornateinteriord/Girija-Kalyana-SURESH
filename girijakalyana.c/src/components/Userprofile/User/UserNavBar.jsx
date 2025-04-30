@@ -139,7 +139,6 @@ const UserNavBar = () => {
                 edge="start"
                 color="inherit"
                 onClick={toggleSidebar}
-                sx={{ mr: 2 }}
               >
                 <FaBars />
               </IconButton>
@@ -150,8 +149,6 @@ const UserNavBar = () => {
                   variant="h5"
                   noWrap
                   component="div"
-                  
-                  sx={{ flexGrow: 1 }}
                 >
                   Girija❤️Kalyana
                 </Typography>
