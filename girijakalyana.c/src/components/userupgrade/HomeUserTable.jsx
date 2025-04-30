@@ -127,66 +127,92 @@ const HomeUserTable = ({ userId }) => {
 
   return (
     <Box>
-      <Container sx={{ mb: 0, mt: 0 }}>
-        <Box textAlign="center" mb={1}>
+      <Container maxWidth="lg" sx={{ my: 2, px: { xs: 2, sm: 3, md: 5 } }}>
+        <Box textAlign="center" mb={3}>
           <Typography variant="h5" fontWeight={700} color="primary">
             Upgrade Your Membership
           </Typography>
-          <Typography variant="subtitle1" color="textSecondary" mt={1}>
-            Choose your plan and enjoy **exclusive benefits** tailored for you!
+          <Typography variant="subtitle1" color="textSecondary" mt={1} fontSize={{ xs: 14, sm: 16 }}>
+            Choose your plan and enjoy <strong>exclusive benefits</strong> tailored for you!
           </Typography>
         </Box>
-
+  
         {currentMembership && (
-          <Box sx={{border:'1px solid black',padding:'10px',borderRadius:'10px',background:'black'}} textAlign="center" mb={2} display={'flex'} alignItems={'center'} justifyContent={'space-around'}>
-            <Typography variant="h6" sx={{ fontWeight: "bold", color: "#fff" }}>
-              Current Plan: <span style={{ color: "#fff" }}>{currentMembership.type}</span>
+          <Box
+            sx={{
+              border: '1px solid black',
+              p: { xs: 2, sm: 3 },
+              borderRadius: '10px',
+              background: 'black',
+              color: '#fff',
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              gap: 2,
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              mb: 4,
+              textAlign: { xs: 'center', sm: 'left' },
+            }}
+          >
+            <Typography variant="h6" fontWeight="bold">
+              Current Plan: <span>{currentMembership.type}</span>
             </Typography>
-            <Typography variant="h6" sx={{ color: "#fff" ,fontWeight:'bold'}}>
+            <Typography variant="h6" fontWeight="bold">
               Price: {currentMembership.price}
             </Typography>
             <Button
-              variant="outlined"
-              sx={{ fontSize:'16px', fontWeight: "bold",background:'red',color:'#fff',textTransform:'capitalize',border:'none' }}
+              variant="contained"
+              sx={{
+                fontSize: '14px',
+                fontWeight: 'bold',
+                background: 'red',
+                color: '#fff',
+                textTransform: 'capitalize',
+                border: 'none',
+                px: 3,
+                py: 1,
+              }}
               onClick={handleRemoveMembership}
             >
               Remove Membership
             </Button>
           </Box>
         )}
-
-        <Grid container spacing={4} justifyContent="center" display={'flex'}>
+  
+        <Grid container spacing={3} justifyContent="center">
           {membershipOptions.map((option) => (
             <Grid item xs={12} sm={6} md={4} key={option.type}>
-              <Card 
-                sx={{ 
-                  p: 0, 
-                  textAlign: "center", 
-                  boxShadow: 6, 
-                  borderRadius: 3, 
-                  position: "relative",
-                  overflow: "hidden",
+              <Card
+                sx={{
+
+                  width:280,
+                  
+                  textAlign: 'center',
+                  boxShadow: 6,
+                  borderRadius: 3,
+                  overflow: 'hidden',
                   background: option.gradient,
-                  color: "#fff"
+                  color: '#fff',
+                  height: '100%',
                 }}
               >
                 <CardContent>
                   <Typography variant="h5" fontWeight={700}>
                     {option.type} Membership
                   </Typography>
-                  <Typography variant="h6" sx={{ mt: 0, opacity: 0.9 }}>
+                  <Typography variant="h6" sx={{ mt: 0.5, opacity: 0.9 }}>
                     {option.price}
                   </Typography>
                   <Button
                     variant="contained"
                     sx={{
                       mt: 2,
-                      backgroundColor: "#fff",
-                      color: "#333",
-                      fontWeight: "bold",
-                      borderRadius: "20px",
-                      textTransform: "capitalize",
-                      "&:hover": { backgroundColor: "#eee" },
+                      backgroundColor: '#fff',
+                      color: '#333',
+                      fontWeight: 'bold',
+                      borderRadius: '20px',
+                      textTransform: 'capitalize',
+                      '&:hover': { backgroundColor: '#eee' },
                     }}
                     onClick={() => handleUpgrade(option)}
                   >
@@ -198,36 +224,52 @@ const HomeUserTable = ({ userId }) => {
           ))}
         </Grid>
       </Container>
-
+  
+      {/* Dialog */}
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontSize: "22px", fontWeight: 700, textAlign: "center", p: 3 }}>
+        <DialogTitle
+          sx={{
+            fontSize: { xs: '18px', sm: '22px' },
+            fontWeight: 700,
+            textAlign: 'center',
+            p: 3,
+          }}
+        >
           {selectedPlan?.type} Membership
-          <IconButton sx={{ position: "absolute", right: 15, top: 15 }} onClick={handleClose}>
+          <IconButton sx={{ position: 'absolute', right: 15, top: 15 }} onClick={handleClose}>
             <AiOutlineClose size={24} />
           </IconButton>
         </DialogTitle>
-        
+  
         <DialogContent dividers>
-          <Typography variant="h6" gutterBottom sx={{ textAlign: "center", mb: 2 }}>
+          <Typography variant="h6" gutterBottom sx={{ textAlign: 'center', mb: 2 }}>
             Benefits of {selectedPlan?.type} Plan:
           </Typography>
-          <ul>
+          <ul style={{ paddingLeft: '1.2rem' }}>
             {selectedPlan?.benefits.map((benefit, index) => (
-              <Typography key={index} variant="body1" component="li" sx={{ fontSize: "16px" }}>
+              <Typography key={index} variant="body1" component="li" sx={{ fontSize: '16px' }}>
                 {benefit}
               </Typography>
             ))}
           </ul>
         </DialogContent>
-
-        <DialogActions sx={{ flexDirection: "column", alignItems: "center", pb: 3 }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
+  
+        <DialogActions
+          sx={{ flexDirection: 'column', alignItems: 'center', gap: 2, pb: 3 }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
             Total: {selectedPlan?.price}
           </Typography>
           <Button
             variant="contained"
             color="success"
-            sx={{ fontWeight: "bold", fontSize: "18px", borderRadius: "12px", padding: "8px 24px" }}
+            sx={{
+              fontWeight: 'bold',
+              fontSize: '16px',
+              borderRadius: '12px',
+              px: 4,
+              py: 1,
+            }}
             onClick={handleConfirmUpgrade}
           >
             Proceed to Pay
@@ -236,6 +278,7 @@ const HomeUserTable = ({ userId }) => {
       </Dialog>
     </Box>
   );
+  
 };
 
 export default HomeUserTable;

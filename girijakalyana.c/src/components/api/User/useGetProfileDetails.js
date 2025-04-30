@@ -114,10 +114,14 @@ export const useGetInterestStatus = (
     queryKey: ["interestStatus", senderRegistrationNo, recipientRegistrationNo],
     queryFn: async () => {
       const { data } = await get(
+     
         `/api/user/interest/status/${senderRegistrationNo}/${recipientRegistrationNo}`
       );
+      
       return data;
+      
     },
+    
     enabled: !!senderRegistrationNo && !!recipientRegistrationNo,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
