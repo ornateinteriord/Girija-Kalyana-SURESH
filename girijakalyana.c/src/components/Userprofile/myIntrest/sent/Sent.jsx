@@ -21,7 +21,7 @@ const Sent = () => {
     page: currentPage,
     limit: itemsPerPage
   });
-
+console.log('sent:',sentInterests)
    useEffect(() => {
       if (isError) {
         toast.error(error.message);

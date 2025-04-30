@@ -36,24 +36,41 @@ const Requests = () => {
 
   const { mutate: updateInterest } = useUpdateInterestStatus();
 
-  const handleInterestResponse = (senderRefNo, recipientRefNo, isAccepted) => {
-    updateInterest(
-      {
+  const handleInterestResponse = async (senderRefNo, recipientRefNo, isAccepted) => {
+    try {
+      await updateInterest({
         senderRegistrationNo: senderRefNo,
         recipientRegistrationNo,
-        status: isAccepted ? "accepted" : "rejected"
-      },
-      {
-        onSuccess: () => {
-          toast.success(`Request ${isAccepted ? "accepted" : "rejected"} successfully`);
-          refetch();
-        },
-        onError: (error) => {
-          toast.error(error.response?.data?.message || "Failed to update request");
-        }
+        status: isAccepted ? "accepted" : "rejected",
+      });
+  
+      if (isAccepted) {
+        toast.success("Interest accepted successfully!", {
+          style: {
+            background: "#d4edda",
+            color: "#155724",
+            border: "1px solid #c3e6cb",
+          },
+        });
+      } else {
+        toast.error("Interest rejected.", {
+          style: {
+            background: "#f8d7da",
+            color: "#721c24",
+            border: "1px solid #f5c6cb",
+          },
+        });
       }
-    );
+  
+      refetch(); // Refresh data if needed
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Failed to update interest request"
+      );
+    }
   };
+  
+  
 
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
