@@ -1,147 +1,77 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   Box,
-  Dialog,
-  DialogContent,
-  Tab,
-  Tabs,
   Typography,
   Card,
   CardMedia,
   CardContent,
   Button,
   Pagination,
-  CircularProgress,
   Chip
 } from "@mui/material";
-import { FaHeart, FaUser } from "react-icons/fa";
-import { RiVerifiedBadgeFill } from "react-icons/ri";
+import { FaUser } from "react-icons/fa";
 import profileimg from "../../../assets/profile.jpg";
 import AboutPop from "./popupContent/abouPop/AboutPop";
 import EducationPop from "./popupContent/educationPop/EducationPop";
 import FamilyPop from "./popupContent/familyPop/FamilyPop";
 import LifeStylePop from "./popupContent/lifeStylePop/LifeStylePop";
 import PreferencePop from "./popupContent/preferencePop/PreferencePop";
-import { useExpressInterest, useGetAllUsersProfiles, useGetInterestStatus } from "../../api/User/useGetProfileDetails";
+import { useExpressInterest, useGetAllUsersProfiles, } from "../../api/User/useGetProfileDetails";
 import TokenService from "../../token/tokenService";
 import { useSnackbar } from "notistack";
 import { LoadingComponent } from "../../../App";
+import ProfileDialog from "../ProfileDialog/ProfileDialog";
 
+// Constants
 const itemsPerPage = 8;
-const tabLabels = ["About", "Family", "Education", "LifeStyle", "Preference"];
 
+/**
+ * Main component to display and browse all user profiles
+ */
 const ViewAll = () => {
+  // State management
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [interestStatus, setInterestStatus] = useState({});
+  // const [interestStatus, setInterestStatus] = useState({});
+  
+  // Hooks for data fetching and UI feedback
   const { enqueueSnackbar } = useSnackbar();
-
-  const { data: users = [], isLoading,isError, error } = useGetAllUsersProfiles();
+  const { data: users = [], isLoading, isError, error } = useGetAllUsersProfiles();
   const loggedInUserId = TokenService.getRegistrationNo();
 
- // Replace the current hook usage with this:
-const { mutateAsync: checkInterestStatus } = useGetInterestStatus();
-const expressInterestMutation = useExpressInterest();
+  // Interest status hook - disabled by default, will be manually triggered
+  // const interestStatusQuery = useGetInterestStatus(loggedInUserId, selectedUser?.registration_no, { enabled: false });
+  // Mutation for expressing interest
+  const expressInterestMutation = useExpressInterest();
 
+  // Filter out current user and admins
   const filteredUsers = useMemo(
     () => users.filter(user => user.registration_no !== loggedInUserId && user.user_role !== "Admin"),
     [users, loggedInUserId]
   );
 
+  // Paginated users
   const paginatedUsers = useMemo(
     () => filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage),
     [filteredUsers, currentPage]
   );
-  useEffect(() => {
-    console.log('Running initial status fetch');
-    if (!filteredUsers.length || !loggedInUserId) return;
-  
-    const fetchStatuses = async () => {
-      // console.log('Fetching statuses for all users');
-      const statusMap = {};
-      await Promise.all(
-        filteredUsers.map(async (user) => {
-          try {
-            // console.log(`Fetching status for user ${user._id}`);
-            const res = await checkInterestStatus({
-              senderRegistrationNo: loggedInUserId,
-              recipientRegistrationNo: user.registration_no
-            });
-            console.log(`Status for ${user._id}:`, res);
-            statusMap[user._id] = res;
-          } catch (error) {
-            // console.error(`Error fetching status for ${user._id}:`, error);
-            statusMap[user._id] = { status: "none" };
-          }
-        })
-      );
-      // console.log('Final status map:', statusMap);
-      setInterestStatus(statusMap);
-    };
-  
-    fetchStatuses();
-  }, [filteredUsers, loggedInUserId, checkInterestStatus]);
-  const handleOpenDialog = useCallback(async (user) => {
+
+  /**
+   * Handles opening the profile dialog and fetching interest status
+   */
+  const handleOpenDialog = useCallback((user) => {
     setSelectedUser(user);
-    try {
-      if (loggedInUserId && user.registration_no) {
-        const status = await checkInterestStatus({
-          senderRegistrationNo: loggedInUserId,
-          recipientRegistrationNo: user.registration_no
-        });
-        setInterestStatus(prev => ({ ...prev, [user._id]: status }));
-      }
-    } catch (error) {
-      console.error('Error fetching status:', error);
-      setInterestStatus(prev => ({ ...prev, [user._id]: { status: "none" } }));
-    }
     setOpenDialog(true);
-  }, [checkInterestStatus, loggedInUserId]);
-  
-  const handleExpressInterest = useCallback(async (userMongoId) => {
-    const recipient = filteredUsers.find(user => user._id === userMongoId);
-    if (!recipient || !loggedInUserId) return;
-  
-    try {
-      // Optimistically update the status to "pending"
-      setInterestStatus(prev => ({
-        ...prev,
-        [userMongoId]: { status: "pending" }
-      }));
-  
-      // Send the interest request
-      await expressInterestMutation.mutateAsync({
-        senderRegistrationNo: loggedInUserId,
-        recipientRegistrationNo: recipient.registration_no,
-        message: "I'd like to connect with you!"
-      });
-  
-      // Verify the actual status after sending
-      const statusResponse = await checkInterestStatus({
-        senderRegistrationNo: loggedInUserId,
-        recipientRegistrationNo: recipient.registration_no
-      });
-  
-      // Update with the actual status from API
-      setInterestStatus(prev => ({
-        ...prev,
-        [userMongoId]: statusResponse
-      }));
-  
-      enqueueSnackbar("Interest expressed successfully!", { variant: "success" });
-    } catch (error) {
-      // Revert on error
-      setInterestStatus(prev => ({
-        ...prev,
-        [userMongoId]: { status: "none" }
-      }));
-      enqueueSnackbar(error?.response?.data?.message || "Failed to express interest", {
-        variant: "error"
-      });
-    }
-  }, [filteredUsers, loggedInUserId, expressInterestMutation, checkInterestStatus, enqueueSnackbar]);
+  }, []);
+  /**
+   * Handles expressing interest in a user
+   */
+
+  /**
+   * Renders the appropriate content for the dialog based on current tab
+   */
   const renderDialogContent = () => {
     if (!selectedUser) return null;
 
@@ -156,9 +86,24 @@ const expressInterestMutation = useExpressInterest();
     return contentMap[currentTab] || null;
   };
 
+  /**
+   * Helper function to calculate age from date of birth
+   */
+  const calculateAge = (dob) => {
+    if (!dob) return null;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+    return age;
+  };
+
+  /**
+   * Renders an individual user card
+   */
   const renderUserCard = (user) => {
-    const currentStatus = interestStatus[user.recipientRegistrationNo]?.status || "none";
-    console.log(currentStatus,"status")
+    // const currentStatus = interestStatus[user._id]?.status || "none"; // Fixed: using user._id instead of user.recipientRegistrationNo
     const age = user.age || calculateAge(user.date_of_birth);
 
     return (
@@ -181,7 +126,6 @@ const expressInterestMutation = useExpressInterest();
             <ProfileInfo label="Religion" value={user.religion || "N/A"} />
             <ProfileInfo label="Caste" value={user.caste || "N/A"} />
           </Box>
-
           
           <Button
             fullWidth
@@ -197,10 +141,14 @@ const expressInterestMutation = useExpressInterest();
     );
   };
 
-
+  // Main component render
   return (
     <Box sx={{ p: 2, backgroundColor: "#f9f9f9" }}>
-      <Typography variant="h5" fontWeight="bold" color="#34495e" mb={3}>Browse Profiles ({filteredUsers.length})</Typography>
+      <Typography variant="h5" fontWeight="bold" color="#34495e" mb={3}>
+        Browse Profiles ({filteredUsers.length})
+      </Typography>
+      
+      {/* User cards grid */}
       <Box sx={{
         display: "grid",
         gridTemplateColumns: {
@@ -214,84 +162,47 @@ const expressInterestMutation = useExpressInterest();
         {paginatedUsers.map(renderUserCard)}
       </Box>
 
+      {/* Profile Dialog */}
       {selectedUser && (
-        <Dialog maxWidth="lg" open={openDialog} onClose={() => setOpenDialog(false)} fullWidth>
-          <DialogContent sx={{ p: 0, backgroundColor: "#f5f5f5" }}>
-            <Box sx={{ width: "100%", display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 3, p: 3 }}>
-              <Box sx={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                <CardMedia component="img" image={profileimg} alt="Profile" sx={{ borderRadius: 2, height: 280, width: "100%", objectFit: "cover" }} />
-                <Box textAlign="center">
-                  <Typography variant="h5" fontWeight="bold">{selectedUser.first_name} {selectedUser.last_name}</Typography>
-                  <Typography color="text.secondary">{selectedUser.age || calculateAge(selectedUser.date_of_birth)} yrs, {selectedUser.height}</Typography>
-                  <Chip label={selectedUser.user_role} color={selectedUser.user_role === "PremiumUser" ? "primary" : "default"} size="small" sx={{ mt: 1 }} />
-                </Box>
-              </Box>
-              <Box sx={{ flex: 2, minWidth: 0 }}>
-                <Tabs value={currentTab} onChange={(e, val) => setCurrentTab(val)} variant="scrollable" scrollButtons="auto" sx={{ mb: 2 }}>
-                  {tabLabels.map((label, index) => (<Tab key={index} label={label} />))}
-                </Tabs>
-                <Box sx={{ p: 2, backgroundColor: "white", borderRadius: 2, boxShadow: 1, minHeight: 300 }}>
-                  {renderDialogContent()}
-                </Box>
-              </Box>
-            </Box>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 2, backgroundColor: "white", borderTop: "1px solid #eee" }}>
-              <Box display="flex" alignItems="center">
-                <RiVerifiedBadgeFill style={{ fontSize: 24, color: "#1976d2", marginRight: 8 }} />
-                <Typography variant="body1" fontWeight="bold">Verified Profile</Typography>
-              </Box>
-              <Box sx={{ display: "flex", gap: 2 }}>
-              <Button
-  variant="contained"
-  color={
-    interestStatus[selectedUser?._id]?.status === "pending" ? "warning" : // Fix: Use selectedUser._id
-    interestStatus[selectedUser?._id]?.status === "accepted" ? "success" :
-    interestStatus[selectedUser?._id]?.status === "rejected" ? "error" : "primary"
-  }
-  onClick={() => handleExpressInterest(selectedUser._id)}
-  disabled={interestStatus[selectedUser?._id]?.status !== "none" || expressInterestMutation.isLoading}
-  startIcon={expressInterestMutation.isLoading ? <CircularProgress size={20} /> : <FaHeart />}
->
-  {
-    interestStatus[selectedUser?._id]?.status === "pending" ? "Interest Pending" :
-    interestStatus[selectedUser?._id]?.status === "accepted" ? "Connected!" :
-    interestStatus[selectedUser?._id]?.status === "rejected" ? "Rejected" : "Express Interest"
-  }
-</Button>
+      <ProfileDialog 
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+        selectedUser={selectedUser}
+        currentTab={currentTab}
+        setCurrentTab={setCurrentTab}
+        loggedInUserId={loggedInUserId}  // Pass loggedInUserId as prop
+        isLoading={expressInterestMutation.isLoading}
+        renderDialogContent={renderDialogContent}
+      />
+    )}
 
-
-    <Button variant="outlined" onClick={() => setOpenDialog(false)}>Close</Button>
-  </Box>
-</Box>
-          </DialogContent>
-        </Dialog>
-      )}
-
+      {/* Pagination */}
       {filteredUsers.length > itemsPerPage && (
         <Box display="flex" justifyContent="flex-end" my={3}>
-          <Pagination count={Math.ceil(filteredUsers.length / itemsPerPage)} page={currentPage} onChange={(e, page) => setCurrentPage(page)} color="primary" shape="rounded" />
+          <Pagination 
+            count={Math.ceil(filteredUsers.length / itemsPerPage)} 
+            page={currentPage} 
+            onChange={(e, page) => setCurrentPage(page)} 
+            color="primary" 
+            shape="rounded" 
+          />
         </Box>
       )}
+      
+      {/* Loading state */}
       {isLoading && <LoadingComponent/>}
     </Box>
   );
 };
 
+/**
+ * Helper component for profile information display
+ */
 const ProfileInfo = ({ label, value }) => (
   <Box textAlign="center">
     <Typography variant="body2" color="text.secondary">{label}</Typography>
     <Typography variant="body2" fontWeight="bold">{value}</Typography>
   </Box>
 );
-
-const calculateAge = (dob) => {
-  if (!dob) return null;
-  const birthDate = new Date(dob);
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const m = today.getMonth() - birthDate.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-  return age;
-};
 
 export default ViewAll;
