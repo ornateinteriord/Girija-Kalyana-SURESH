@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -6,7 +6,7 @@ import {
   Typography,
   Button,
   Box,
-  CircularProgress,
+  
 } from "@mui/material";
 import { useGetMemberDetails } from "../../api/User/useGetProfileDetails";
 import profileimg from "../../../assets/profile.jpg";

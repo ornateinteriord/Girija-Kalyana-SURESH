@@ -1,74 +1,60 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState} from "react";
 import { Box, Divider, Tab, Tabs, Typography } from "@mui/material";
 import Accepted from "./insidepage/accepted/Accepted";
 import Requests from "./insidepage/requests/Request";
-import Pending from "./insidepage/pending/Pending";
 import Sent from "./sent/Sent";
-import axios from "axios";
+import TokenService from "../../token/tokenService";
+import { useGetAcceptedInterests, useGetReceivedInterests, useGetSentInterests } from "../../api/User/useGetProfileDetails";
 
-const API_BASE_URL = "http://localhost:5000/api";
+
+
 
 const MyInterest = () => {
+  const registrationNo = TokenService.getRegistrationNo()
   const [tabValue, setTabValue] = useState(0);
-  const [userData, setUserData] = useState(null);
-  const [totalCounts, setTotalCounts] = useState({
+  const [counts, setCounts] = useState({
     accepted: 0,
     requests: 0,
-    sent: 0,
-    pending: 0,
+    sent: 0
   });
 
+  const { data: acceptedData } = useGetAcceptedInterests(registrationNo);
+  const { data: receivedData } = useGetReceivedInterests(registrationNo);
+  const { data: sentData } = useGetSentInterests(registrationNo);
+ 
+
   useEffect(() => {
-    const fetchUserData = async () => {
-      const storedData = sessionStorage.getItem("userData");
-      if (!storedData) return;
-      
-      const parsedData = JSON.parse(storedData);
-      setUserData(parsedData);
-      fetchTotalCounts(parsedData._id);
-    };
-
-    fetchUserData();
-  }, []);
-
-  const fetchTotalCounts = async (userId) => {
-    try {
-      const endpoints = {
-        accepted: `${API_BASE_URL}/accepted-users/${userId}`,
-        requests: `${API_BASE_URL}/interested-users/${userId}`,
-        sent: `${API_BASE_URL}/sent-interests/${userId}`,
-        pending: `${API_BASE_URL}/pending-interests/${userId}`,
-      };
-
-      const responses = await Promise.all(
-        Object.keys(endpoints).map((key) => axios.get(endpoints[key]))
-      );
-
-      setTotalCounts({
-        accepted: responses[0].data.length,
-        requests: responses[1].data.length,
-        sent: responses[2].data.length,
-        pending: responses[3].data.length,
-      });
-    } catch (error) {
-      console.error("Error fetching total counts:", error);
+    if (acceptedData) {
+      setCounts(prev => ({ ...prev, accepted: acceptedData.length || 0 }));
     }
-  };
+  }, [acceptedData]);
+
+  useEffect(() => {
+    if (receivedData) {
+      setCounts(prev => ({ ...prev, requests: receivedData.length || 0 }));
+    }
+  }, [receivedData]);
+
+  useEffect(() => {
+    if (sentData) {
+      setCounts(prev => ({ ...prev, sent: sentData.totalCount || 0 }));
+    }
+  }, [sentData]);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
 
+ 
+
   const renderContents = () => {
     switch (tabValue) {
       case 0:
-        return <Accepted />;
+        return <Accepted  />;
       case 1:
         return <Requests />;
       case 2:
-        return <Sent />;
-      case 3:
-        return <Pending />;
+        return <Sent  />;
       default:
         return null;
     }
@@ -92,10 +78,9 @@ const MyInterest = () => {
         scrollButtons="auto"
         sx={{ marginBottom: 2 }}
       >
-        <Tab label={`Accepted (${totalCounts.accepted})`} />
-        <Tab label={`Requests (${totalCounts.requests})`} />
-        <Tab label={`Sent (${totalCounts.sent})`} />
-        <Tab label={`Pending (${totalCounts.pending})`} />
+        <Tab label={`Accepted (${counts.accepted})`} />
+        <Tab label={`Requests (${counts.requests})`} />
+        <Tab label={`Sent (${counts.sent})`} />
       </Tabs>
 
       {/* Content Section */}

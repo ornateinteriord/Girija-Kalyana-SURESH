@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react"; 
 import {
   Box,
   Typography,
   Pagination,
-  CircularProgress
 } from "@mui/material";
 import {
   useGetReceivedInterests,
@@ -27,12 +26,12 @@ const Requests = () => {
     refetch
   } = useGetReceivedInterests(recipientRegistrationNo);
 
+  useEffect(() => {
+    if (isError) {
+      toast.error(error.message);
+    }
+  }, [isError, error]);
 
-   useEffect(() => {
-      if (isError) {
-        toast.error(error.message);
-      }
-    }, [isError, error]);
 
   const { mutate: updateInterest } = useUpdateInterestStatus();
 
@@ -60,7 +59,6 @@ const Requests = () => {
   const currentUsers = receivedInterests.slice(indexOfFirst, indexOfLast);
   const pageCount = Math.ceil(receivedInterests.length / itemsPerPage);
 
-  
   return (
     <Box sx={{ padding: 3 }}>
       <Box
@@ -72,7 +70,9 @@ const Requests = () => {
           marginTop: 1
         }}
       >
-        {currentUsers.length === 0 ? (
+        {isLoading ? (
+          <LoadingComponent />
+        ) : currentUsers.length === 0 ? (
           <Typography variant="h6">No pending requests found</Typography>
         ) : (
           currentUsers.map((user) => (
@@ -97,7 +97,6 @@ const Requests = () => {
           />
         </Box>
       )}
-      {isLoading && <LoadingComponent/>}
     </Box>
   );
 };
