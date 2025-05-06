@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -6,7 +6,7 @@ import {
   Typography,
   Button,
   Box,
-  CircularProgress,
+  
 } from "@mui/material";
 import { useGetMemberDetails } from "../../api/User/useGetProfileDetails";
 import profileimg from "../../../assets/profile.jpg";
@@ -46,7 +46,8 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
         alt="user-dp"
         sx={{ borderRadius: "12px", padding: "50px 50px 0" }}
       />
-      <CardContent>
+      <CardC
+      ontent>
         {/* <Box display={"flex"} justifyContent={"space-between"}> */}
           <Typography fontSize={18} fontWeight="bold" textAlign={'start'}>
             {senderDetails?.first_name} {senderDetails?.last_name}
@@ -111,7 +112,7 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
             Accept
           </Button>
         </Box>
-      </CardContent>
+      </CardC>
       {isLoading && <LoadingComponent/>}
     </Card>
   );

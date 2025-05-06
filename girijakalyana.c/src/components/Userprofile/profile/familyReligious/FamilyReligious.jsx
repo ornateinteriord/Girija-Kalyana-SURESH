@@ -102,7 +102,7 @@ const FamilyReligious = () => {
     <Box
       sx={{
         bgcolor: '#fff',
-        p: 3,
+        p: 1,
         borderRadius: 2,
         boxShadow: 1,
         maxWidth: 1200,
@@ -111,17 +111,24 @@ const FamilyReligious = () => {
     >
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5" fontWeight="bold">
+        <Typography variant="h5" sx={{fontSize:{xs : '21px',sm:'25px',color:'#34495e'}}} fontWeight="bold">
           Family & Religious Information
         </Typography>
-        <Button
-          variant={isEditing ? 'outlined' : 'contained'}
-          color={isEditing ? 'error' : 'primary'}
-          onClick={() => setIsEditing(!isEditing)}
-          disabled={isUpdating}
-        >
-          {isEditing ? 'Cancel' : 'Edit'}
-        </Button>
+         <Button
+                  variant={isEditing ? "outlined" : "contained"}
+                  color={isEditing ? "error" : "primary"}
+                  onClick={() => setIsEditing(!isEditing)}
+                  disabled={isUpdating}
+                  fullWidth={true}
+                  sx={{
+                    maxWidth: { xs: '100px', sm: 180 },
+                    padding:{xs:0.6},
+                    textTransform: 'capitalize',
+                    fontSize: '16px'
+                  }}
+                >
+                  {isEditing ? 'Cancel' : 'Edit Profile'}
+                </Button>
       </Box>
 
       {/* Sections */}

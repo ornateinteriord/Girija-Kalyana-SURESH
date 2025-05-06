@@ -41,14 +41,38 @@ const Profile = () => {
       case 3: return <Photos />;
       case 4: return <LifeStyle render={setOpen} />;
       case 5: return <ParentsPrefer />;
-      case 6: return <Others />;
+      case 6: return <Others />;       
       case 7: return <PrivacySettings />;
       default: return null;
     }
   };
 
   return (
-    <Box display="flex" flexDirection="column"  >         
+    <Box
+    sx={{
+      bgcolor: 'background.paper',
+      borderRadius: 2,
+      boxShadow: 1,
+      p: { xs: 1, sm: 3, md: 4 },
+      maxWidth: 1200,
+      justifySelf:{md:'center'},
+      // mx: 'auto',
+      width: { 
+        xs: '40%',   // For very small screens (like iPhone SE)
+        sm: '90%',   // For small screens (like iPhone 15/16 in portrait)
+        md: '85%',   // For medium screens (like iPhone 15/16 in landscape)
+        lg: '100%'   // For larger screens
+      },
+      '@media (min-width: 600px) and (max-width: 899px)': {
+        // Specific adjustments for iPhone 15/16 in landscape
+        width: '81%',
+      },
+      '@media (min-width: 375px) and (max-width: 428px)': {
+        // Specific adjustments for iPhone 15/16 in portrait
+        width: '44%',
+      }
+    }}
+  >        
             <Typography variant="h5" fontWeight={700} mt={0}  color="#34495e">
               My Profile
             </Typography>
@@ -68,7 +92,7 @@ const Profile = () => {
           </Snackbar>
 
           {/* Tabs and content */}
-          <Paper elevation={1} sx={{ p: 1}} >
+          <Paper elevation={1} sx={{ p: 0}} >
             <Tabs
               value={value}
               onChange={handleChange}
