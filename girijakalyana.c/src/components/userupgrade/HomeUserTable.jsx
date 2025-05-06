@@ -233,8 +233,8 @@ const HomeUserTable = ({ userId }) => {
                   overflow: "hidden",
                   background: option.gradient,
                   color: "#fff",
-                  width: '100%',
-                  maxWidth: '400px'
+                  width: '300px',
+                  marginBottom:'15px'
                 }}
               >
                 <CardContent sx={{ p: isSmallScreen ? 2 : 3 }}>
