@@ -111,7 +111,7 @@ const FamilyReligious = () => {
     >
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5" sx={{fontSize:{xs : '21px',sm:'25px'}}} fontWeight="bold">
+        <Typography variant="h5" sx={{fontSize:{xs : '21px',sm:'25px',color:'#34495e'}}} fontWeight="bold">
           Family & Religious Information
         </Typography>
          <Button
