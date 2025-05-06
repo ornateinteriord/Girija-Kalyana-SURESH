@@ -55,6 +55,7 @@ const Profile = () => {
       boxShadow: 1,
       p: { xs: 1, sm: 3, md: 4 },
       maxWidth: 1200,
+      justifySelf:{md:'center'},
       // mx: 'auto',
       width: { 
         xs: '40%',   // For very small screens (like iPhone SE)
