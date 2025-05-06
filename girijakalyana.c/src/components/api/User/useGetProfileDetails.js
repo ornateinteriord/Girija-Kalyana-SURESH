@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { get, post, put } from "../authHooks";
 import TokenService from "../../token/tokenService";
@@ -76,7 +76,7 @@ export const useExpressInterest = () => {
     },
     onSuccess: () => {
       toast.success('Interest expressed successfully!');
-      queryClient.invalidateQueries(['interestStatus']);
+      queryClient.invalidateQueries(['interestStatus','get-interes']);
     },
     onError: (error) => {
       const errorMessage = error?.response?.data?.message || error.message;
@@ -106,20 +106,14 @@ export const useGetReceivedInterests = (recipientRegistrationNo) => {
 };
 
 // Get interest status query
-export const useGetInterestStatus = (
-  senderRegistrationNo,
-  recipientRegistrationNo
-) => {
-  return useQuery({
-    queryKey: ["interestStatus", senderRegistrationNo, recipientRegistrationNo],
+// api/User/useGetProfileDetails.js
+export const useGetSentInterests = (senderRegistrationNo) => {
+  return useSuspenseQuery({
+    queryKey: ["sentInterests", senderRegistrationNo],
     queryFn: async () => {
-      const { data } = await get(
-        `/api/user/interest/status/${senderRegistrationNo}/${recipientRegistrationNo}`
-      );
-      return data;
+      const data = await get(`/api/user/interest/sent/${senderRegistrationNo}`);
+      return data || { data: [], totalPages: 0 };
     },
-    enabled: !!senderRegistrationNo && !!recipientRegistrationNo,
-    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 
@@ -154,13 +148,6 @@ export const useGetAcceptedInterests = (recipientRegistrationNo) => {
     queryKey: ["acceptedInterests", recipientRegistrationNo],
     queryFn: async () => {
       const response = await get(`/api/user/interest/accepted/${recipientRegistrationNo}`);
-      
-      // if (!response || response.length === 0) {
-      //   toast.info("No accepted interests found.");
-      // } else {
-      //   toast.success("Accepted interests loaded successfully.");
-      // }
-
       return response;
     },
     enabled: !!recipientRegistrationNo,
