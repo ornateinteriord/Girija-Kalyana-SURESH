@@ -2,14 +2,15 @@ import React, { memo, useEffect, useState } from "react";
 import {
   Box,
   Grid,
-  Stack,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   Button,
   Typography,
-  CircularProgress
+  CircularProgress,
+  useMediaQuery,
+  useTheme
 } from "@mui/material";
 import rawJsonData from "../eduction/jsondata/data.json";
 import toast from "react-hot-toast";
@@ -20,6 +21,11 @@ import { LoadingComponent } from "../../../../App";
 const datas = rawJsonData.reduce((acc, curr) => ({ ...acc, ...curr }), {});
 
 const ParentsPrefer = () => {
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.only('xs'));
+  const isMd = useMediaQuery(theme.breakpoints.between('sm', 'lg'));
+  const isLg = useMediaQuery(theme.breakpoints.up('lg'));
+
   const registerNo = TokenService.getRegistrationNo();
 
   const [formData, setFormData] = useState({
@@ -33,23 +39,19 @@ const ParentsPrefer = () => {
     education_preference: ""
   });
 
-  const { data: userProfile, isLoading, isError,error } = useGetMemberDetails(registerNo);
+  const { data: userProfile, isLoading, isError, error } = useGetMemberDetails(registerNo);
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
 
-
-
-   useEffect(() => {
-      if (isError) {
-        toast.error(error.message);
-      }
-    }, [isError, error]);
+  useEffect(() => {
+    if (isError) {
+      toast.error(error.message);
+    }
+  }, [isError, error]);
 
   useEffect(() => {
-
     if (userProfile) {
       setFormData({
-       ...userProfile
-      
+        ...userProfile
       });
     }
   }, [userProfile]);
@@ -62,9 +64,7 @@ const ParentsPrefer = () => {
   };
 
   const handleSave = () => {
-    updateProfile(formData, {
-
-    });
+    updateProfile(formData, {});
   };
 
   const handleClear = () => {
@@ -80,203 +80,152 @@ const ParentsPrefer = () => {
     });
   };
 
-  
+  const formFields = [
+    {
+      name: "caste_preference",
+      label: "Caste Preference",
+      options: datas?.casteValues || [],
+      currentValue: formData.caste_preference
+    },
+    {
+      name: "from_age_preference",
+      label: "Age Preference (From)",
+      options: datas?.minAge || [],
+      currentValue: formData.from_age_preference
+    },
+    {
+      name: "to_age_preference",
+      label: "Age Preference (To)",
+      options: datas?.minAge || [],
+      currentValue: formData.to_age_preference
+    },
+    {
+      name: "from_height_preference",
+      label: "Height Preference (From)",
+      options: datas?.heightValues || [],
+      currentValue: formData.from_height_preference
+    },
+    {
+      name: "to_height_preference",
+      label: "Height Preference (To)",
+      options: datas?.heightValues || [],
+      currentValue: formData.to_height_preference
+    },
+    {
+      name: "occupation_country_preference",
+      label: "Occupation Country",
+      options: ["India", "USA", "China"],
+      currentValue: formData.occupation_country_preference
+    },
+    {
+      name: "maritalstatus_preference",
+      label: "Marital Status",
+      options: datas?.marritalStatus || [],
+      currentValue: formData.maritalstatus_preference
+    },
+    {
+      name: "education_preference",
+      label: "Education Preference",
+      options: datas?.qualificationValues || [],
+      currentValue: formData.education_preference
+    }
+  ];
 
   return (
     <Box
       sx={{
-        padding: "24px",
+        padding:1,
         backgroundColor: "#f9f9f9",
         borderRadius: "12px",
         boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
         fontFamily: "Roboto, sans-serif",
-        width: "80%",
+        width: { xs: "100%", md: "80%" },
+        // margin: "0 auto",
+        maxWidth: "1200px"
       }}
     >
       <Typography
         variant="h6"
         sx={{
-          textAlign: "center",
+          textAlign: "start",
           fontWeight: 700,
-          fontSize: "22px",
+          fontSize: { xs: "23px", sm: "22px" },
           color: "#34495e",
-          marginBottom: "24px",
+          marginBottom: { xs: "16px", sm: "24px" },
         }}
       >
         Parents' Preference
       </Typography>
 
-      <Stack direction="row" spacing={4}>
-        {/* LEFT SIDE */}
-        <Box flex={1}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <FormControl fullWidth variant="outlined">
-                <InputLabel id="caste-label">Caste Preference</InputLabel>
-                <Select
-                  labelId="caste-label"
-                  value={formData.caste_preference}
-                  onChange={(e) => handleChange("caste_preference", e.target.value)}
-                  label="Caste Preference"
-                > {formData.caste_preference && !datas?.casteValues?.includes(formData.caste_preference) && (
-                  <MenuItem key="current" value={formData.caste_preference}>
-                    {formData.caste_preference}
-                  </MenuItem>
-                )}
-                  {datas?.casteValues?.map((item, index) => (
-                    <MenuItem key={index} value={item}>
-                      {item}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Age Preference (From)</InputLabel>
-                <Select
-                  value={formData.from_age_preference}
-                  onChange={(e) => handleChange("from_age_preference", e.target.value)}
-                  label="Age Preference (From)"
-                >
-                  {datas?.minAge?.map((item, index) => (
-                    <MenuItem key={index} value={item}>{item}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Height Preference (From)</InputLabel>
-                <Select
-                  value={formData.from_height_preference}
-                  onChange={(e) => handleChange("from_height_preference", e.target.value)}
-                  label="Height Preference (From)"
-                >
-                  {formData.from_height_preference && !datas?.heightValues?.includes(formData.from_height_preference) && (
-                  <MenuItem key="current" value={formData.from_height_preference}>
-                    {formData.from_height_preference}
-                  </MenuItem>
-                )}
-                  {datas?.heightValues?.map((item, index) => (
-                    <MenuItem key={index} value={item}>{item}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Occupation Country</InputLabel>
-                <Select
-                  value={formData.occupation_country_preference}
-                  onChange={(e) => handleChange("occupation_country_preference", e.target.value)}
-                  label="Occupation Country"
-                >
-                  <MenuItem value="India">India</MenuItem>
-                  <MenuItem value="USA">USA</MenuItem>
-                  <MenuItem value="China">China</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </Box>
-
-        {/* RIGHT SIDE */}
-        <Box flex={1}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Education Preference</InputLabel>
-                <Select
-                  value={formData.education_preference}
-                  onChange={(e) => handleChange("education_preference", e.target.value)}
-                  label="Education Preference"
-                >
-                   {formData.education_preference && !datas?.qualificationValues?.includes(formData.education_preference) && (
-                  <MenuItem key="current" value={formData.education_preference}>
-                    {formData.education_preference}
-                  </MenuItem>
-                )}
-                  {datas?.qualificationValues?.map((item, index) => (
-                    <MenuItem key={index} value={item}>{item}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Age Preference (To)</InputLabel>
-                <Select
-                  value={formData.to_age_preference}
-                  onChange={(e) => handleChange("to_age_preference", e.target.value)}
-                  label="Age Preference (To)"
-                >
-                  {datas?.minAge?.map((item, index) => (
-                    <MenuItem key={index} value={item}>{item}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Height Preference (To)</InputLabel>
-                <Select
-                  value={formData.to_height_preference}
-                  onChange={(e) => handleChange("to_height_preference", e.target.value)}
-                  label="Height Preference (To)"
-                >
-                  {formData.to_height_preference && !datas?.heightValues?.includes(formData.to_height_preference) && (
-                  <MenuItem key="current" value={formData.to_height_preference}>
-                    {formData.to_height_preference}
-                  </MenuItem>
-                )}
-                  {datas?.heightValues?.map((item, index) => (
-                    <MenuItem key={index} value={item}>{item}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Marital Status</InputLabel>
-                <Select
-                  value={formData.maritalstatus_preference}
-                  onChange={(e) => handleChange("maritalstatus_preference", e.target.value)}
-                  label="Marital Status"
-                >
-                  {datas?.marritalStatus?.map((item, index) => (
-                    <MenuItem key={index} value={item}>{item}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </Box>
-      </Stack>
-
-      <Box display="flex" justifyContent="end" gap={1} mt={3}>
-        <Button
-          variant="outlined"
-          sx={{ background: "#34495e", color: "#fff", border: "none" }}
-          onClick={handleClear}
-        >
-          Clear
-        </Button>
-        <Button
-          variant="contained"
-          sx={{ background: "#34495e" }}
-          onClick={handleSave}
-          disabled={isUpdating}
-        >
-          {isUpdating ? <CircularProgress size={24} /> : "Save"}
-        </Button>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            md: 'repeat(2, 1fr)',
+            lg: 'repeat(2, 1fr)'
+          },
+          gap: 2
+        }}
+      >
+        {formFields.map((field, index) => (
+          <FormControl key={index} fullWidth size={isXs ? "medium" : "medium"}>
+            <InputLabel>{field.label}</InputLabel>
+            <Select
+              value={field.currentValue}
+              onChange={(e) => handleChange(field.name, e.target.value)}
+              label={field.label}
+            >
+              {field.currentValue && !field.options.includes(field.currentValue) && (
+                <MenuItem key="current" value={field.currentValue}>
+                  {field.currentValue}
+                </MenuItem>
+              )}
+              {field.options.map((item, idx) => (
+                <MenuItem key={idx} value={item}>{item}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        ))}
       </Box>
+
+      <Box
+      mt={1.5}
+                    sx={{
+                      display: "flex",
+                      gap: "10px",
+                      flexDirection: { xs: "row", sm: "row" },
+                      alignItems: { xs: "center", sm: "center" },
+                      justifySelf: {sm:'end',md:'end'}
+                    }}
+                  >
+                    <Button
+                      onClick={handleClear}
+                      variant="outlined"
+                      sx={{
+                        color: "black",
+                        backgroundColor: "#fff",
+                        textTransform: "capitalize",
+                        "&:hover": { backgroundColor: "#fff" },
+                        width: { xs: "100%", sm: "130px" }
+                      }}
+                    >
+                      Clear
+                    </Button>
+                    <Button
+                      onClick={handleSave}
+                      variant="contained"
+                      disabled={isUpdating}
+                      sx={{
+                        backgroundColor: "#34495e",
+                        textTransform: "capitalize",
+                        "&:hover": { backgroundColor: "#2c3e50" },
+                        width: { xs: "100%", sm: "130px" }
+                      }}
+                    >
+                      {isUpdating ? <CircularProgress size={24} /> : "Save"}
+                    </Button>
+                  </Box>
       {isLoading && <LoadingComponent/>}
     </Box>
   );

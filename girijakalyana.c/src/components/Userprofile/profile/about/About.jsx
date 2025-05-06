@@ -100,6 +100,7 @@ const About = () => {
           variant="h5"
           fontWeight="bold"
           fontSize={{ xs: '1.3rem', sm: '1.7rem' }}
+          sx={{color:'#34495e'}}
         >
           Profile Information
         </Typography>
