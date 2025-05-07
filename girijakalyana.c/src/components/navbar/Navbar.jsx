@@ -21,7 +21,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useLoginMutation } from "../api/Auth";
+import { useLoginMutation, useSignupMutation } from "../api/Auth";
 import useAuth from "../hook/UseAuth";
 import TokenService from "../token/tokenService";
 
@@ -32,21 +32,13 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // State for mobile menu
   const [loginData, setLoginData] = useState({ username: "", password: "" });
   const [registerData, setRegisterData] = useState({
-    firstName: "",
-    lastName: "",
-    gender: "",
-    dob: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    mobile: "",
   });
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const { isLoggedIn } = useAuth();
   const navigation = useNavigate();
   const location = useLocation();
@@ -90,6 +82,8 @@ const Navbar = () => {
     setLoginData((prev) => ({ ...prev, [name]: value }));
   };
 
+ 
+
   const handleChangeRegister = (e) => {
     const { name, value } = e.target;
     setRegisterData((prev) => ({ ...prev, [name]: value }));
@@ -110,6 +104,30 @@ const Navbar = () => {
       TokenService.removeToken();
       window.dispatchEvent(new Event("storage"));
     };
+
+    const SignupMutation = useSignupMutation();
+    const { mutate, isPending } = SignupMutation;
+
+    const handleSubmit = (e) =>{
+      e.preventDefault()
+      if (registerData.password !== registerData.confirmPassword) {
+        setErrorMessage("Passwords do not match");
+        return;
+      }
+      try {
+        mutate(registerData, {
+          onSuccess: () => {
+            setOpen(false);
+            navigate('/');
+          },
+          onError: (error) => {
+            console.error("Registration failed:", error);
+          },
+        });
+      }  catch (error) {
+        console.error("Registration failed:", error);
+      }
+    }
 
   return (
     <div className="navbar-main-container">
@@ -248,13 +266,13 @@ const Navbar = () => {
             {isRegister ? "Create Your Account" : "Login"}
           </Typography>
           {isRegister ? (
-            <form style={{ width: "100%" }}>
+            <form style={{ width: "100%" }} onSubmit={handleSubmit}>
               <Box display="flex" gap={2} flexWrap="wrap" marginBottom={1.5}>
                 <TextField
                   style={{ flex: 1 }}
                   label="First Name"
-                  name="firstName"
-                  value={registerData.firstName}
+                  name="first_name"
+                  value={registerData.first_name}
                   onChange={handleChangeRegister}
                   variant="outlined"
                   required
@@ -262,8 +280,8 @@ const Navbar = () => {
                 <TextField
                   style={{ flex: 1 }}
                   label="Last Name"
-                  name="lastName"
-                  value={registerData.lastName}
+                  name="last_name"
+                  value={registerData.last_name}
                   onChange={handleChangeRegister}
                   variant="outlined"
                   required
@@ -278,15 +296,15 @@ const Navbar = () => {
                     onChange={handleChangeRegister}
                     required
                   >
-                    <MenuItem value="male">Male</MenuItem>
-                    <MenuItem value="female">Female</MenuItem>
+                    <MenuItem value="male">BrideGroom</MenuItem>
+                    <MenuItem value="female">Bride</MenuItem>
                   </Select>
                 </FormControl>
                 <TextField
                   style={{ flex: 1 }}
                   label="Date of Birth"
-                  name="dob"
-                  value={registerData.dob}
+                  name="date_of_birth"
+                  value={registerData.date_of_birth}
                   onChange={handleChangeRegister}
                   type="date"
                   InputLabelProps={{ shrink: true }}
@@ -295,8 +313,8 @@ const Navbar = () => {
                 <TextField
                   fullWidth
                   label="Mobile Number"
-                  name="mobile"
-                  value={registerData.mobile}
+                  name="mobile_no"
+                  value={registerData.mobile_no}
                   onChange={handleChangeRegister}
                   variant="outlined"
                   margin="normal"
@@ -306,8 +324,8 @@ const Navbar = () => {
               <TextField
                 fullWidth
                 label="Email Address"
-                name="email"
-                value={registerData.email}
+                name="username"
+                value={registerData.username}
                 onChange={handleChangeRegister}
                 variant="outlined"
                 margin="normal"
@@ -330,6 +348,8 @@ const Navbar = () => {
                 name="confirmPassword"
                 value={registerData.confirmPassword}
                 onChange={handleChangeRegister}
+                error={!!errorMessage} 
+                helperText={errorMessage} 
                 type="password"
                 variant="outlined"
                 margin="normal"
