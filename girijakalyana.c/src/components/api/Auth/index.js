@@ -4,6 +4,24 @@ import { toast } from "react-toastify";
 import TokenService from "../../token/tokenService";
 import { post } from "../authHooks";
 
+
+export const useSignupMutation = ()=>{
+  return useMutation({
+      mutationFn: async (data) => {
+        return await post("/api/auth/signup", data);
+      },
+      onSuccess: (response) => {
+        if (response.success) {
+          toast.success(response.message);
+        } else {
+          console.error(response.message);
+        }
+      },
+      onError: (error) => {
+        toast.error(error.response.data.message);
+      },
+    });
+}
 export const useLoginMutation = () => {
   const navigate = useNavigate();
 
