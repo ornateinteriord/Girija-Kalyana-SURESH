@@ -47,6 +47,7 @@ export const useUpdateProfile = () => {
     },
     onSuccess: (response) => {
       if (response?.success) {
+        toast.success(response.message)
         queryClient.invalidateQueries({ queryKey: ["userDetails", reg_No] });
       }
     },
