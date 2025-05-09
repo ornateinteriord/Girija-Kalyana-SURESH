@@ -22,6 +22,11 @@ import {
   MenuItem,
   IconButton,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { FaDashcube, FaUsersViewfinder } from "react-icons/fa6";
@@ -29,7 +34,6 @@ import { Link, Outlet, useNavigate } from "react-router-dom";
 import UserDashboard from "../userdDashboard/UserDashboard";
 import { convertFromBase64 } from "../profile/photo/Photos";
 import useStore from "../../../store";
-
 import TokenService from "../../token/tokenService";
 import { useGetMemberDetails } from "../../api/User/useGetProfileDetails";
 import { toast } from "react-toastify";
@@ -47,6 +51,7 @@ const UserNavBar = () => {
   const { profileImage, firstName, setFirstName, setProfileImage } = useStore();
   const [anchorEl, setAnchorEl] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const navigation = useNavigate();
   const [imageUrl, setImageUrl] = useState("");
 
@@ -84,9 +89,18 @@ const UserNavBar = () => {
     setAnchorEl(null);
   };
 
-  const handleLogout = () => {
+  const handleOpenLogoutDialog = () => {
+    setOpenLogoutDialog(true);
+    setAnchorEl(null); 
+  };
+
+  const handleCloseLogoutDialog = () => {
+    setOpenLogoutDialog(false);
+  };
+
+  const handleConfirmLogout = () => {
+    handleCloseLogoutDialog();
     navigation("/");
-    setAnchorEl(null);
     TokenService.removeToken();
     window.dispatchEvent(new Event("storage"));
   };
@@ -191,7 +205,7 @@ const UserNavBar = () => {
                 }}
               >
                 <MenuItem onClick={handleProfileClick}>My Profile</MenuItem>
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                <MenuItem onClick={handleOpenLogoutDialog}>Logout</MenuItem>
               </Menu>
             </Toolbar>
           </AppBar>
@@ -217,23 +231,8 @@ const UserNavBar = () => {
             <Box sx={{ overflow: "auto" }}>
               <List>
                 <ListItem>
-                  <Box sx={{ textAlign: "center", py: 0 }}>
-                    {/* <Avatar
-                      src={imageUrl || profileImage}
-                      alt={firstName}
-                      sx={{
-                        width: 80,
-                        height: 80,
-                        margin: "0 auto",
-                        mb: 2,
-                        color: "black",
-                        fontWeight: "bold",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {!imageUrl && !profileImage && firstName?.[0]}
-                    </Avatar> */}
-                    <Typography
+                  <Box sx={{ textAlign: "center", py: 0 }}> 
+                   <Typography
                       variant="h5"
                       marginLeft={2}
                       textTransform={"capitalize"}
@@ -276,7 +275,7 @@ const UserNavBar = () => {
                   {
                     text: "Logout",
                     icon: <FaSignOutAlt />,
-                    onClick: handleLogout,
+                    onClick: handleOpenLogoutDialog,
                   },
                 ].map((item, index) => (
                   <ListItem button key={index} onClick={item.onClick}>
@@ -316,6 +315,28 @@ const UserNavBar = () => {
             <Toolbar />
             <Outlet />
           </Box>
+          
+          {/* Logout Confirmation Dialog */}
+          <Dialog
+            open={openLogoutDialog}
+            onClose={handleCloseLogoutDialog}
+            aria-labelledby="alert-dialog-title"                                      
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">{"Confirm Logout"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Are you sure you want to logout from your account?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseLogoutDialog}>Cancel</Button>
+              <Button onClick={handleConfirmLogout} autoFocus color="error">
+                Logout
+              </Button>
+            </DialogActions>
+          </Dialog>
+          
           {isLoading && <LoadingComponent />}
         </Box>
       </ThemeProvider>
