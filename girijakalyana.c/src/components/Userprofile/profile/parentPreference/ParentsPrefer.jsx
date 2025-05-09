@@ -41,6 +41,7 @@ const ParentsPrefer = () => {
 
   const { data: userProfile, isLoading, isError, error } = useGetMemberDetails(registerNo);
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+  console.log("prefffere,",userProfile)
 
   useEffect(() => {
     if (isError) {
