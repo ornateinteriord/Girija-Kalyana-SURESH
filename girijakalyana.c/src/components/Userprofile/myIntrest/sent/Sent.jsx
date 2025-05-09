@@ -24,6 +24,7 @@ const Sent = () => {
     error 
   } = useGetSentInterests(currentUserRegistrationNo);
 
+
   useEffect(() => {
     if (isError) {
       toast.error(error.message);
@@ -37,6 +38,7 @@ const Sent = () => {
   );
 
   const totalPages = sentInterests.totalPages || Math.ceil(sentInterests.data.length / itemsPerPage);
+  
 
   return (
     <Box sx={{ p: 3 }}>
@@ -61,7 +63,7 @@ const Sent = () => {
             ))}
           </Box>
 
-          {totalPages > 1 && (
+          {totalPages > 0 && (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
               <Pagination
                 count={totalPages}

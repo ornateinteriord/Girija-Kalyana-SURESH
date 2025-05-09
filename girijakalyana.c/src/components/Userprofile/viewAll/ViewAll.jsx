@@ -37,7 +37,7 @@ const ViewAll = () => {
   // const [interestStatus, setInterestStatus] = useState({});
   
   // Hooks for data fetching and UI feedback
-  const { enqueueSnackbar } = useSnackbar();
+ 
   const { data: users = [], isLoading, isError, error } = useGetAllUsersProfiles();
   const loggedInUserId = TokenService.getRegistrationNo();
 
@@ -100,7 +100,7 @@ const ViewAll = () => {
   };
 
   /**
-   * Renders an individual user card
+   * Renders an individual user card 
    */
   const renderUserCard = (user) => {
     // const currentStatus = interestStatus[user._id]?.status || "none"; // Fixed: using user._id instead of user.recipientRegistrationNo
