@@ -52,10 +52,7 @@ const MyMatches = () => {
     error: usersError,
   } = useGetAllUsersProfiles();
 
-  const handleOpenDialog = useCallback((user) => {
-    setSelectedUser(user);
-    setOpenDialog(true);
-  }, []);
+
   const handleOpenDialog = useCallback((user) => {
     setSelectedUser(user);
     setOpenDialog(true);
@@ -108,10 +105,6 @@ const MyMatches = () => {
 
       setTotalItems(filteredUsers.length);
       const startIndex = (currentPage - 1) * itemsPerPage;
-      const paginatedUsers = filteredUsers.slice(
-        startIndex,
-        startIndex + itemsPerPage
-      );
       const paginatedUsers = filteredUsers.slice(
         startIndex,
         startIndex + itemsPerPage
@@ -240,12 +233,6 @@ const MyMatches = () => {
                     right: 12,
                     fontWeight: "bold",
                   }}
-                  sx={{
-                    position: "absolute",
-                    top: 12,
-                    right: 12,
-                    fontWeight: "bold",
-                  }}
                 />
               )}
 
@@ -287,7 +274,7 @@ const MyMatches = () => {
                    <Typography component="span" color="text.secondary">
                       {user.age || calculateAge(user.date_of_birth)} yrs
                     </Typography>
-
+                </Box>
                 <Box
                   display="flex"
                   alignItems="center"
@@ -368,8 +355,6 @@ const MyMatches = () => {
         </Box>
       )}
 
-      {selectedUser && (
-        <ProfileDialog
       {selectedUser && (
         <ProfileDialog
           openDialog={openDialog}
