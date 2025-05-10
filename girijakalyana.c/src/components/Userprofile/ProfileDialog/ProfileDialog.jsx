@@ -20,7 +20,6 @@ const ProfileDialog = ({
   const [localInterestStatus, setLocalInterestStatus] = useState('none');
   const [isStatusLoading, setIsStatusLoading] = useState(false);
 
-  // Fetch interest status
   const fetchStatus = async () => {
     if (!loggedInUserId || !selectedUser?.registration_no) {
       console.error('Missing registration numbers:', { loggedInUserId, recipientRegistrationNo: selectedUser?.registration_no });
@@ -40,7 +39,6 @@ const ProfileDialog = ({
     }
   };
 
-  // Fetch status when dialog opens or dependencies change
   useEffect(() => {
     if (openDialog && loggedInUserId && selectedUser?.registration_no) {
       fetchStatus();
@@ -107,58 +105,114 @@ const ProfileDialog = ({
       {
         onSuccess: () => {
           setLocalInterestStatus('pending');
-          fetchStatus(); // Refetch to confirm backend status
+          fetchStatus();
         },
         onError: (error) => {
           console.error('Error expressing interest:', error);
-          fetchStatus(); // Refetch to revert to backend status
+          fetchStatus();
         },
       }
     );
   };
 
   return (
-    <Dialog maxWidth="lg" open={openDialog} onClose={() => setOpenDialog(false)} fullWidth>
-      <DialogContent sx={{ p: 0, backgroundColor: '#f5f5f5' }}>
-        <Box sx={{ width: '100%', display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, p: 3 }}>
+    <Dialog
+      open={openDialog}
+      onClose={() => setOpenDialog(false)}
+      fullWidth
+      maxWidth="lg"
+      sx={{
+        '& .MuiDialog-paper': {
+          margin: { xs: '8px', sm: '16px' },
+          width: { xs: 'calc(100% - 16px)', sm: 'calc(100% - 32px)' },
+          maxWidth: '1200px',
+          maxHeight: { xs: 'calc(100% - 16px)', sm: 'calc(100% - 32px)' }
+        }
+      }}
+    >
+      <DialogContent sx={{ 
+        p: 0, 
+        backgroundColor: '#f5f5f5',
+        overflowY: 'auto',
+        maxHeight: { xs: '90vh', sm: '85vh' }
+      }}>
+        <Box sx={{ 
+          width: '100%', 
+          display: 'flex', 
+          flexDirection: { xs: 'column', md: 'row' }, 
+          gap: { xs: 2, sm: 3 }, 
+          p: { xs: 1.5, sm: 3 }
+        }}>
           {/* Left side - Profile image and basic info */}
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ 
+            flex: 1, 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            gap: { xs: 1, sm: 2 },
+            minWidth: { xs: '100%', md: '300px' }
+          }}>
             <CardMedia
               component="img"
               image={profileimg}
               alt="Profile"
-              sx={{ borderRadius: 2, height: 280, width: '100%', objectFit: 'cover' }}
+              sx={{ 
+                borderRadius: 2, 
+                height: { xs: 200, sm: 250, md: 280 }, 
+                width: '100%', 
+                objectFit: 'cover',
+                maxWidth: { xs: '300px', md: 'none' }
+              }}
             />
-            <Box textAlign="center">
-              <Typography variant="h5" fontWeight="bold">
+            <Box textAlign="center" sx={{ width: '100%' }}>
+              <Typography variant="h5" fontWeight="bold" sx={{ fontSize: { xs: '1.3rem', sm: '1.5rem' } }}>
                 {selectedUser?.first_name} {selectedUser?.last_name}
               </Typography>
-              <Typography color="text.secondary">
+              <Typography color="text.secondary" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
                 {selectedUser?.age || calculateAge(selectedUser?.date_of_birth)} yrs, {selectedUser?.height}
               </Typography>
               <Chip
                 label={selectedUser?.user_role}
                 color={selectedUser?.user_role === 'PremiumUser' ? 'primary' : 'default'}
                 size="small"
-                sx={{ mt: 1 }}
+                sx={{ mt: 1, fontSize: { xs: '0.7rem', sm: '0.8rem' } }}
               />
             </Box>
           </Box>
 
           {/* Right side - Tabbed content */}
-          <Box sx={{ flex: 2, minWidth: 0 }}>
+          <Box sx={{ 
+            flex: 2, 
+            minWidth: 0,
+            width: { xs: '100%', md: 'auto' }
+          }}>
             <Tabs
               value={currentTab}
               onChange={(e, val) => setCurrentTab(val)}
               variant="scrollable"
               scrollButtons="auto"
-              sx={{ mb: 2 }}
+              sx={{ 
+                mb: 2,
+                '& .MuiTab-root': {
+                  fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                  minWidth: 'unset',
+                  padding: { xs: '6px 8px', sm: '12px 16px' }
+                }
+              }}
             >
               {tabLabels.map((label, index) => (
                 <Tab key={index} label={label} />
               ))}
             </Tabs>
-            <Box sx={{ p: 2, backgroundColor: 'white', borderRadius: 2, boxShadow: 1, minHeight: 300 }}>
+            <Box sx={{ 
+              p: { xs: 1, sm: 2 }, 
+              backgroundColor: 'white', 
+              borderRadius: 2, 
+              boxShadow: 1, 
+              minHeight: { xs: 250, sm: 300 },
+              maxHeight: { xs: '40vh', sm: '50vh', md: '60vh' },
+              overflowY: 'auto'
+            }}>
               {renderDialogContent()}
             </Box>
           </Box>
@@ -168,30 +222,49 @@ const ProfileDialog = ({
         <Box
           sx={{
             display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
             justifyContent: 'space-between',
             alignItems: 'center',
-            p: 2,
+            p: { xs: 1.5, sm: 2 },
             backgroundColor: 'white',
             borderTop: '1px solid #eee',
+            gap: { xs: 1, sm: 0 }
           }}
         >
-          <Box display="flex" alignItems="center">
-            <RiVerifiedBadgeFill style={{ fontSize: 24, color: '#1976d2', marginRight: 8 }} />
-            <Typography variant="body1" fontWeight="bold">
+          <Box display="flex" alignItems="center" sx={{ mb: { xs: 1, sm: 0 } }}>
+            <RiVerifiedBadgeFill style={{ 
+              fontSize: { xs: 20, sm: 24 }, 
+              color: '#1976d2', 
+              marginRight: 8 
+            }} />
+            <Typography variant="body1" fontWeight="bold" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
               Verified Profile
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', gap: 2 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 2,
+            width: { xs: '100%', sm: 'auto' },
+            '& button': {
+              fontSize: { xs: '0.8rem', sm: '0.9rem' },
+              padding: { xs: '6px 12px', sm: '8px 16px' }
+            }
+          }}>
             <Button
               variant="contained"
               color={buttonState.color}
               onClick={!buttonState.disabled ? handleSendInterest : undefined}
               disabled={isLoading}
               startIcon={isLoading || isStatusLoading ? <CircularProgress size={20} /> : <FaHeart />}
+              fullWidth={window.innerWidth < 600}
             >
               {buttonState.text}
             </Button>
-            <Button variant="outlined" onClick={() => setOpenDialog(false)}>
+            <Button 
+              variant="outlined" 
+              onClick={() => setOpenDialog(false)}
+              fullWidth={window.innerWidth < 600}
+            >
               Close
             </Button>
           </Box>

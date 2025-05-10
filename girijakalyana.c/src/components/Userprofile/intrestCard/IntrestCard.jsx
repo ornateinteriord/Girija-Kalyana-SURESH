@@ -46,7 +46,7 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
         alt="user-dp"
         sx={{ borderRadius: "12px", padding: "50px 50px 0" }}
       />
-      <CardC
+      <Card
       ontent>
         {/* <Box display={"flex"} justifyContent={"space-between"}> */}
           <Typography fontSize={18} fontWeight="bold" textAlign={'start'}>
@@ -112,7 +112,7 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
             Accept
           </Button>
         </Box>
-      </CardC>
+      </Card>
       {isLoading && <LoadingComponent/>}
     </Card>
   );

@@ -296,8 +296,8 @@ const Navbar = () => {
                     onChange={handleChangeRegister}
                     required
                   >
-                    <MenuItem value="male">BrideGroom</MenuItem>
-                    <MenuItem value="female">Bride</MenuItem>
+                    <MenuItem value="BrideGroom">BrideGroom</MenuItem>
+                    <MenuItem value="Bride">Bride</MenuItem>
                   </Select>
                 </FormControl>
                 <TextField

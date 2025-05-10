@@ -1,191 +1,307 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Box,
-  Button,
-  Divider,
   Typography,
   Card,
   CardContent,
-  CardMedia,
-  Stack,
+  Avatar,
+  Chip,
+  Divider,
   Pagination,
+  Button,
 } from "@mui/material";
+import { FaMapMarkerAlt, FaBriefcase } from "react-icons/fa";
+import profileimg from "../../../assets/profile.jpg";
+import TokenService from "../../token/tokenService";
+import {
+  useGetAllUsersProfiles,
+  useGetMemberDetails,
+} from "../../api/User/useGetProfileDetails";
+import { LoadingComponent } from "../../../App";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import toast from "react-hot-toast";
+import AboutPop from "../viewAll/popupContent/abouPop/AboutPop";
+import FamilyPop from "../viewAll/popupContent/familyPop/FamilyPop";
+import EducationPop from "../viewAll/popupContent/educationPop/EducationPop";
+import LifeStylePop from "../viewAll/popupContent/lifeStylePop/LifeStylePop";
+import PreferencePop from "../viewAll/popupContent/preferencePop/PreferencePop";
+import ProfileDialog from "../ProfileDialog/ProfileDialog";
 
 const MyMatches = () => {
-  const navigate = useNavigate();
+  
   const [userCard, setUserCard] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const itemsPerPage = 9;
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [openDialog,setOpenDialog] = useState(null);
+  const [currentTab,setCurrentTab] = useState(0);
+  
+  const itemsPerPage = 8;
+  const registerNo = TokenService.getRegistrationNo();
+
+  const {
+    data: userProfile,
+    isLoading: isProfileLoading,
+    isError: isProfileError,
+    error: profileError,
+  } = useGetMemberDetails(registerNo);
+  const {
+    data: allUsers = [],
+    isLoading: isUsersLoading,
+    isError: isUsersError,
+    error: usersError,
+  } = useGetAllUsersProfiles();
+
+    const handleOpenDialog = useCallback((user) => {
+      setSelectedUser(user);
+      setOpenDialog(true);
+    }, []);
 
 
-
- 
-  const getData = async (page) => {
-    try {
-      const userData = sessionStorage.getItem("userData");
-      if (!userData) {
-        console.error("No user data found in session storage");
-        return;
-      }
-      const parsedUserData = JSON.parse(userData);
-      const loggedInUserId = parsedUserData._id;
-  
-      const response = await axios.get("http://localhost:5000/api/users", {
-        params: {
-          page: page,
-          limit: itemsPerPage,
-          userId: loggedInUserId,
-        },
-      });
-  
-      console.log("API Response:", response.data); // Debugging
-  
-
-      let users = response.data.users; // Expecting an object, but got an array
-  
-      // ✅ Temporary fix: If response is an array, assign directly
-      if (Array.isArray(response.data)) {
-        users = response.data;
-      }
-  
-      // Filter out the logged-in user
-      const filteredUsers = users.filter((user) => user._id !== loggedInUserId);
-  
-      setUserCard(filteredUsers);
-      setTotalItems(response.data.totalItems || filteredUsers.length); // Handle missing totalItems
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-  
-  
-
-  const handlePageChange = (event, page) => {
-    if (page >= 1 && page <= Math.ceil(totalItems / itemsPerPage)) {
-      setCurrentPage(page);
-      getData(page);
-    }
-  };
 
   useEffect(() => {
-    getData(currentPage);
-  }, [currentPage]);
+    if (allUsers.length > 0 && userProfile) {
+      const filteredUsers = allUsers.filter((user) => {
+        if (user.registration_no === registerNo) return false;
+
+        const {
+          from_age_preference,
+          to_age_preference,
+          from_height_preference,
+          to_height_preference,
+          caste_preference,
+        } = userProfile;
+
+        const isAgeMatch =
+          from_age_preference &&
+          to_age_preference &&
+          user.age &&
+          parseInt(user.age) >= parseInt(from_age_preference) &&
+          parseInt(user.age) <= parseInt(to_age_preference);
+
+        const isHeightMatch =
+          from_height_preference &&
+          to_height_preference &&
+          user.height &&
+          parseInt(user.height.replace("cm", "")) >= parseInt(from_height_preference.replace("cm", "")) &&
+          parseInt(user.height.replace("cm", "")) <= parseInt(to_height_preference.replace("cm", ""));
+
+        const isCasteMatch =
+          !caste_preference ||
+          caste_preference.toLowerCase().includes("any") ||
+          (user.caste &&
+            caste_preference.toLowerCase().includes(user.caste.toLowerCase()));
+
+        return isAgeMatch && isHeightMatch && isCasteMatch;
+      });
+
+      setTotalItems(filteredUsers.length);
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+      setUserCard(paginatedUsers);
+    } else {
+      setUserCard([]);
+      setTotalItems(0);
+    }
+  }, [allUsers, userProfile, currentPage, registerNo]);
+
+  useEffect(() => {
+    if (isProfileError) toast.error(profileError.message);
+    if (isUsersError) toast.error(usersError.message);
+  }, [isProfileError, profileError, isUsersError, usersError]);
+
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
+  };
+
+  const calculateAge = (dob) => {
+    if (!dob) return null;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+    return age;
+  };
+
+
+  const renderDialogContent = () => {
+    if (!selectedUser) return null;
+
+    const contentMap = {
+      0: <AboutPop userDetails={selectedUser} />,
+      1: <FamilyPop userDetails={selectedUser} />,
+      2: <EducationPop userDetails={selectedUser} />,
+      3: <LifeStylePop userDetails={selectedUser} />,
+      4: <PreferencePop userDetails={selectedUser} />
+    };
+
+    return contentMap[currentTab] || null;
+  };
+
 
   return (
-    <Box sx={{ padding: 1, backgroundColor: "#f9f9f9", marginBottom: "10px" }}>
-      {/* Header Section */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 2,
-        }}
-      >
-        <Typography variant="h4" fontWeight="bold" color="#34495e">
-          My Matches
+    <Box sx={{ p: { xs: 1, sm: 2 }, backgroundColor: "#f9f9f9" }}>
+      <Typography variant="h5" fontWeight="bold" mb={2}>
+        My Matches
+      </Typography>
+
+      {isProfileLoading || isUsersLoading ? (
+        <LoadingComponent />
+      ) : userCard.length === 0 ? (
+        <Typography variant="h6" textAlign="center" mt={4}>
+          No matches found based on your preferences.
         </Typography>
+      ) : (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(3, 1fr)",
+              lg: "repeat(4, 1fr)",
+            },
+            gap: { xs: 2, sm: 3 },
+            justifyContent: "center",
+          }}
+        >
+          {userCard.map((user) => (
+            <Card
+              key={user.registration_no}
+              sx={{
+                width: { xs: 300, sm: 280, md: 260 },
+                borderRadius: 4,
+                boxShadow: 3,
+                p: 2,
+                position: "relative",
+                overflow: "hidden",
+                transition: "transform 0.3s",
+                "&:hover": { transform: "translateY(-5px)" },
+              }}
+              // onClick={() => navigate(`/profile/${user.registration_no}`)}
+            >
+              {/* Premium badge */}
+              {user.user_role === "PremiumUser" && (
+                <Chip
+                  label="PREMIUM"
+                  color="primary"
+                  size="small"
+                  sx={{ position: "absolute", top: 12, right: 12, fontWeight: "bold" }}
+                />
+              )}
 
-     
-      </Box>
-      <Divider />
+              {/* Profile Image */}
+              <Box
+                sx={{
+                  width: 100,
+                  height: 100,
+                  borderRadius: "50%",
+                  border: "3px solid #87CEEB",
+                  mx: "auto",
+                  mb: 2,
+                  padding: "2px",
+                  background: "linear-gradient(45deg, #87CEEB, #E0F7FA)",
+                }}
+              >
+                <Avatar
+                  src={profileimg}
+                  alt="Profile"
+                  sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </Box>
 
-      {/* Cards Section */}
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 3,
-          justifyContent: "flex-start",
-          marginTop: 2,
-        }}
-      >
-        {userCard.map((card, index) => (
-          <Card
-            key={index}
-            sx={{
-              width: "270px",
-              height: "360px",
-              borderRadius: 1,
-              boxShadow: 3,
-              textAlign: "center",
-              cursor: "pointer",
-              position: "relative",
-              background: "black",
-              color: "#fff",
-            }}
-          >
-           <CardMedia
-  component="img"
-  height="230px"
-  image={card.profileImg ? card.profileImg : "/default-placeholder.png"}
-  alt="user-dp"
-  sx={{ borderRadius: "1%" }}
-  // onError={(e) => {
-  //   e.target.onerror = null;
-  //   e.target.src = "/default-placeholder.png"; // Fallback if image not found
-  // }}
-/>
-
-
-            <CardContent>
-              <Box display={"flex"} justifyContent={"center"}>
-                <Typography variant="h6" fontWeight="bold" sx={{ color: "#fff" }}>
-                  {card.firstName} {card.lastName}
+              {/* User Info */}
+              <CardContent sx={{ textAlign: "center", p: 0 }}>
+                <Typography fontWeight="bold">
+                  {user.first_name} {user.last_name}{" "}
+                  <Typography component="span" color="text.secondary">
+                    {user.age || calculateAge(user.date_of_birth)} yrs
+                  </Typography>
                 </Typography>
-              </Box>
-              <Typography fontWeight={550} sx={{ color: "#fff" }}>
-                {card.address || "N/A"}
-              </Typography>
 
-              <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
-                <Box>
-                  <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>
-                    {card.parentPrefer?.toAge || "N/A"}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "#fff" }}>
-                    Age
+                <Box display="flex" alignItems="center" justifyContent="center" mt={1} gap={0.5}>
+                  <FaBriefcase size={14} />
+                  <Typography variant="body2">
+                    {user.occupation || "Not specified"}
                   </Typography>
                 </Box>
-                <Box>
-                  <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>
-                    {card.parentPrefer?.toHeight || "N/A"}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "#fff" }}>
-                    Height
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="body1" fontWeight="bold" sx={{ color: "#fff" }}>
-                    {index + 1}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "#fff" }}>
-                    Reg No
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
-      </Box>
 
-      {/* Pagination Section */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", margin: 2 }}>
-        <Pagination
-          count={Math.ceil(totalItems / itemsPerPage)}
-          page={currentPage}
-          onChange={handlePageChange}
-          shape="rounded"
-          color="primary"
-          siblingCount={1}
-          boundaryCount={1}
+                <Box display="flex" alignItems="center" justifyContent="center" mt={0.5} gap={0.5}>
+                  <FaMapMarkerAlt size={14} />
+                  <Typography variant="body2">
+                    {[user.city, user.state, user.country].filter(Boolean).join(", ") || "Location not specified"}
+                  </Typography>
+                </Box>
+
+                <Divider sx={{ my: 1 }} />
+
+                {/* Additional Details */}
+                <Box display="flex" justifyContent="space-around">
+                  <DetailItem label="Height" value={user.height || "N/A"} />
+                  <DetailItem label="Religion" value={user.religion || "N/A"} />
+                  <DetailItem label="Caste" value={user.caste || "N/A"} />
+                </Box>
+
+                {/* Caste Preference */}
+                <Box mt={2}>
+                  <Chip
+                    label={`Caste Preference: ${userProfile.caste_preference || "N/A"}`}
+                    size="small"
+                    color="secondary"
+                    sx={{ fontSize: "0.75rem" }}
+                  />
+                </Box>
+                <Button
+                sx={{display:'flex',justifySelf:'flex-end',
+                  textTransform:'capitalize',padding:'5px 0 0 0',}}
+                  onClick={()=>handleOpenDialog(user)}
+                >View more</Button>
+              </CardContent>
+            </Card>
+          ))}
+      
+        </Box>
+      )}
+      
+
+      {userCard.length > 0 && (
+        <Box sx={{ display: "flex", justifyContent: "end", mt: 3 }}>
+          <Pagination
+            count={Math.ceil(totalItems / itemsPerPage)}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+            shape="rounded"
+          />
+        </Box>
+      )}
+
+{selectedUser && (
+        <ProfileDialog 
+          openDialog={openDialog}
+          setOpenDialog={setOpenDialog}
+          selectedUser={selectedUser}
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+          loggedInUserId={registerNo}
+          isLoading={false}
+          renderDialogContent={renderDialogContent}
         />
-      </Box>
+      )}
     </Box>
   );
 };
+
+const DetailItem = ({ label, value }) => (
+  <Box textAlign="center">
+    <Typography variant="caption" color="text.secondary">
+      {label}
+    </Typography>
+    <Typography variant="subtitle2" fontWeight="bold">
+      {value}
+    </Typography>
+  </Box>
+);
 
 export default MyMatches;
