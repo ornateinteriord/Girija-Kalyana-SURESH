@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -25,6 +25,7 @@ import EducationPop from "../viewAll/popupContent/educationPop/EducationPop";
 import LifeStylePop from "../viewAll/popupContent/lifeStylePop/LifeStylePop";
 import PreferencePop from "../viewAll/popupContent/preferencePop/PreferencePop";
 import ProfileDialog from "../ProfileDialog/ProfileDialog";
+import GenderFilter from "../../../utils/Filters/GenderFilter";
 
 const MyMatches = () => {
   const [userCard, setUserCard] = useState([]);
@@ -33,6 +34,7 @@ const MyMatches = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [openDialog, setOpenDialog] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
+  const [selectedStatus, setSelectedStatus] = useState("all");
 
   const itemsPerPage = 8;
   const registerNo = TokenService.getRegistrationNo();
@@ -50,6 +52,7 @@ const MyMatches = () => {
     error: usersError,
   } = useGetAllUsersProfiles();
 
+
   const handleOpenDialog = useCallback((user) => {
     setSelectedUser(user);
     setOpenDialog(true);
@@ -60,6 +63,9 @@ const MyMatches = () => {
       const filteredUsers = allUsers.filter((user) => {
         if (user.registration_no === registerNo) return false;
 
+        if (selectedStatus !== "all" && user.gender !== selectedStatus) {
+        return false;
+      }
         const {
           from_age_preference,
           to_age_preference,
@@ -79,16 +85,17 @@ const MyMatches = () => {
           from_height_preference &&
           to_height_preference &&
           user.height &&
-          parseInt(user.height.replace("cm", "")) >=
-            parseInt(from_height_preference.replace("cm", "")) &&
-          parseInt(user.height.replace("cm", "")) <=
-            parseInt(to_height_preference.replace("cm", ""));
+          parseInt(user.height?.replace("cm", "")) >=
+            parseInt(from_height_preference?.replace("cm", "")) &&
+          parseInt(user.height?.replace("cm", "")) <=
+            parseInt(to_height_preference?.replace("cm", ""));
+
 
         const isCasteMatch =
           !caste_preference ||
-          caste_preference.toLowerCase().includes("any") ||
+          caste_preference?.toLowerCase().includes("any") ||
           (user.caste &&
-            caste_preference.toLowerCase().includes(user.caste.toLowerCase()));
+            caste_preference?.toLowerCase().includes(user.caste.toLowerCase()));
 
         return isAgeMatch && isHeightMatch && isCasteMatch;
       });
@@ -104,7 +111,7 @@ const MyMatches = () => {
       setUserCard([]);
       setTotalItems(0);
     }
-  }, [allUsers, userProfile, currentPage, registerNo]);
+  }, [allUsers, userProfile, currentPage, registerNo, selectedStatus]);
 
   useEffect(() => {
     if (isProfileError) toast.error(profileError.message);
@@ -114,7 +121,10 @@ const MyMatches = () => {
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
   };
-
+  const handleStatusChange = (value) => {
+    setSelectedStatus(value);
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
   const calculateAge = (dob) => {
     if (!dob) return null;
     const birthDate = new Date(dob);
@@ -134,6 +144,7 @@ const MyMatches = () => {
       2: <EducationPop userDetails={selectedUser} />,
       3: <LifeStylePop userDetails={selectedUser} />,
       4: <PreferencePop userDetails={selectedUser} />,
+      4: <PreferencePop userDetails={selectedUser} />,
     };
 
     return contentMap[currentTab] || null;
@@ -141,9 +152,34 @@ const MyMatches = () => {
 
   return (
     <Box sx={{ p: { xs: 1, sm: 2 }, backgroundColor: "#f9f9f9" }}>
-      <Typography variant="h5" fontWeight="bold" mb={2}>
-        My Matches
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexDirection: { xs: "column", sm: "row" }, // Stack on mobile, row on desktop
+          gap: 2,
+          mb: 3,
+        }}
+      >
+        {/* Left-aligned heading */}
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          sx={{
+            alignSelf: { xs: "flex-start", sm: "center" },
+            fontSize: { xs: "1.5rem", sm: "1.75rem" },
+          }}
+        >
+          My Matches
+        </Typography>
+
+        {/* Right-aligned filter */}
+        <GenderFilter
+          selectedStatus={selectedStatus}
+          handleStatusChange={handleStatusChange}
+        />
+      </Box>
 
       {isProfileLoading || isUsersLoading ? (
         <LoadingComponent />
@@ -235,34 +271,34 @@ const MyMatches = () => {
                    <Typography component="span" color="text.secondary">
                       {user.age || calculateAge(user.date_of_birth)} yrs
                     </Typography>
+                </Box>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  mt={1}
+                  gap={0.5}
+                >
+                  <FaBriefcase size={14} />
+                  <Typography variant="body2">
+                    {user.occupation || "Not specified"}
+                  </Typography>
+                </Box>
 
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    mt={1}
-                    gap={0.5}
-                  >
-                    <FaBriefcase size={14} />
-                    <Typography variant="body2">
-                      {user.occupation || "Not specified"}
-                    </Typography>
-                  </Box>
-
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    mt={0.5}
-                    gap={0.5}
-                  >
-                    <FaMapMarkerAlt size={14} />
-                    <Typography variant="body2">
-                      {[user.city, user.state, user.country]
-                        .filter(Boolean)
-                        .join(", ") || "Location not specified"}
-                    </Typography>
-                  </Box>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  mt={0.5}
+                  gap={0.5}
+                >
+                  <FaMapMarkerAlt size={14} />
+                  <Typography variant="body2">
+                    {[user.city, user.state, user.country]
+                      .filter(Boolean)
+                      .join(", ") || "Location not specified"}
+                  </Typography>
+                </Box>
 
                   <Divider sx={{ my: 1 }} />
 
@@ -276,37 +312,28 @@ const MyMatches = () => {
                     <DetailItem label="Caste" value={user.caste || "N/A"} />
                   </Box>
 
-                  {/* Caste Preference */}
-                  <Box mt={2}>
-                    <Chip
-                      label={`Caste Preference: ${
-                        userProfile.caste_preference || "N/A"
-                      }`}
-                      size="small"
-                      color="secondary"
-                      sx={{ fontSize: "0.75rem" }}
-                    />
-                  </Box>
+                {/* Caste Preference */}
+                <Box mt={2}>
+                  <Chip
+                    label={`Caste Preference: ${
+                      userProfile.caste_preference || "N/A"
+                    }`}
+                    size="small"
+                    color="secondary"
+                    sx={{ fontSize: "0.75rem" }}
+                  />
                 </Box>
-
-                {/* Button container with margin-top auto to push it to bottom */}
-                <Box sx={{ mt: "auto", pt: 2 }}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    sx={{
-                      borderRadius: 2,
-                      py: 1,
-                      textTransform: "none",
-                      fontWeight: "bold",
-                      fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                    }}
-                    onClick={() => handleOpenDialog(user)}
-                  >
-                    View more
-                  </Button>
-                </Box>
+                <Button
+                  sx={{
+                    display: "flex",
+                    justifySelf: "flex-end",
+                    textTransform: "capitalize",
+                    padding: "5px 0 0 0",
+                  }}
+                  onClick={() => handleOpenDialog(user)}
+                >
+                  View more
+                </Button>
               </CardContent>
             </Card>
           ))}
