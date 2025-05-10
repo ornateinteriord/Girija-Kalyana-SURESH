@@ -85,20 +85,17 @@ const MyMatches = () => {
           from_height_preference &&
           to_height_preference &&
           user.height &&
-          parseInt(user.height.replace("cm", "")) >=
-            parseInt(from_height_preference.replace("cm", "")) &&
-          parseInt(user.height.replace("cm", "")) <=
-            parseInt(to_height_preference.replace("cm", ""));
-          parseInt(user.height.replace("cm", "")) >=
-            parseInt(from_height_preference.replace("cm", "")) &&
-          parseInt(user.height.replace("cm", "")) <=
-            parseInt(to_height_preference.replace("cm", ""));
+          parseInt(user.height?.replace("cm", "")) >=
+            parseInt(from_height_preference?.replace("cm", "")) &&
+          parseInt(user.height?.replace("cm", "")) <=
+            parseInt(to_height_preference?.replace("cm", ""));
+
 
         const isCasteMatch =
           !caste_preference ||
-          caste_preference.toLowerCase().includes("any") ||
+          caste_preference?.toLowerCase().includes("any") ||
           (user.caste &&
-            caste_preference.toLowerCase().includes(user.caste.toLowerCase()));
+            caste_preference?.toLowerCase().includes(user.caste.toLowerCase()));
 
         return isAgeMatch && isHeightMatch && isCasteMatch;
       });
