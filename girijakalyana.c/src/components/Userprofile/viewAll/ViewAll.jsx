@@ -22,6 +22,7 @@ import TokenService from "../../token/tokenService";
 import { useSnackbar } from "notistack";
 import { LoadingComponent } from "../../../App";
 import ProfileDialog from "../ProfileDialog/ProfileDialog";
+import GenderFilter from "../../../utils/Filters/GenderFilter";
 
 // Constants
 const itemsPerPage = 8;
@@ -35,16 +36,35 @@ const ViewAll = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedStatus, setSelectedStatus] = useState("all");
   
   // Hooks for data fetching
   const { data: users = [], isLoading } = useGetAllUsersProfiles();
   const loggedInUserId = TokenService.getRegistrationNo();
 
-  // Filter out current user and admins
-  const filteredUsers = useMemo(
-    () => users.filter(user => user.registration_no !== loggedInUserId && user.user_role !== "Admin"),
-    [users, loggedInUserId]
-  );
+  
+ // Handle status change and reset to first page
+  const handleStatusChange = useCallback((value) => {
+    setSelectedStatus(value);
+    setCurrentPage(1); // Reset to first page when filter changes
+  }, []);
+
+  // Filter out current user, admins, and apply gender filter
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      // Skip current user and admins
+      if (user.registration_no === loggedInUserId || user.user_role === "Admin") {
+        return false;
+      }
+      
+      // Apply gender filter if not "all"
+      if (selectedStatus !== "all" && user.gender !== selectedStatus) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [users, loggedInUserId, selectedStatus]);
 
   // Paginated users
   const paginatedUsers = useMemo(
@@ -226,9 +246,34 @@ const ViewAll = () => {
       maxWidth: '100%',
       overflowX: 'hidden'
     }}>
-      <Typography variant="h4" fontWeight="bold" color="#34495e" mb={3}>
-        Profiles
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexDirection: { xs: "column", sm: "row" }, // Stack on mobile, row on desktop
+          gap: 2,
+          mb: 3,
+        }}
+      >
+        {/* Left-aligned heading */}
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          sx={{
+            alignSelf: { xs: "flex-start", sm: "center" },
+            fontSize: { xs: "1.5rem", sm: "1.75rem" },
+          }}
+        >
+          Profiles
+        </Typography>
+
+        {/* Right-aligned filter */}
+        <GenderFilter
+          selectedStatus={selectedStatus}
+          handleStatusChange={handleStatusChange}
+        />
+      </Box>
       
       {/* User cards grid */}
       <Box sx={{
