@@ -16,6 +16,7 @@ const AboutPop = ({ userDetails }) => {
   if (!userDetails || Object.keys(userDetails).length === 0) {
     return <Typography>No user details available.</Typography>;
   }
+  console.log(userDetails)
   
   return (
     <Box sx={{ padding: 2, backgroundColor: "#f5f5f5", borderRadius: 2 }}>
