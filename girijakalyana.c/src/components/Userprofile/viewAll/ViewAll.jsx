@@ -8,7 +8,7 @@ import {
   Pagination,
   Chip,
   Avatar,
-  Divider
+  Divider,
 } from "@mui/material";
 import { FaUser, FaMapMarkerAlt, FaBriefcase } from "react-icons/fa";
 import profileimg from "../../../assets/profile.jpg";
@@ -17,7 +17,10 @@ import EducationPop from "./popupContent/educationPop/EducationPop";
 import FamilyPop from "./popupContent/familyPop/FamilyPop";
 import LifeStylePop from "./popupContent/lifeStylePop/LifeStylePop";
 import PreferencePop from "./popupContent/preferencePop/PreferencePop";
-import { useExpressInterest, useGetAllUsersProfiles } from "../../api/User/useGetProfileDetails";
+import {
+  useExpressInterest,
+  useGetAllUsersProfiles,
+} from "../../api/User/useGetProfileDetails";
 import TokenService from "../../token/tokenService";
 import { useSnackbar } from "notistack";
 import { LoadingComponent } from "../../../App";
@@ -68,7 +71,11 @@ const ViewAll = () => {
 
   // Paginated users
   const paginatedUsers = useMemo(
-    () => filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage),
+    () =>
+      filteredUsers.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+      ),
     [filteredUsers, currentPage]
   );
 
@@ -85,7 +92,7 @@ const ViewAll = () => {
       1: <FamilyPop userDetails={selectedUser} />,
       2: <EducationPop userDetails={selectedUser} />,
       3: <LifeStylePop userDetails={selectedUser} />,
-      4: <PreferencePop userDetails={selectedUser} />
+      4: <PreferencePop userDetails={selectedUser} />,
     };
 
     return contentMap[currentTab] || null;
@@ -105,135 +112,160 @@ const ViewAll = () => {
     const age = user.age || calculateAge(user.date_of_birth);
 
     return (
-      <Card key={user._id} sx={{ 
-        width: { xs: 300, sm: 280, md: 260, lg: 280 },
-        height: { xs: 380, sm: 400, md: 420, lg: 400 },
-        borderRadius: 4, 
-        boxShadow: 3, 
-        overflow: "hidden", 
-        transition: "transform 0.2s", 
-        '&:hover': { 
-          transform: "translateY(-4px)",
-          boxShadow: 6
-        },
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        pt: 2,
-        position: 'relative',
-        mx: 'auto'
-      }}>
+      <Card
+        key={user._id}
+        sx={{
+          width: { xs: 300, sm: 280, md: 260, lg: 280 },
+          height:"auto", // Fixed height
+          borderRadius: 4,
+          boxShadow: 3,
+          overflow: "hidden",
+          transition: "transform 0.2s",
+          "&:hover": {
+            transform: "translateY(-4px)",
+            boxShadow: 6,
+          },
+          display: "flex",
+          flexDirection: "column",
+          position: "relative",
+          mx: "auto",
+        }}
+      >
         {/* Premium badge */}
         {user.user_role === "PremiumUser" && (
-          <Chip 
-            label="PREMIUM" 
-            color="primary" 
-            size="small" 
-            sx={{ 
-              position: "absolute", 
-              top: 12, 
-              right: 12,
-              fontWeight: 'bold',
-              fontSize: { xs: '0.6rem', sm: '0.7rem' }
-            }} 
-          />
-        )}
-        
-        {/* Round profile image with skyblue border */}
-        <Box sx={{
-          width: { xs: 100, sm: 120, md: 110, lg: 120 },
-          height: { xs: 100, sm: 120, md: 110, lg: 120 },
-          borderRadius: '50%',
-          border: '3px solid #87CEEB',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-          mb: 2,
-          position: 'relative',
-          zIndex: 1,
-          padding: '2px',
-          background: 'linear-gradient(45deg, #87CEEB, #E0F7FA)'
-        }}>
-          <Avatar
-            src={profileimg}
-            alt="Profile"
+          <Chip
+            label="PREMIUM"
+            color="primary"
+            size="small"
             sx={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover'
+              position: "absolute",
+              top: 12,
+              right: 12,
+              fontWeight: "bold",
+              fontSize: { xs: "0.6rem", sm: "0.7rem" },
             }}
           />
+        )}
+
+        {/* Profile image container */}
+        <Box
+          sx={{
+            pt: 2,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              width: { xs: 100, sm: 120, md: 110, lg: 120 },
+              height: { xs: 100, sm: 120, md: 110, lg: 120 },
+              borderRadius: "50%",
+              border: "3px solid #87CEEB",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+              mb: 2,
+              position: "relative",
+              zIndex: 1,
+              padding: "2px",
+              background: "linear-gradient(45deg, #87CEEB, #E0F7FA)",
+            }}
+          >
+            <Avatar
+              src={profileimg}
+              alt="Profile"
+              sx={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+          </Box>
         </Box>
-        
-        <CardContent sx={{
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          textAlign: 'center',
-          pt: 0,
-          px: { xs: 1, sm: 2 }
-        }}>
+
+        {/* Card content with flex-grow to push button to bottom */}
+        <CardContent
+          sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            flexGrow: 1, // This makes the content take available space
+            px: { xs: 1, sm: 2 },
+            pt: 0,
+            pb: 2,
+          }}
+        >
           {/* Name and age */}
-          <Typography fontWeight="bold" sx={{ 
-            mb: 0.5,
-            fontSize: { xs: '16px', sm: '17px', md: '16px', lg: '17px' }
-          }}>
-            {user.first_name} {user.last_name}
-            <Typography component="span" color="text.secondary" sx={{ ml: 1 }}>
-              {age || "N/A"} yrs
+          <Box sx={{ textAlign: "center", mb: 0.5 }}>
+            <Typography
+              fontWeight="bold"
+              sx={{
+                fontSize: { xs: "16px", sm: "17px", md: "16px", lg: "17px" },
+              }}
+            >
+              {user.first_name} {user.last_name}
             </Typography>
-          </Typography>
-          
+            <Typography color="text.secondary">{age || "N/A"} yrs</Typography>
+          </Box>
+
           {/* Occupation */}
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            mb: 0.5,
-            fontSize: { xs: '0.8rem', sm: '0.9rem' }
-          }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 0.5,
+              fontSize: { xs: "0.8rem", sm: "0.9rem" },
+            }}
+          >
             <FaBriefcase size={14} color="#777" style={{ marginRight: 6 }} />
             <Typography variant="body2" color="text.secondary">
               {user.occupation || "Not specified"}
             </Typography>
           </Box>
-          
+
           {/* Location */}
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            mb: 1,
-            fontSize: { xs: '0.8rem', sm: '0.9rem' }
-          }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 1,
+              fontSize: { xs: "0.8rem", sm: "0.9rem" },
+            }}
+          >
             <FaMapMarkerAlt size={14} color="#777" style={{ marginRight: 6 }} />
             <Typography variant="body2">
-              {[user.city, user.state, user.country].filter(Boolean).join(", ") || "Location not specified"}
+              {[user.city, user.state, user.country]
+                .filter(Boolean)
+                .join(", ") || "Location not specified"}
             </Typography>
           </Box>
-          
-          <Divider sx={{ width: '80%', my: 0.5 }} />
-          
+
+          <Divider sx={{ width: "80%", my: 0.5 }} />
+
           {/* Details row */}
           <Box display="flex" justifyContent="space-around" width="100%" my={2}>
             <ProfileInfo label="Height" value={user.height || "N/A"} />
             <ProfileInfo label="Religion" value={user.religion || "N/A"} />
             <ProfileInfo label="Caste" value={user.caste || "N/A"} />
           </Box>
-          
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            onClick={() => handleOpenDialog(user)}
-            sx={{
-              mt: 'auto',
-              borderRadius: 2,
-              py: 1,
-              textTransform: 'none',
-              fontWeight: 'bold',
-              fontSize: { xs: '0.8rem', sm: '0.9rem' }
-            }}
-          >
-            View More
-          </Button>
+
+          {/* Button container with margin-top auto */}
+          <Box sx={{ mt: "auto", width: "100%" }}>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              onClick={() => handleOpenDialog(user)}
+              sx={{
+                borderRadius: 2,
+                py: 1,
+                textTransform: "none",
+                fontWeight: "bold",
+                fontSize: { xs: "0.8rem", sm: "0.9rem" },
+              }}
+            >
+              View More
+            </Button>
+          </Box>
         </CardContent>
       </Card>
     );
@@ -276,23 +308,25 @@ const ViewAll = () => {
       </Box>
       
       {/* User cards grid */}
-      <Box sx={{
-        display: "grid",
-        gridTemplateColumns: {
-          xs: "1fr",
-          sm: "repeat(2, 1fr)",
-          md: "repeat(3, 1fr)",
-          lg: "repeat(4, 1fr)"
-        },
-        gap: { xs: 2, sm: 3 },
-        justifyContent: 'center'
-      }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "repeat(2, 1fr)",
+            md: "repeat(3, 1fr)",
+            lg: "repeat(4, 1fr)",
+          },
+          gap: { xs: 2, sm: 3 },
+          justifyContent: "center",
+        }}
+      >
         {paginatedUsers.map(renderUserCard)}
       </Box>
 
       {/* Profile Dialog */}
       {selectedUser && (
-        <ProfileDialog 
+        <ProfileDialog
           openDialog={openDialog}
           setOpenDialog={setOpenDialog}
           selectedUser={selectedUser}
@@ -306,20 +340,20 @@ const ViewAll = () => {
 
       {/* Pagination */}
       {filteredUsers.length > itemsPerPage && (
-        <Box display="flex" justifyContent={'end'} my={3}>
-          <Pagination 
-            count={Math.ceil(filteredUsers.length / itemsPerPage)} 
-            page={currentPage} 
-            onChange={(e, page) => setCurrentPage(page)} 
-            color="primary" 
+        <Box display="flex" justifyContent={"end"} my={3}>
+          <Pagination
+            count={Math.ceil(filteredUsers.length / itemsPerPage)}
+            page={currentPage}
+            onChange={(e, page) => setCurrentPage(page)}
+            color="primary"
             shape="rounded"
             size={window.innerWidth < 600 ? "small" : "medium"}
           />
         </Box>
       )}
-      
+
       {/* Loading state */}
-      {isLoading && <LoadingComponent/>}
+      {isLoading && <LoadingComponent />}
     </Box>
   );
 };
@@ -329,14 +363,22 @@ const ViewAll = () => {
  */
 const ProfileInfo = ({ label, value }) => (
   <Box textAlign="center" sx={{ px: 1 }}>
-    <Typography variant="caption" color="text.secondary" display="flex" 
-      alignItems="center" justifyContent="center"
-      sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}
+    <Typography
+      variant="caption"
+      color="text.secondary"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      sx={{ fontSize: { xs: "0.7rem", sm: "0.8rem" } }}
     >
       {label}
     </Typography>
-    <Typography variant="subtitle2" fontWeight="bold" 
-      sx={{ fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.8rem', lg: '0.85rem' } }}
+    <Typography
+      variant="subtitle2"
+      fontWeight="bold"
+      sx={{
+        fontSize: { xs: "0.75rem", sm: "0.85rem", md: "0.8rem", lg: "0.85rem" },
+      }}
     >
       {value}
     </Typography>

@@ -18,7 +18,6 @@ import {
   useGetMemberDetails,
 } from "../../api/User/useGetProfileDetails";
 import { LoadingComponent } from "../../../App";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import AboutPop from "../viewAll/popupContent/abouPop/AboutPop";
 import FamilyPop from "../viewAll/popupContent/familyPop/FamilyPop";
@@ -57,6 +56,10 @@ const MyMatches = () => {
     setSelectedUser(user);
     setOpenDialog(true);
   }, []);
+  const handleOpenDialog = useCallback((user) => {
+    setSelectedUser(user);
+    setOpenDialog(true);
+  }, []);
 
   useEffect(() => {
     if (allUsers.length > 0 && userProfile) {
@@ -89,6 +92,10 @@ const MyMatches = () => {
             parseInt(from_height_preference.replace("cm", "")) &&
           parseInt(user.height.replace("cm", "")) <=
             parseInt(to_height_preference.replace("cm", ""));
+          parseInt(user.height.replace("cm", "")) >=
+            parseInt(from_height_preference.replace("cm", "")) &&
+          parseInt(user.height.replace("cm", "")) <=
+            parseInt(to_height_preference.replace("cm", ""));
 
         const isCasteMatch =
           !caste_preference ||
@@ -101,6 +108,10 @@ const MyMatches = () => {
 
       setTotalItems(filteredUsers.length);
       const startIndex = (currentPage - 1) * itemsPerPage;
+      const paginatedUsers = filteredUsers.slice(
+        startIndex,
+        startIndex + itemsPerPage
+      );
       const paginatedUsers = filteredUsers.slice(
         startIndex,
         startIndex + itemsPerPage
@@ -142,6 +153,7 @@ const MyMatches = () => {
       1: <FamilyPop userDetails={selectedUser} />,
       2: <EducationPop userDetails={selectedUser} />,
       3: <LifeStylePop userDetails={selectedUser} />,
+      4: <PreferencePop userDetails={selectedUser} />,
       4: <PreferencePop userDetails={selectedUser} />,
     };
 
@@ -211,8 +223,10 @@ const MyMatches = () => {
                 overflow: "hidden",
                 transition: "transform 0.3s",
                 "&:hover": { transform: "translateY(-5px)" },
+                display: "flex", // Add flex display
+                flexDirection: "column", // Stack children vertically
+                height: "100%", // Take full height available
               }}
-              // onClick={() => navigate(`/profile/${user.registration_no}`)}
             >
               {/* Premium badge */}
               {user.user_role === "PremiumUser" && (
@@ -220,6 +234,12 @@ const MyMatches = () => {
                   label="PREMIUM"
                   color="primary"
                   size="small"
+                  sx={{
+                    position: "absolute",
+                    top: 12,
+                    right: 12,
+                    fontWeight: "bold",
+                  }}
                   sx={{
                     position: "absolute",
                     top: 12,
@@ -250,13 +270,23 @@ const MyMatches = () => {
               </Box>
 
               {/* User Info */}
-              <CardContent sx={{ textAlign: "center", p: 0 }}>
-                <Typography fontWeight="bold">
-                  {user.first_name} {user.last_name}{" "}
-                  <Typography component="span" color="text.secondary">
-                    {user.age || calculateAge(user.date_of_birth)} yrs
+              <CardContent
+                sx={{
+                  textAlign: "center",
+                  p: 0,
+                  flexGrow: 1, // Allow this section to grow and take available space
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <Box>
+                  <Typography fontWeight="bold">
+                    {user.first_name} {user.last_name}{" "}
+                   
                   </Typography>
-                </Typography>
+                   <Typography component="span" color="text.secondary">
+                      {user.age || calculateAge(user.date_of_birth)} yrs
+                    </Typography>
 
                 <Box
                   display="flex"
@@ -286,14 +316,17 @@ const MyMatches = () => {
                   </Typography>
                 </Box>
 
-                <Divider sx={{ my: 1 }} />
+                  <Divider sx={{ my: 1 }} />
 
-                {/* Additional Details */}
-                <Box display="flex" justifyContent="space-around">
-                  <DetailItem label="Height" value={user.height || "N/A"} />
-                  <DetailItem label="Religion" value={user.religion || "N/A"} />
-                  <DetailItem label="Caste" value={user.caste || "N/A"} />
-                </Box>
+                  {/* Additional Details */}
+                  <Box display="flex" justifyContent="space-around">
+                    <DetailItem label="Height" value={user.height || "N/A"} />
+                    <DetailItem
+                      label="Religion"
+                      value={user.religion || "N/A"}
+                    />
+                    <DetailItem label="Caste" value={user.caste || "N/A"} />
+                  </Box>
 
                 {/* Caste Preference */}
                 <Box mt={2}>
@@ -335,6 +368,8 @@ const MyMatches = () => {
         </Box>
       )}
 
+      {selectedUser && (
+        <ProfileDialog
       {selectedUser && (
         <ProfileDialog
           openDialog={openDialog}
