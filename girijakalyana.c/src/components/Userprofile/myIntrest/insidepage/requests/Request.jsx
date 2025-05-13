@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from "react"; 
-import {
-  Box,
-  Typography,
-  Pagination,
-} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, Typography, Pagination } from "@mui/material";
 import {
   useGetReceivedInterests,
-  useUpdateInterestStatus
+  useUpdateInterestStatus,
 } from "../../../../api/User/useGetProfileDetails";
 import TokenService from "../../../../token/tokenService";
 import toast from "react-hot-toast";
@@ -18,29 +14,29 @@ const Requests = () => {
   const itemsPerPage = 4;
 
   const recipientRegistrationNo = TokenService.getRegistrationNo();
+
   const {
     data: receivedInterests = [],
     isLoading,
     isError,
     error,
-    refetch
+    refetch,
   } = useGetReceivedInterests(recipientRegistrationNo);
+
+  const { mutate: updateInterest } = useUpdateInterestStatus();
 
   useEffect(() => {
     if (isError) {
-      toast.error(error.message);
+      toast.error(error?.message || "Something went wrong while fetching requests");
     }
   }, [isError, error]);
-
-
-  const { mutate: updateInterest } = useUpdateInterestStatus();
 
   const handleInterestResponse = (senderRefNo, recipientRefNo, isAccepted) => {
     updateInterest(
       {
         senderRegistrationNo: senderRefNo,
         recipientRegistrationNo,
-        status: isAccepted ? "accepted" : "rejected"
+        status: isAccepted ? "accepted" : "rejected",
       },
       {
         onSuccess: () => {
@@ -48,16 +44,31 @@ const Requests = () => {
           refetch();
         },
         onError: (error) => {
-          toast.error(error.response?.data?.message || "Failed to update request");
-        }
+          toast.error(error?.response?.data?.message || "Failed to update request");
+        },
       }
     );
   };
 
-  const indexOfLast = currentPage * itemsPerPage;
-  const indexOfFirst = indexOfLast - itemsPerPage;
-  const currentUsers = receivedInterests.slice(indexOfFirst, indexOfLast);
-  const pageCount = Math.ceil(receivedInterests.length / itemsPerPage);
+  // Calculate pagination values
+  const totalItems = receivedInterests?.length || 0;
+  const pageCount = Math.ceil(totalItems / itemsPerPage);
+  
+  // Ensure current page stays within valid range
+  const validCurrentPage = Math.min(currentPage, Math.max(pageCount, 1));
+  
+  const currentUsers = receivedInterests?.slice(
+    (validCurrentPage - 1) * itemsPerPage,
+    validCurrentPage * itemsPerPage
+  );
+ 
+
+  // Reset to page 1 if data changes and current page becomes invalid
+  useEffect(() => {
+    if (currentPage > pageCount && pageCount > 0) {
+      setCurrentPage(1);
+    }
+  }, [pageCount, currentPage]);
 
   return (
     <Box sx={{ padding: 3 }}>
@@ -66,16 +77,16 @@ const Requests = () => {
           display: "flex",
           flexWrap: "wrap",
           gap: 3,
-          justifyContent: currentUsers.length > 0 ? "flex-start" : "center",
-          marginTop: 1
+          justifyContent: currentUsers?.length > 0 ? "flex-start" : "center",
+          marginTop: 1,
         }}
       >
         {isLoading ? (
           <LoadingComponent />
-        ) : currentUsers.length === 0 ? (
+        ) : currentUsers?.length === 0 ? (
           <Typography variant="h6">No pending requests found</Typography>
         ) : (
-          currentUsers.map((user) => (
+          currentUsers?.map((user) => (
             <InterestCard
               key={user._id}
               senderRefNo={user.senderRegistrationNo}
@@ -86,12 +97,14 @@ const Requests = () => {
         )}
       </Box>
 
-      {pageCount > 1 && (
-        <Box sx={{ display: "flex", justifyContent: "center", marginTop: 4 }}>
+      {pageCount >=1 && totalItems > 0 && (
+        <Box sx={{ display: "flex", justifyContent: "end", marginTop: 4 }}>
           <Pagination
             count={pageCount}
-            page={currentPage}
-            onChange={(_, page) => setCurrentPage(page)}
+            page={validCurrentPage}
+            onChange={(_, page) => {
+              setCurrentPage(page);
+            }}
             shape="rounded"
             color="primary"
           />

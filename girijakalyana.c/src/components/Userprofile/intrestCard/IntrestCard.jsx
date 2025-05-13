@@ -2,95 +2,175 @@ import React, { useEffect } from "react";
 import {
   Card,
   CardContent,
-  CardMedia,
+  Avatar,
   Typography,
   Button,
   Box,
-  
+  Divider,
+  Chip,
 } from "@mui/material";
+import { FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
 import { useGetMemberDetails } from "../../api/User/useGetProfileDetails";
 import profileimg from "../../../assets/profile.jpg";
 import { LoadingComponent } from "../../../App";
 import { toast } from "react-toastify";
+
+
+  const ProfileInfo = ({ label, value }) => (
+    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <Typography variant="body2" color="text.secondary" sx={{ fontWeight: "bold" }}>
+        {label}
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        {value}
+      </Typography>
+    </Box>
+  );
 
 const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
   const {
     data: senderDetails,
     isLoading,
     isError,
-    error
+    error,
   } = useGetMemberDetails(senderRefNo);
 
-   useEffect(() => {
-     if (isError) {
-       toast.error(error.message);
-     }
-   }, [isError, error]);
+  useEffect(() => {
+    if (isError) {
+      toast.error(error.message || "Failed to load profile");
+    }
+  }, [isError, error]);
+
+  if (isLoading) return <LoadingComponent />;
+
+  const profile = senderDetails;
 
   return (
     <Card
       sx={{
-        width: 270,
-        borderRadius: 1,
+        width: { xs: 300, sm: 280, md: 260, lg: 280 },
+        borderRadius: 4,
         boxShadow: 3,
-        textAlign: "center",
+        overflow: "hidden",
+        transition: "transform 0.2s",
+        "&:hover": {
+          transform: "translateY(-4px)",
+          boxShadow: 6,
+        },
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        pt: 1,
         position: "relative",
-        background: "#fff", // white background
-        color: "#000", // black text
       }}
     >
-      <CardMedia
-        component="img"
-        height="200px"
-        image={profileimg}
-        alt="user-dp"
-        sx={{ borderRadius: "12px", padding: "50px 50px 0" }}
-      />
-      <Card
-      ontent>
-        {/* <Box display={"flex"} justifyContent={"space-between"}> */}
-          <Typography fontSize={18} fontWeight="bold" textAlign={'start'}>
-            {senderDetails?.first_name} {senderDetails?.last_name}
-          </Typography>
-          <Typography fontWeight={550}  textAlign={'start'}>
-            {senderDetails?.address || "N/A"}
-          </Typography>
-        {/* </Box> */}
+      {profile?.user_role === "PremiumUser" && (
+        <Chip
+          label="PREMIUM"
+          color="primary"
+          size="small"
+          sx={{
+            position: "absolute",
+            top: 12,
+            right: 12,
+            fontWeight: "bold",
+            fontSize: { xs: "0.6rem", sm: "0.7rem" },
+          }}
+        />
+      )}
+
+      <Box
+        sx={{
+          width: { xs: 100, sm: 120, md: 110, lg: 120 },
+          height: { xs: 100, sm: 120, md: 110, lg: 120 },
+          borderRadius: "50%",
+          border: "3px solid #87CEEB",
+          boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+          mb: 1,
+          position: "relative",
+          zIndex: 1,
+          padding: "2px",
+          background: "linear-gradient(45deg, #87CEEB, #E0F7FA)",
+        }}
+      >
+        <Avatar
+          src={profile?.profile_photo || profileimg}
+          alt={profile?.first_name}
+          sx={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
+      </Box>
+
+      <CardContent
+        sx={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+          pt: 0,
+          px: { xs: 1, sm: 2 },
+        }}
+      >
+        <Typography fontWeight="bold" sx={{ mb: 0.5 }}>
+          {profile?.first_name} {profile?.last_name}
+        </Typography>
+        <Typography component="span" color="text.secondary" sx={{ ml: 1 }}>
+          {profile?.age || "N/A"} yrs
+        </Typography>
+
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
-            marginTop: 0,
+            alignItems: "center",
+            mb: 0.5,
+            fontSize: { xs: "0.8rem", sm: "0.9rem" },
           }}
         >
-          <Box display={"flex"} flexDirection={"column"}>
-            <Typography variant="body1" fontWeight="bold">
-              {senderDetails?.age || "N/A"}
-            </Typography>
-            <Typography variant="caption">Age</Typography>
-          </Box>
-          <Box display={"flex"} flexDirection={"column"}>
-            <Typography variant="body1" fontWeight="bold">
-              {senderDetails?.height || "N/A"}
-            </Typography>
-            <Typography variant="caption">Height</Typography>
-          </Box>
-          <Box display={"flex"} flexDirection={"column"}>
-            <Typography variant="body1" fontWeight="bold">
-              {senderDetails?.registration_no}
-            </Typography>
-            <Typography variant="caption">RegNo</Typography>
-          </Box>
+          <FaBriefcase size={14} color="#777" style={{ marginRight: 6 }} />
+          <Typography variant="body2" color="text.secondary">
+            {profile?.occupation || "Not specified"}
+          </Typography>
         </Box>
-        <Box display={"flex"} gap={1} mt={2}>
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            mb: 1,
+            fontSize: { xs: "0.8rem", sm: "0.9rem" },
+          }}
+        >
+          <FaMapMarkerAlt size={14} color="#777" style={{ marginRight: 6 }} />
+          <Typography variant="body2">
+            {[profile?.city, profile?.state, profile?.country]
+              .filter(Boolean)
+              .join(", ") || "Location not specified"}
+          </Typography>
+        </Box>
+
+        <Divider sx={{ width: "80%", my: 1 }} />
+
+        <Box display="flex" justifyContent="space-around" width="100%" my={2}>
+          <ProfileInfo label="Height" value={profile?.height || "N/A"} />
+          <ProfileInfo label="Religion" value={profile?.religion || "N/A"} />
+          <ProfileInfo label="Caste" value={profile?.caste || "N/A"} />
+        </Box>
+
+        <Box display="flex" gap={1} mt={2} width="100%">
           <Button
             fullWidth
             variant="outlined"
+             
             sx={{
               background: "#fff",
               color: "red",
               fontWeight: "bold",
               borderColor: "red",
+              textTransform:"capitalize"
             }}
             onClick={() => handleResponse(senderRefNo, recipientRefNo, false)}
           >
@@ -99,23 +179,21 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
           <Button
             fullWidth
             variant="contained"
+            color="primary"
             sx={{
-              background: "#000",
               color: "#fff",
-              fontWeight: "bold",
-              "&:hover": {
-                background: "#333",
-              },
+             textTransform:"capitalize"
             }}
             onClick={() => handleResponse(senderRefNo, recipientRefNo, true)}
           >
             Accept
           </Button>
         </Box>
-      </Card>
-      {isLoading && <LoadingComponent/>}
+        
+      </CardContent>
     </Card>
   );
+
 };
 
 export default InterestCard;

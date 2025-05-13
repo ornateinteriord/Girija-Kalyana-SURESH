@@ -66,3 +66,39 @@ export const useLoginMutation = () => {
     },
   });
 };
+
+
+export const useResetpassword = () => {
+  return useMutation({
+    mutationFn: async (data) => {
+      return await post("/api/auth/reset-password", data);
+    },
+    onSuccess: (response) => {
+      if (response.success) {
+        toast.success(response.message);
+      } else {
+        console.error(response.message);
+      }
+    },
+    onError: (error) => {
+      toast.error(error.response.data.message);
+    }
+  });
+};
+export const useRecoverpassword = () =>{
+  return useMutation({
+    mutationFn:async()=>{
+      return await post("/auth/recover-password",data);
+    },
+    onSuccess:(response)=>{
+      if(response.success){
+        toast.success(response.message);
+      }else{
+        console.error(response.message)
+      }
+    },
+    onError:()=>{
+      toast.error(error.response.data.message)
+    }
+  })
+}
