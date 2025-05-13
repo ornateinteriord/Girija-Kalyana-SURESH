@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Stack,
@@ -9,15 +9,53 @@ import {
   TableRow,
   Paper,
   Typography,
+  Button,
 } from "@mui/material";
+import MembershipDialog from "../../../MembershipDailog/MembershipDailog";
+import {membershipOptions} from '../../../MembershipDailog/MemberShipPlans'
+
+
+const PremiumButton = ({ onClick }) => (
+  <Button
+    onClick={onClick}
+    variant="contained"
+    size="small"
+    sx={{
+      textTransform: "none",
+      background: "linear-gradient(45deg, #FFD700 0%, #D4AF37 100%)",
+      color: "#000",
+      fontWeight: "bold",
+      "&:hover": {
+        background: "linear-gradient(45deg, #D4AF37 0%, #FFD700 100%)",
+      },
+    }}
+  >
+    Upgrade
+  </Button>
+);
 
 const AboutPop = ({ userDetails }) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+
+  const handleUpgrade = () => {
+    setSelectedPlan(membershipOptions[1]); 
+    setDialogOpen(true);
+  };
   
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
+  const handleConfirmPayment = () => {
+    setDialogOpen(false);
+  };
+
   if (!userDetails || Object.keys(userDetails).length === 0) {
     return <Typography>No user details available.</Typography>;
   }
-  console.log(userDetails)
-  
+
   return (
     <Box sx={{ padding: 2, backgroundColor: "#f5f5f5", borderRadius: 2 }}>
       <Stack spacing={2}>
@@ -28,15 +66,21 @@ const AboutPop = ({ userDetails }) => {
           <Table>
             <TableBody>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold",width:'150px' }}>Full Name</TableCell>
-                <TableCell>{`${userDetails?.first_name || "N/A"} ${userDetails?.last_name || ""}`}</TableCell>
+                <TableCell sx={{ fontWeight: "bold", width: "150px" }}>
+                  Full Name
+                </TableCell>
+                <TableCell>{`${userDetails?.first_name || "N/A"} ${
+                  userDetails?.last_name || ""
+                }`}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Date of Birth</TableCell>
                 <TableCell>{userDetails?.date_of_birth || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold" }}>Marital Status</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>
+                  Marital Status
+                </TableCell>
                 <TableCell>{userDetails?.marital_status || "N/A"}</TableCell>
               </TableRow>
               <TableRow>
@@ -49,16 +93,27 @@ const AboutPop = ({ userDetails }) => {
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Contact No</TableCell>
-                <TableCell>{userDetails?.mobile_no || "N/A"}</TableCell>
+                <TableCell>
+                  {userDetails?.mobile_no || <PremiumButton onClick={handleUpgrade} />}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
-                <TableCell>{userDetails?.email_id || "N/A"}</TableCell>
+                <TableCell>
+                  {userDetails?.email_id || <PremiumButton onClick={handleUpgrade} />}
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
         </TableContainer>
       </Stack>
+
+      <MembershipDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        selectedPlan={selectedPlan}
+        onConfirm={handleConfirmPayment}
+      />
     </Box>
   );
 };

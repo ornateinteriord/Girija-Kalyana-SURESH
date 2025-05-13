@@ -52,7 +52,6 @@ const MyMatches = () => {
     error: usersError,
   } = useGetAllUsersProfiles();
 
-
   const handleOpenDialog = useCallback((user) => {
     setSelectedUser(user);
     setOpenDialog(true);
@@ -64,8 +63,8 @@ const MyMatches = () => {
         if (user.registration_no === registerNo) return false;
 
         if (selectedStatus !== "all" && user.gender !== selectedStatus) {
-        return false;
-      }
+          return false;
+        }
         const {
           from_age_preference,
           to_age_preference,
@@ -89,7 +88,6 @@ const MyMatches = () => {
             parseInt(from_height_preference?.replace("cm", "")) &&
           parseInt(user.height?.replace("cm", "")) <=
             parseInt(to_height_preference?.replace("cm", ""));
-
 
         const isCasteMatch =
           !caste_preference ||
@@ -266,11 +264,10 @@ const MyMatches = () => {
                 <Box>
                   <Typography fontWeight="bold">
                     {user.first_name} {user.last_name}{" "}
-                   
                   </Typography>
-                   <Typography component="span" color="text.secondary">
-                      {user.age || calculateAge(user.date_of_birth)} yrs
-                    </Typography>
+                  <Typography component="span" color="text.secondary">
+                    {user.age || calculateAge(user.date_of_birth)} yrs
+                  </Typography>
                 </Box>
                 <Box
                   display="flex"
@@ -300,20 +297,17 @@ const MyMatches = () => {
                   </Typography>
                 </Box>
 
-                  <Divider sx={{ my: 1 }} />
+                <Divider sx={{ my: 1 }} />
 
-                  {/* Additional Details */}
-                  <Box display="flex" justifyContent="space-around">
-                    <DetailItem label="Height" value={user.height || "N/A"} />
-                    <DetailItem
-                      label="Religion"
-                      value={user.religion || "N/A"}
-                    />
-                    <DetailItem label="Caste" value={user.caste || "N/A"} />
-                  </Box>
+                {/* Additional Details */}
+                <Box display="flex" justifyContent="space-around">
+                  <DetailItem label="Height" value={user.height || "N/A"} />
+                  <DetailItem label="Religion" value={user.religion || "N/A"} />
+                  <DetailItem label="Caste" value={user.caste || "N/A"} />
+                </Box>
 
                 {/* Caste Preference */}
-                <Box mt={2}>
+                <Box mt={2} mb={2}>
                   <Chip
                     label={`Caste Preference: ${
                       userProfile.caste_preference || "N/A"
@@ -323,17 +317,24 @@ const MyMatches = () => {
                     sx={{ fontSize: "0.75rem" }}
                   />
                 </Box>
-                <Button
-                  sx={{
-                    display: "flex",
-                    justifySelf: "flex-end",
-                    textTransform: "capitalize",
-                    padding: "5px 0 0 0",
-                  }}
-                  onClick={() => handleOpenDialog(user)}
-                >
-                  View more
-                </Button>
+
+                <Box sx={{  width: "100%" }}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleOpenDialog(user)}
+                    sx={{
+                      borderRadius: 2,
+                      py: 1,
+                      textTransform: "none",
+                      fontWeight: "bold",
+                      fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                    }}
+                  >
+                    View More
+                  </Button>
+                </Box>
               </CardContent>
             </Card>
           ))}
