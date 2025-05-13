@@ -3,13 +3,15 @@ import {
   Box,
   Card,
   CardContent,
-  CardMedia,
   Typography,
   Button,
   Grid,
-  Pagination
+  Pagination,
+  Avatar,
+  Divider,
+  Chip
 } from "@mui/material";
-import placeholderImg from "../../../myIntrest/insidepage/accepted/mathes.jpeg";
+import { FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
 import TokenService from "../../../../token/tokenService";
 import { useGetAcceptedInterests } from "../../../../api/User/useGetProfileDetails";
 import { LoadingComponent } from "../../../../../App";
@@ -19,20 +21,30 @@ import FamilyPop from "../../../viewAll/popupContent/familyPop/FamilyPop";
 import EducationPop from "../../../viewAll/popupContent/educationPop/EducationPop";
 import LifeStylePop from "../../../viewAll/popupContent/lifeStylePop/LifeStylePop";
 import PreferencePop from "../../../viewAll/popupContent/preferencePop/PreferencePop";
+import profileimg from "../../../../../assets/profile.jpg";
+
+const ProfileInfo = ({ label, value }) => (
+  <Box sx={{ textAlign: "center" }}>
+    <Typography variant="body2" fontWeight="bold">{label}</Typography>
+    <Typography variant="body2" color="text.secondary">{value}</Typography>
+  </Box>
+);
 
 const Accepted = () => {
   const registrationNo = TokenService.getRegistrationNo();
-  const { data: responseData = { data: [], totalPages: 0 }, isLoading } = useGetAcceptedInterests(registrationNo);
+  const { data: responseData, isLoading } = useGetAcceptedInterests(registrationNo);
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
 
-  const acceptedInterests = Array.isArray(responseData) 
+  const allAccepted = Array.isArray(responseData)
     ? responseData.filter(item => item?.status === "accepted")
     : [];
-  const totalItems = acceptedInterests?.length;
+
+  const totalItems = allAccepted.length;
 
   const handlePageChange = (_, value) => {
     setCurrentPage(value);
@@ -40,7 +52,7 @@ const Accepted = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = acceptedInterests?.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = allAccepted.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleOpenDialog = useCallback((user) => {
     setSelectedUser(user);
@@ -49,7 +61,6 @@ const Accepted = () => {
 
   const renderDialogContent = () => {
     if (!selectedUser) return null;
- 
     const contentMap = {
       0: <AboutPop userDetails={selectedUser} />,
       1: <FamilyPop userDetails={selectedUser} />,
@@ -59,67 +70,123 @@ const Accepted = () => {
     };
     return contentMap[currentTab] || null;
   };
-  
 
   return (
-    <Box sx={{ padding: 3, backgroundColor: "aliceblue" }}>
-      {totalItems === 0 ? (
+    <Box sx={{ padding: 3 }}>
+      {isLoading ? (
+        <LoadingComponent />
+      ) : totalItems === 0 ? (
         <Typography variant="h6" textAlign="center" mt={4}>
           No accepted interests found
         </Typography>
       ) : (
         <>
-          <Grid container spacing={4}>
-            {currentItems?.map((item, index) => {
-              const user = item.sender || {};
+          <Grid container spacing={3}>
+            {currentItems.map((item, index) => {
+              const profile = item.sender || {};
               return (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                <Grid item xs={12} sm={6} md={3} key={index}>
                   <Card
                     sx={{
-                      width: 260,
-                      height: 370,
-                      borderRadius: 2,
-                      boxShadow: 6,
-                      textAlign: "center",
-                      backgroundColor: "#f4f4f9",
-                      color: "black",
-                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                      width: 270,
+                      maxWidth: 320,
+                      height: "100%",
+                      borderRadius: 4,
+                      boxShadow: 3,
+                      overflow: "hidden",
+                      transition: "transform 0.2s",
                       "&:hover": {
-                        transform: "scale(1.02)",
-                        boxShadow: 12,
+                        transform: "translateY(-4px)",
+                        boxShadow: 6,
                       },
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      pt: 1,
+                      position: "relative",
                     }}
                   >
-                    <CardMedia
-                      component="img"
-                      alt="User"
-                      height="190"
-                      image={user.profilePhoto || placeholderImg}
-                      sx={{ objectFit: "cover" }}
-                    />
-                    <CardContent>
-                      <Typography fontSize={18} fontWeight="bold" sx={{ color: "#333", textAlign: "start" }}>
-                        {user?.first_name} {user?.last_name}
-                      </Typography>
-                      <Typography sx={{ color: "#666", fontSize: "16px", textAlign: "start" }} mb={0}>
-                        {user.address || "N/A"}
-                      </Typography>
-                      <Box display="flex" justifyContent="space-between" mt={1}>
-                        <Typography sx={{ color: "#666", fontSize: 13 }}>Age: {user?.age || "N/A"}</Typography>
-                        <Typography sx={{ color: "#666", fontSize: 13 }}>Height: {user?.height || "N/A"}</Typography>
-                      </Box>
-                      <Typography sx={{ color: "#666", fontSize: 13 }} mt={0.5}>
-                        Ref No: {user?.registrationNo || item.senderRegistrationNo}
-                      </Typography>
-                      <Button
-                        variant="contained"
-                        fullWidth
+                    {profile.user_role === "PremiumUser" && (
+                      <Chip
+                        label="PREMIUM"
+                        color="primary"
+                        size="small"
                         sx={{
-                          mt: 1,
-                          background: "#4CAF50",
-                          "&:hover": { background: "#388E3C" },
+                          position: "absolute",
+                          top: 12,
+                          right: 12,
+                          fontWeight: "bold",
+                          fontSize: "0.7rem",
                         }}
-                        onClick={() => handleOpenDialog(user)}
+                      />
+                    )}
+
+                    <Box
+                         sx={{
+                           width: { xs: 100, sm: 120 },
+                           height: { xs: 100, sm: 120 },
+                           borderRadius: "50%",
+                           border: "3px solid #87CEEB",
+                           boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                           padding: "2px",
+                           background: "linear-gradient(45deg, #87CEEB, #E0F7FA)",
+                         }}
+                       >
+                      <Avatar
+                        src={profileimg}
+                        alt={profile.first_name}
+                        sx={{ width: "100%", height: "100%" }}
+                      />
+                    </Box>
+
+                    <CardContent sx={{ width: "100%", textAlign: "center", px: 2 }}>
+                      <Typography fontWeight="bold" gutterBottom>
+                        {profile.first_name} {profile.last_name}
+                      </Typography>
+                      <Typography color="text.secondary">
+                        {profile.age || "N/A"} yrs
+                      </Typography>
+
+                      <Box
+                        sx={{ display: "flex", justifyContent: "center", gap: 1, mt: 1 }}
+                      >
+                        <FaBriefcase size={14} color="#777" />
+                        <Typography variant="body2" color="text.secondary">
+                          {profile.occupation || "Not specified"}
+                        </Typography>
+                      </Box>
+
+                      <Box
+                        sx={{ display: "flex", justifyContent: "center", gap: 1, mt: 1 }}
+                      >
+                        <FaMapMarkerAlt size={14} color="#777" />
+                        <Typography variant="body2">
+                          {[profile.city, profile.state, profile.country]
+                            .filter(Boolean)
+                            .join(", ") || "Location not specified"}
+                        </Typography>
+                      </Box>
+
+                      <Divider sx={{ my: 2 }} />
+
+                      <Box display="flex" justifyContent="space-around" mb={2}>
+                        <ProfileInfo label="Height" value={profile.height || "N/A"} />
+                        <ProfileInfo label="Religion" value={profile.religion || "N/A"} />
+                        <ProfileInfo label="Caste" value={profile.caste || "N/A"} />
+                      </Box>
+
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleOpenDialog(profile)}
+                        sx={{
+                          borderRadius: 2,
+                          py: 1,
+                          textTransform: "none",
+                          fontWeight: "bold",
+                          fontSize: "0.9rem",
+                        }}
                       >
                         View Profile
                       </Button>
@@ -130,37 +197,33 @@ const Accepted = () => {
             })}
           </Grid>
 
-          {totalItems > itemsPerPage && (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "end",
-                alignItems: "center",
-                marginTop: 4,
-                gap: 2,
-              }}
-            >
-              <Pagination
-                count={Math.ceil(totalItems / itemsPerPage)}
-                page={currentPage}
-                onChange={handlePageChange}
-                shape="rounded"
-                color="primary"
-              />
-            </Box>
-          )}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "end",
+              marginTop: 4,
+            }}
+          >
+            <Pagination
+              count={Math.ceil(totalItems / itemsPerPage)}
+              page={currentPage}
+              onChange={handlePageChange}
+              shape="rounded"
+              color="primary"
+            />
+          </Box>
         </>
       )}
-      {isLoading && <LoadingComponent />}
+
       {selectedUser && (
         <ProfileDialog
           openDialog={openDialog}
           setOpenDialog={setOpenDialog}
           selectedUser={selectedUser}
-          currentTab={currentTab} 
-          setCurrentTab={setCurrentTab} 
-          loggedInUserId={registrationNo} 
-          isLoading={false} 
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+          loggedInUserId={registrationNo}
+          isLoading={false}
           renderDialogContent={renderDialogContent}
         />
       )}

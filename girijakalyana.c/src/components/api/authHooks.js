@@ -109,4 +109,19 @@ export const put = async (path, data) => {
   }
 
 };
+export const del = async (path, data) => {
+
+  try {
+
+    const response = await api.delete(path, data);
+
+    return response.data;
+
+  } catch (error) {
+
+    throw error;
+
+  }
+
+};
  

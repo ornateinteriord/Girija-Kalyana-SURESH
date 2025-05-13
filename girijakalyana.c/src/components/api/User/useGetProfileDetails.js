@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { get, post, put } from "../authHooks";
+import { del, get, post, put } from "../authHooks";
 import TokenService from "../../token/tokenService";
 
 // Get all user profiles
@@ -156,5 +156,25 @@ export const useGetAcceptedInterests = (recipientRegistrationNo) => {
     onError: (error) => {
       toast.error(error?.message || "Failed to fetch accepted interests.");
     }
+  });
+};
+
+
+export const useCancelSentInterest = () => {
+  return useMutation({
+    mutationFn: ({ senderRegistrationNo, recipientRegistrationNo }) => {
+      return del("/api/user/cancel", {
+        data: {
+          senderRegistrationNo,
+          recipientRegistrationNo,
+        },
+      });
+    },
+    onSuccess: (data) => {
+      toast.success(data.message)
+    },
+    onError: (error) => {
+      toast.error("Failed to cancel interest");
+    },
   });
 };
