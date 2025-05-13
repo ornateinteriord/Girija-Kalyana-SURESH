@@ -35,9 +35,11 @@ const ProfileDialog = ({
   const [isStatusLoading, setIsStatusLoading] = useState(false);
   const [membershipDialogOpen, setMembershipDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const loggedInUserRole = TokenService.getRole();
+ 
 
   const fetchStatus = async () => {
-    if (!loggedInUserId || !selectedUser?.registration_no) {
+    if (!loggedInUserRole || !loggedInUserId || !selectedUser?.registration_no) {
       setLocalInterestStatus("none");
       setIsStatusLoading(false);
       return;
@@ -45,10 +47,12 @@ const ProfileDialog = ({
 
     setIsStatusLoading(true);
     try {
-      const data = await get(
+      const response = await get(
         `/api/user/interest/status/${loggedInUserId}/${selectedUser.registration_no}`
       );
-      setLocalInterestStatus(data?.status);
+        const payload = response.data;
+        const status = payload?.status ?? "none";
+    setLocalInterestStatus(status);
     } catch (error) {
       console.error("Error fetching interest status:", error);
     } finally {
@@ -57,10 +61,10 @@ const ProfileDialog = ({
   };
 
   useEffect(() => {
-    if (openDialog && loggedInUserId && selectedUser?.registration_no) {
+    if (openDialog && loggedInUserRole&& loggedInUserId && selectedUser?.registration_no) {
       fetchStatus();
     }
-  }, [openDialog, loggedInUserId, selectedUser?.registration_no]);
+  }, [openDialog,loggedInUserRole, loggedInUserId, selectedUser?.registration_no]);
 
   const calculateAge = (dob) => {
     if (!dob) return null;
@@ -72,7 +76,7 @@ const ProfileDialog = ({
     return age;
   };
 
-  const loggedInUserRole = TokenService.getRole();
+
 
   const getButtonState = () => {
     if (isStatusLoading) {
@@ -334,7 +338,7 @@ const ProfileDialog = ({
             <Button
               variant="contained"
               color={buttonState.color}
-              onClick={!buttonState.disabled ? handleButtonClick : undefined}
+              onClick={handleButtonClick}
               disabled={isLoading}
               startIcon={
                 isLoading || isStatusLoading ? (

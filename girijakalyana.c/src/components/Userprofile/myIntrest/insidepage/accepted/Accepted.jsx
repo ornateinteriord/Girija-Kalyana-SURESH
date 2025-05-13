@@ -33,6 +33,7 @@ const ProfileInfo = ({ label, value }) => (
 const Accepted = () => {
   const registrationNo = TokenService.getRegistrationNo();
   const { data: responseData, isLoading } = useGetAcceptedInterests(registrationNo);
+  console.log(responseData)
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
