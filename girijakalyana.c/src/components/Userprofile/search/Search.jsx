@@ -15,10 +15,11 @@ import {
   DialogActions,
 } from "@mui/material";
 import { FaSearch, FaHeart } from "react-icons/fa";
-import axios from "axios";
 import "./search.scss";
 import { useGetAllUsersProfiles } from "../../api/User/useGetProfileDetails";
 import { LoadingComponent } from "../../../App";
+import { useVerifiedImage } from "../../hook/ImageVerification";
+import TokenService from "../../token/tokenService";
 
 const Search = () => {
   const {data:users=[],isLoading,isError,error} = useGetAllUsersProfiles()
@@ -26,7 +27,8 @@ const Search = () => {
   const [profiles, setProfiles] = useState([]);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
-
+  const {getVerifiedImage} = useVerifiedImage()
+  const loggedInUserId = TokenService.getRegistrationNo()
 
  useEffect(() => {
       if (isError) {
@@ -46,11 +48,12 @@ const Search = () => {
 
   const handleSearch = () => {
     if (!searchQuery.trim()) {
-      setProfiles([]); // Return empty array if search is empty
+      setProfiles([]); 
       return;
     }
     setIsSearching(true);
     const filteredProfiles = users.filter((profile) => {
+      if(profile.registration_no === loggedInUserId) return false
       const query = searchQuery.toLowerCase();
       return (
         profile?.first_name?.toString().toLowerCase().includes(query) ||
@@ -124,7 +127,7 @@ const Search = () => {
               <CardMedia
                 component="img"
                 height="230px"
-                image={profile?.profileImg || "https://via.placeholder.com/150"}
+                src={getVerifiedImage(profile)}
                 alt="Profile"
                 sx={{ borderRadius: "1%" }}
               />

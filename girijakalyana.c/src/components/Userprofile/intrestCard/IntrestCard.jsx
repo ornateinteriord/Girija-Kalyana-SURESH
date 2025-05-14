@@ -11,9 +11,9 @@ import {
 } from "@mui/material";
 import { FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
 import { useGetMemberDetails } from "../../api/User/useGetProfileDetails";
-import profileimg from "../../../assets/profile.jpg";
 import { LoadingComponent } from "../../../App";
 import { toast } from "react-toastify";
+import { useVerifiedImage } from "../../hook/ImageVerification";
 
 
   const ProfileInfo = ({ label, value }) => (
@@ -34,6 +34,7 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
     isError,
     error,
   } = useGetMemberDetails(senderRefNo);
+   const {getVerifiedImage} = useVerifiedImage()
 
   useEffect(() => {
     if (isError) {
@@ -94,7 +95,7 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
         }}
       >
         <Avatar
-          src={profile?.profile_photo || profileimg}
+          src={getVerifiedImage(profile)}
           alt={profile?.first_name}
           sx={{
             width: "100%",

@@ -10,57 +10,52 @@ import {
   Avatar,
   Divider,
 } from "@mui/material";
-import { FaUser, FaMapMarkerAlt, FaBriefcase } from "react-icons/fa";
-import profileimg from "../../../assets/profile.jpg";
+import { FaMapMarkerAlt, FaBriefcase } from "react-icons/fa";
 import AboutPop from "./popupContent/abouPop/AboutPop";
 import EducationPop from "./popupContent/educationPop/EducationPop";
 import FamilyPop from "./popupContent/familyPop/FamilyPop";
 import LifeStylePop from "./popupContent/lifeStylePop/LifeStylePop";
 import PreferencePop from "./popupContent/preferencePop/PreferencePop";
 import {
-  useExpressInterest,
   useGetAllUsersProfiles,
 } from "../../api/User/useGetProfileDetails";
 import TokenService from "../../token/tokenService";
-import { useSnackbar } from "notistack";
 import { LoadingComponent } from "../../../App";
 import ProfileDialog from "../ProfileDialog/ProfileDialog";
 import GenderFilter from "../../../utils/Filters/GenderFilter";
+import { useVerifiedImage } from "../../hook/ImageVerification";
 
-// Constants
+
+
 const itemsPerPage = 8;
 
-/**
- * Main component to display and browse all user profiles
- */
+
 const ViewAll = () => {
-  // State management
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedStatus, setSelectedStatus] = useState("all");
+  const {getVerifiedImage} = useVerifiedImage()
   
-  // Hooks for data fetching
+  
   const { data: users = [], isLoading } = useGetAllUsersProfiles();
   const loggedInUserId = TokenService.getRegistrationNo();
 
   
- // Handle status change and reset to first page
+
   const handleStatusChange = useCallback((value) => {
     setSelectedStatus(value);
-    setCurrentPage(1); // Reset to first page when filter changes
+    setCurrentPage(1);
   }, []);
 
-  // Filter out current user, admins, and apply gender filter
+ 
   const filteredUsers = useMemo(() => {
     return users.filter(user => {
-      // Skip current user and admins
       if (user.registration_no === loggedInUserId || user.user_role === "Admin") {
         return false;
       }
       
-      // Apply gender filter if not "all"
       if (selectedStatus !== "all" && user.gender !== selectedStatus) {
         return false;
       }
@@ -69,7 +64,7 @@ const ViewAll = () => {
     });
   }, [users, loggedInUserId, selectedStatus]);
 
-  // Paginated users
+
   const paginatedUsers = useMemo(
     () =>
       filteredUsers.slice(
@@ -171,7 +166,7 @@ const ViewAll = () => {
             }}
           >
             <Avatar
-              src={profileimg}
+              src={getVerifiedImage(user) }
               alt="Profile"
               sx={{
                 width: "100%",
@@ -179,6 +174,7 @@ const ViewAll = () => {
                 objectFit: "cover",
               }}
             />
+           
           </Box>
         </Box>
 

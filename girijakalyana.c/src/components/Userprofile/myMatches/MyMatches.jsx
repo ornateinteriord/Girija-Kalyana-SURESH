@@ -11,7 +11,6 @@ import {
   Button,
 } from "@mui/material";
 import { FaMapMarkerAlt, FaBriefcase } from "react-icons/fa";
-import profileimg from "../../../assets/profile.jpg";
 import TokenService from "../../token/tokenService";
 import {
   useGetAllUsersProfiles,
@@ -26,6 +25,7 @@ import LifeStylePop from "../viewAll/popupContent/lifeStylePop/LifeStylePop";
 import PreferencePop from "../viewAll/popupContent/preferencePop/PreferencePop";
 import ProfileDialog from "../ProfileDialog/ProfileDialog";
 import GenderFilter from "../../../utils/Filters/GenderFilter";
+import { useVerifiedImage } from "../../hook/ImageVerification";
 
 const MyMatches = () => {
   const [userCard, setUserCard] = useState([]);
@@ -35,7 +35,7 @@ const MyMatches = () => {
   const [openDialog, setOpenDialog] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState("all");
-
+  const {getVerifiedImage} = useVerifiedImage()
   const itemsPerPage = 8;
   const registerNo = TokenService.getRegistrationNo();
 
@@ -245,7 +245,7 @@ const MyMatches = () => {
                 }}
               >
                 <Avatar
-                  src={profileimg}
+                  src={getVerifiedImage(user)}
                   alt="Profile"
                   sx={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />

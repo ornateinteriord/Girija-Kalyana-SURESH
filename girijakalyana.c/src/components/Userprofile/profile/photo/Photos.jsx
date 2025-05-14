@@ -3,79 +3,86 @@ import { Box, Button, Typography, Card, CardMedia } from "@mui/material";
 import { FaUpload } from "react-icons/fa";
 import toast from "react-hot-toast";
 import useStore from "../../../../store";
-
-
-// Replace with your actual backend API endpoints
-const API_URL = "http://locahost:5000/api/uploads"; // Example for POST request
+import {
+  getCloudinaryUrl,
+  useGetMemberDetails,
+  useUpdateProfile,
+} from "../../../api/User/useGetProfileDetails";
+import TokenService from "../../../token/tokenService";
 
 const Photos = () => {
-  const [file, setFile] = useState("");
+  const [formData, setFormData] = useState({});
+  const registerNo = TokenService.getRegistrationNo();
+  const { data: userProfile } = useGetMemberDetails(registerNo);
+  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+  const cloudinary = getCloudinaryUrl();
   const fileInputRef = useRef(null);
-const {setprofileImage}=useStore();
-  const chooseFile = () => {
+
+  const handleFileChange = async (event) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+      if (!file.type.match("image.*")) {
+        toast.error("Please select an image file");
+        return;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("File size should be less than 10MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFormData((prev) => ({ ...prev, previewImage: e.target.result }));
+      };
+      reader.readAsDataURL(file);
+
+      cloudinary.mutate(file, {
+        onSuccess: (data) => {
+          if (data.secure_url) {
+            setFormData((prev) => ({
+              ...prev,
+              image: data.secure_url,
+              previewImage: data.secure_url,
+            }));
+            toast.success("Image uploaded to Cloudinary");
+          } else {
+            toast.error("Failed to get image URL");
+          }
+        },
+        onError: (err) => {
+          toast.error("Failed to upload image");
+          console.error(err);
+        },
+      });
+    }
+  };
+
+  const handleUploadClick = () => {
     fileInputRef.current.click();
   };
 
-  const handleFileChange = async (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      if (
-        selectedFile.type.startsWith("image/") &&
-        selectedFile.size <= 10 * 1024 * 1024
-      ) {
-        const base64 = await convertToBase64(selectedFile);
-        setFile(base64); // Store the Base64 string in state
-      } else {
-        setFile("");
-        toast.warn("Please select a valid image file (max size: 10 MB).");
-      }
+  const handleSave = () => {
+    if (!formData.image) {
+      toast.error("Please upload an image first");
+      return;
     }
-  };
 
-  // Helper function to convert file to Base64
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result); // Base64 string
-      reader.onerror = (error) => reject(error);
-    });
-  };
-
-  // POST API call to upload image
-  const uploadImage = async (data) => {
-    if (!file) return alert("No image selected for upload.");
-   
-    try {
-      const formData = new FormData();
-      formData.append("profileImg", file);
-      const userId =
-        localStorage.getItem("userId")
-
-      const response = await fetch(
-        `http://localhost:5000/api/updateImg/${userId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            profileImg: file,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Error uploading image");
+    updateProfile(
+      {
+        registerNo,
+        image: formData.image,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Profile image updated successfully");
+        },
+        onError: (error) => {
+          toast.error(
+            error.response?.data?.message || "Failed to update profile"
+          );
+        },
       }
-
-      toast.success("Profile Image Added SuccessFully")
-      localStorage.removeItem('profileImg');
-      localStorage.setItem('profileImg', JSON.stringify(file))
-      setprofileImage(JSON.stringify(file))
-    } catch (error) {
-      alert(error.message);
-    }
+    );
   };
 
   return (
@@ -88,71 +95,74 @@ const {setprofileImage}=useStore();
         fontFamily: "Roboto, sans-serif",
         maxWidth: "600px",
         margin: "auto",
-        display:'flex'
+        display: "flex",
       }}
     >
-      
       <Card
         sx={{
           boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
           borderRadius: "12px",
           padding: "16px",
+          width: "100%",
         }}
       >
-        <Box >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          {file ? (
-            <CardMedia
-              component="img"
-              height="450"
-              image={file}
-              alt="Uploaded Preview"
-              sx={{
-                borderRadius: "12px",
-                marginBottom: "16px",
-                width: "100%",
-                objectFit: "center",
-                overflowY: "auto",
-              }}
-            />
-          ) : (
+        <Box>
+          <Box>
             <Box
               sx={{
-                height: "200px",
-                width: "100%",
-                backgroundColor: "#e0e0e0",
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "center",
-                borderRadius: "12px",
-                marginBottom: "16px",
               }}
             >
-              <Typography variant="body2" color="text.secondary">
-                No Image Selected
-              </Typography>
+              {formData.previewImage || userProfile?.image ? (
+                <CardMedia
+                  src={formData.previewImage || userProfile?.image}
+                  component="img"
+                  height="450"
+                  alt="Uploaded Preview"
+                  sx={{
+                    borderRadius: "12px",
+                    marginBottom: "16px",
+                    width: "100%",
+                    objectFit: "cover",
+                    overflowY: "auto",
+                    maxHeight: "450px",
+                  }}
+                />
+              ) : (
+                <Box
+                  sx={{
+                    height: "200px",
+                    width: "100%",
+                    backgroundColor: "#e0e0e0",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "12px",
+                    marginBottom: "16px",
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    No Image Selected
+                  </Typography>
+                </Box>
+              )}
             </Box>
-          )}
 
-          <Typography
-            variant="body2"
-            color="text.primary"
-            sx={{ marginBottom: "16px", textAlign: "center" }}
-          >
-            * Please upload high-resolution images only (Max size: 10 MB)
-          </Typography>
+            <Typography
+              variant="body2"
+              color="text.primary"
+              sx={{ marginBottom: "16px", textAlign: "center" }}
+            >
+              * Please upload high-resolution images only (Max size: 10 MB)
+            </Typography>
           </Box>
           <Box display="flex" gap={1}>
             <Button
               variant="outlined"
               startIcon={<FaUpload />}
-              onClick={chooseFile}
+              onClick={handleUploadClick}
               sx={{
                 color: "#1976d2",
                 borderColor: "#1976d2",
@@ -162,29 +172,50 @@ const {setprofileImage}=useStore();
               }}
             >
               Choose File
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                hidden
+                ref={fileInputRef}
+                onChange={handleFileChange}
+              />
             </Button>
-            <input
-              type="file"
-              onChange={handleFileChange}
-              ref={fileInputRef}
-              style={{ display: "none" }}
-              accept="image/*"
-            />
 
             <Button
               variant="contained"
               size="small"
-              onClick={uploadImage}
+              onClick={handleSave}
+              disabled={isUpdating || !formData.image}
               sx={{
                 height: "35px",
                 backgroundColor: "#34495e",
                 "&:hover": {
                   backgroundColor: "#1976d2",
                 },
+                visibility: formData.image ? "visible" : "visible", // Always visible
+                opacity: !formData.image || isUpdating ? 0.7 : 1, // Faded when disabled
               }}
             >
-              Save
+              {isUpdating ? "Saving..." : "Save"}
             </Button>
+          </Box>
+          <Box>
+            <Typography sx={{ fontWeight: "bold" }}>
+              Image Verification Status:{" "}
+              <Box
+                component="span"
+                sx={{
+                  color:
+                    {
+                      active: "green",
+                      pending: "orange",
+                    }[userProfile?.image_verification] || "text.secondary",
+                }}
+              >
+                {userProfile?.image_verification}
+              </Box>
+            </Typography>
           </Box>
         </Box>
       </Card>
@@ -193,35 +224,3 @@ const {setprofileImage}=useStore();
 };
 
 export default Photos;
-
-export const convertFromBase64 = (base64String, fileName) => {
-  return new Promise((resolve, reject) => {
-    try {
-      // Extract the content type and Base64 data from the Base64 string
-      const matches = base64String.match(/^data:(.+);base64,(.+)$/);
-
-      if (!matches) {
-        return reject(new Error("Invalid Base64 string format"));
-      }
-
-      const contentType = matches[1]; // Extract MIME type (e.g., "image/png")
-      const base64Data = matches[2]; // Extract the Base64-encoded string
-
-      // Decode the Base64 string
-      const byteCharacters = atob(base64Data);
-      const byteNumbers = new Array(byteCharacters.length);
-
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-
-      const byteArray = new Uint8Array(byteNumbers);
-
-      // Create a File object
-      const file = new File([byteArray], fileName, { type: contentType });
-      resolve(file);
-    } catch (error) {
-      reject(error);
-    }
-  });
-};
