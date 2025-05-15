@@ -22,6 +22,7 @@ import EducationPop from "../../../viewAll/popupContent/educationPop/EducationPo
 import LifeStylePop from "../../../viewAll/popupContent/lifeStylePop/LifeStylePop";
 import PreferencePop from "../../../viewAll/popupContent/preferencePop/PreferencePop";
 import { useVerifiedImage } from "../../../../hook/ImageVerification";
+import { useConnectionStatus } from "../../../../hook/ConnectionStatus";
 
 const ProfileInfo = ({ label, value }) => (
   <Box sx={{ textAlign: "center" }}>
@@ -32,13 +33,15 @@ const ProfileInfo = ({ label, value }) => (
 
 const Accepted = () => {
   const registrationNo = TokenService.getRegistrationNo();
+  const loggedInUserRole = TokenService.getRole()
   const { data: responseData, isLoading } = useGetAcceptedInterests(registrationNo);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
-   const {getVerifiedImage} = useVerifiedImage()
+  const {getVerifiedImage} = useVerifiedImage()
+  const { getConnectionStatus } = useConnectionStatus(responseData);
 
   const allAccepted = Array.isArray(responseData)
     ? responseData.filter(item => item?.status === "accepted")
@@ -71,6 +74,8 @@ const Accepted = () => {
     return contentMap[currentTab] || null;
   };
 
+   
+
   return (
     <Box sx={{ padding: 3 }}>
       {isLoading ? (
@@ -84,6 +89,8 @@ const Accepted = () => {
           <Grid container spacing={3}>
             {currentItems.map((item, index) => {
               const profile = item.sender || {};
+              const connectionStatus = getConnectionStatus(profile.registration_no);
+               const imageSrc = getVerifiedImage(profile, loggedInUserRole, connectionStatus);
               return (
                 <Grid item xs={12} sm={6} md={3} key={index}>
                   <Card
@@ -133,7 +140,7 @@ const Accepted = () => {
                          }}
                        >
                       <Avatar
-                        src={getVerifiedImage(profile)}
+                        src={imageSrc}
                         alt={profile.first_name}
                         sx={{ width: "100%", height: "100%" }}
                       />
