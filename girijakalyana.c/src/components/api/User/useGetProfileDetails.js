@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tansta
 import { toast } from "react-toastify";
 import { del, get, post, put } from "../authHooks";
 import TokenService from "../../token/tokenService";
+import axios from "axios";
 
 // Get all user profiles
 export const useGetAllUsersProfiles = () => {
@@ -175,6 +176,19 @@ export const useCancelSentInterest = () => {
     },
     onError: (error) => {
       toast.error("Failed to cancel interest");
+    },
+  });
+};
+
+export const getCloudinaryUrl = () => {
+  return useMutation({
+    mutationFn: async (file) => {
+      const data = new FormData();
+      data.append("file", file);
+      data.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+      data.append("cloud_name", import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
+      const response = await axios.post(import.meta.env.VITE_CLOUDINARY_BASE_URL, data);
+      return response.data;
     },
   });
 };

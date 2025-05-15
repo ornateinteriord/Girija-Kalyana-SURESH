@@ -31,8 +31,6 @@ import {
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { FaDashcube, FaUsersViewfinder } from "react-icons/fa6";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import UserDashboard from "../userdDashboard/UserDashboard";
-import { convertFromBase64 } from "../profile/photo/Photos";
 import useStore from "../../../store";
 import TokenService from "../../token/tokenService";
 import { useGetMemberDetails } from "../../api/User/useGetProfileDetails";
@@ -48,7 +46,7 @@ const theme = createTheme({
 });
 
 const UserNavBar = () => {
-  const { profileImage, firstName, setFirstName, setProfileImage } = useStore();
+  const { profileImage, firstName, setFirstName,  } = useStore();
   const [anchorEl, setAnchorEl] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
@@ -73,13 +71,8 @@ const UserNavBar = () => {
   useEffect(() => {
     if (userProfile) {
       setFirstName(userProfile.firstName || "");
-      if (userProfile.profileImage) {
-        const url = convertFromBase64(userProfile.profileImage);
-        setImageUrl(url);
-        setProfileImage(url);
-      }
     }
-  }, [userProfile, setFirstName, setProfileImage]);
+  }, [userProfile, setFirstName, ]);
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -180,7 +173,7 @@ const UserNavBar = () => {
                   {userProfile?.first_name}
                 </Typography>
                 <Avatar
-                  src={imageUrl || profileImage}
+                  src={userProfile?.image}
                   alt={firstName}
                   sx={{
                     color: "black",
@@ -188,7 +181,7 @@ const UserNavBar = () => {
                     textTransform: "uppercase",
                   }}
                 >
-                  {!imageUrl && !profileImage && firstName?.[0]}
+                  {userProfile?.image || ""}
                 </Avatar>
               </IconButton>
               <Menu

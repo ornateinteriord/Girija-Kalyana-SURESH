@@ -26,6 +26,7 @@ import EducationPop from "../../viewAll/popupContent/educationPop/EducationPop";
 import FamilyPop from "../../viewAll/popupContent/familyPop/FamilyPop";
 import AboutPop from "../../viewAll/popupContent/abouPop/AboutPop";
 import ProfileDialog from "../../ProfileDialog/ProfileDialog";
+import { useVerifiedImage } from "../../../hook/ImageVerification";
 
 const Sent = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -197,11 +198,10 @@ const Sent = () => {
 const InterestCard = ({
   interestId,
   profile,
-  interestDate,
-  status,
   handleOpenDialog,
   handleRequestCancelClick,
-}) => (
+}) =>{ const {getVerifiedImage} = useVerifiedImage()
+return (
   <Card
     sx={{
       width: { xs: 300, sm: 280, md: 260, lg: 280 },
@@ -248,8 +248,7 @@ const InterestCard = ({
       }}
     >
       <Avatar
-        src={profileimg || "/default-avatar.png"}
-        alt={profile.first_name}
+        src={getVerifiedImage(profile)}
         sx={{ width: "100%", height: "100%" }}
       />
     </Box>
@@ -332,7 +331,7 @@ const InterestCard = ({
       </Box>
     </CardContent>
   </Card>
-);
+)};
 
 const ProfileInfo = ({ label, value }) => (
   <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>

@@ -21,7 +21,7 @@ import FamilyPop from "../../../viewAll/popupContent/familyPop/FamilyPop";
 import EducationPop from "../../../viewAll/popupContent/educationPop/EducationPop";
 import LifeStylePop from "../../../viewAll/popupContent/lifeStylePop/LifeStylePop";
 import PreferencePop from "../../../viewAll/popupContent/preferencePop/PreferencePop";
-import profileimg from "../../../../../assets/profile.jpg";
+import { useVerifiedImage } from "../../../../hook/ImageVerification";
 
 const ProfileInfo = ({ label, value }) => (
   <Box sx={{ textAlign: "center" }}>
@@ -33,13 +33,12 @@ const ProfileInfo = ({ label, value }) => (
 const Accepted = () => {
   const registrationNo = TokenService.getRegistrationNo();
   const { data: responseData, isLoading } = useGetAcceptedInterests(registrationNo);
-  console.log(responseData)
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
+   const {getVerifiedImage} = useVerifiedImage()
 
   const allAccepted = Array.isArray(responseData)
     ? responseData.filter(item => item?.status === "accepted")
@@ -134,7 +133,7 @@ const Accepted = () => {
                          }}
                        >
                       <Avatar
-                        src={profileimg}
+                        src={getVerifiedImage(profile)}
                         alt={profile.first_name}
                         sx={{ width: "100%", height: "100%" }}
                       />
