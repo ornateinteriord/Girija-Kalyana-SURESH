@@ -192,3 +192,16 @@ export const getCloudinaryUrl = () => {
     },
   });
 };
+
+const changePasswordAPI = async ({ registrationNo, oldPassword, newPassword }) => {
+  return await post(`/api/user/change-password/${registrationNo}`, {
+    oldPassword,
+    newPassword,
+  });
+};
+
+export const useChangePassword = () => {
+  return useMutation({
+    mutationFn: changePasswordAPI,
+  });
+};
