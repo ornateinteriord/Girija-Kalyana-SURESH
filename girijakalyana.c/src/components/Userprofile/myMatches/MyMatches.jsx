@@ -13,6 +13,7 @@ import {
 import { FaMapMarkerAlt, FaBriefcase } from "react-icons/fa";
 import TokenService from "../../token/tokenService";
 import {
+  useGetAcceptedInterests,
   useGetAllUsersProfiles,
   useGetMemberDetails,
 } from "../../api/User/useGetProfileDetails";
@@ -26,6 +27,7 @@ import PreferencePop from "../viewAll/popupContent/preferencePop/PreferencePop";
 import ProfileDialog from "../ProfileDialog/ProfileDialog";
 import GenderFilter from "../../../utils/Filters/GenderFilter";
 import { useVerifiedImage } from "../../hook/ImageVerification";
+import { useConnectionStatus } from "../../hook/ConnectionStatus";
 
 const MyMatches = () => {
   const [userCard, setUserCard] = useState([]);
@@ -38,6 +40,9 @@ const MyMatches = () => {
   const {getVerifiedImage} = useVerifiedImage()
   const itemsPerPage = 8;
   const registerNo = TokenService.getRegistrationNo();
+  const loggedInUserRole = TokenService.getRole()
+  const { data: responseData } = useGetAcceptedInterests(registerNo);
+  const { getConnectionStatus } = useConnectionStatus(responseData);
 
   const {
     data: userProfile,
@@ -147,6 +152,7 @@ const MyMatches = () => {
 
     return contentMap[currentTab] || null;
   };
+  
 
   return (
     <Box sx={{ p: { xs: 1, sm: 2 }, backgroundColor: "#f9f9f9" }}>
@@ -199,7 +205,10 @@ const MyMatches = () => {
             justifyContent: "center",
           }}
         >
-          {userCard.map((user) => (
+          {userCard.map((user) => {
+            const connectionStatus = getConnectionStatus(user.registration_no);
+    const imageSrc = getVerifiedImage(user, loggedInUserRole, connectionStatus);
+           return(
             <Card
               key={user.registration_no}
               sx={{
@@ -245,7 +254,7 @@ const MyMatches = () => {
                 }}
               >
                 <Avatar
-                  src={getVerifiedImage(user)}
+                  src={imageSrc}
                   alt="Profile"
                   sx={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
@@ -337,7 +346,8 @@ const MyMatches = () => {
                 </Box>
               </CardContent>
             </Card>
-          ))}
+           )}
+          )}
         </Box>
       )}
 

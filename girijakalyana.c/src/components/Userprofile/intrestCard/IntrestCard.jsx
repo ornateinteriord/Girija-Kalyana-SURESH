@@ -14,6 +14,7 @@ import { useGetMemberDetails } from "../../api/User/useGetProfileDetails";
 import { LoadingComponent } from "../../../App";
 import { toast } from "react-toastify";
 import { useVerifiedImage } from "../../hook/ImageVerification";
+import TokenService from "../../token/tokenService";
 
 
   const ProfileInfo = ({ label, value }) => (
@@ -35,6 +36,7 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
     error,
   } = useGetMemberDetails(senderRefNo);
    const {getVerifiedImage} = useVerifiedImage()
+   const loggedInUserRole = TokenService.getRole()
 
   useEffect(() => {
     if (isError) {
@@ -95,7 +97,7 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
         }}
       >
         <Avatar
-          src={getVerifiedImage(profile)}
+          src={getVerifiedImage(profile,loggedInUserRole)}
           alt={profile?.first_name}
           sx={{
             width: "100%",
