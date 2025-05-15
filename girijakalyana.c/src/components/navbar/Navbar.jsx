@@ -16,12 +16,17 @@ import {
   List,
   ListItem,
   ListItemText,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  InputAdornment,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useLoginMutation, useSignupMutation } from "../api/Auth";
+import { useLoginMutation, useResetpassword, useSignupMutation } from "../api/Auth";
 import useAuth from "../hook/UseAuth";
 import TokenService from "../token/tokenService";
 
@@ -29,22 +34,26 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // State for mobile menu
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginData, setLoginData] = useState({ username: "", password: "" });
-  const [registerData, setRegisterData] = useState({
-  });
+  const [registerData, setRegisterData] = useState({});
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [forgotPasswordError, setForgotPasswordError] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const { isLoggedIn } = useAuth();
-  const navigation = useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
   const { openDialog } = location.state || {};
 
   const { mutate: login, isPending: isLoginPending } = useLoginMutation();
+  const { mutate: resetPassword, isPending: isResettingPassword } = useResetpassword();
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -62,12 +71,20 @@ const Navbar = () => {
     if (openDialog) {
       setOpen(true);
     }
-  }, [openDialog]);
-
+  }, []);
 
   const handleToggleForm = () => setIsRegister((prev) => !prev);
 
-  const handleOpenForgotPassword = () => setOpenForgotPassword(true);
+  const handleOpenForgotPassword = () => {
+    setOpenForgotPassword(true);
+    setOtpSent(false);
+    setEmail("");
+    setOtp("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setForgotPasswordError("");
+  };
+
   const handleCloseForgotPassword = () => {
     setOpenForgotPassword(false);
     setOtpSent(false);
@@ -75,14 +92,13 @@ const Navbar = () => {
     setOtp("");
     setNewPassword("");
     setConfirmPassword("");
+    setForgotPasswordError("");
   };
 
   const handleChangeLogin = (e) => {
     const { name, value } = e.target;
     setLoginData((prev) => ({ ...prev, [name]: value }));
   };
-
- 
 
   const handleChangeRegister = (e) => {
     const { name, value } = e.target;
@@ -100,34 +116,74 @@ const Navbar = () => {
   ];
 
   const handleLogout = () => {
-      navigation("/");
-      TokenService.removeToken();
-      window.dispatchEvent(new Event("storage"));
-    };
+    navigate("/");
+    TokenService.removeToken();
+    window.dispatchEvent(new Event("storage"));
+  };
 
-    const SignupMutation = useSignupMutation();
-    const { mutate, isPending } = SignupMutation;
+  const SignupMutation = useSignupMutation();
+  const { mutate, isPending } = SignupMutation;
 
-    const handleSubmit = (e) =>{
-      e.preventDefault()
-      if (registerData.password !== registerData.confirmPassword) {
-        setErrorMessage("Passwords do not match");
-        return;
-      }
-      try {
-        mutate(registerData, {
-          onSuccess: () => {
-            setOpen(false);
-            navigate('/');
-          },
-          onError: (error) => {
-            console.error("Registration failed:", error);
-          },
-        });
-      }  catch (error) {
-        console.error("Registration failed:", error);
-      }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (registerData.password !== registerData.confirmPassword) {
+      setErrorMessage("Passwords do not match");
+      return;
     }
+    try {
+      mutate(registerData, {
+        onSuccess: () => {
+          setOpen(false);
+          navigate('/');
+        },
+        onError: (error) => {
+          console.error("Registration failed:", error);
+        },
+      });
+    } catch (error) {
+      console.error("Registration failed:", error);
+    }
+  };
+
+  const handleSendOtp = () => {
+    if (!email) {
+      setForgotPasswordError("Email is required");
+      return;
+    }
+    setForgotPasswordError("");
+    
+    // Using the resetPassword mutation to send OTP
+    resetPassword({ email, action: "send_otp" }, {
+      onSuccess: (response) => {
+        if (response.success) {
+          setOtpSent(true);
+          // toast.success("OTP sent successfully");
+        }
+      }
+    });
+  };
+
+  const handleResetPassword = () => {
+    if (newPassword !== confirmPassword) {
+      setForgotPasswordError("Passwords do not match");
+      return;
+    }
+    if (!otp || !newPassword || !confirmPassword) {
+      setForgotPasswordError("All fields are required");
+      return;
+    }
+    
+    resetPassword({ 
+      email, 
+      otp, 
+      newPassword, 
+      confirmPassword,
+      action: "reset_password"
+    }, {
+    
+    });
+     handleCloseForgotPassword()
+  };
 
   return (
     <div className="navbar-main-container">
@@ -157,7 +213,7 @@ const Navbar = () => {
               <Button
                 variant="contained"
                 size="large"
-                onClick={handleLogout} // Add your logout handler
+                onClick={handleLogout}
                 sx={{
                   backgroundColor: "black",
                   width: "150px",
@@ -178,7 +234,7 @@ const Navbar = () => {
               <Button
                 variant="contained"
                 size="large"
-                onClick={handleOpen} // Your existing login handler
+                onClick={handleOpen}
                 sx={{
                   backgroundColor: "black",
                   width: "150px",
@@ -244,7 +300,6 @@ const Navbar = () => {
       </Drawer>
 
       {/* Login/Register Dialog */}
-      {openDialog && (
       <Dialog open={open} onClose={handleClose}>
         <Box
           sx={{
@@ -442,113 +497,120 @@ const Navbar = () => {
           </Typography>
         </Box>
       </Dialog>
-         )}
+
       {/* Forgot Password Dialog */}
-      <Dialog open={openForgotPassword} onClose={handleCloseForgotPassword}>
-        <Box
-          component="form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            otpSent ? handleResetPassword() : handleSendOtp();
-          }}
-          sx={{
-            padding: "20px",
-            width: { xs: "100%", sm: "400px" },
-            display: "flex",
-            flexDirection: "column",
-            gap: "20px",
-          }}
-        >
-          {!otpSent ? (
-            <>
-              <Typography variant="h6" textAlign="center">
-                Forgot Password
-              </Typography>
-              <TextField
-                fullWidth
-                label="Enter Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                variant="outlined"
-                margin="normal"
-                required
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{
-                  width: "150px",
-                  alignSelf: "center",
-                  background: "#34495e",
-                }}
-              >
-                Send OTP
-              </Button>
-            </>
-          ) : (
-            <>
-              <Typography variant="h6" textAlign="center">
-                Reset Password
-              </Typography>
-              <TextField
-                fullWidth
-                label="Enter OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                variant="outlined"
-                required
-              />
-              <TextField
-                fullWidth
-                label="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                variant="outlined"
-                type="password"
-                required
-              />
-              <TextField
-                fullWidth
-                label="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                variant="outlined"
-                type="password"
-                required
-              />
-              {error && (
-                <Typography color="error" textAlign="center">
-                  {error}
-                </Typography>
-              )}
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{
-                  width: "190px",
-                  padding: "10px",
-                  alignSelf: "center",
-                  background: "#34495e",
-                  marginTop: "10px",
-                }}
-              >
-                Reset Password
-              </Button>
-            </>
-          )}
-          <Button
-            onClick={handleCloseForgotPassword}
-            sx={{
-              alignSelf: "center",
-              color: "#1976d2",
-              "&:hover": { backgroundColor: "transparent" },
+     <Dialog open={openForgotPassword} onClose={handleCloseForgotPassword} maxWidth="xs" fullWidth>
+  <DialogTitle sx={{ textAlign: "center", fontWeight: "bold", pb: 0 }}>
+    {otpSent ? "Reset Your Password" : "Forgot Password"}
+  </DialogTitle>
+
+  <DialogContent>
+    <Box
+      component="form"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        mt: 2,
+        px: 1,
+      }}
+    >
+      {!otpSent ? (
+        <>
+          <Typography variant="subtitle2" color="textSecondary">
+            Enter your registered email to receive an OTP.
+          </Typography>
+          <TextField
+            label="Email Address"
+            fullWidth
+            variant="outlined"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </>
+      ) : (
+        <>
+          <Typography variant="subtitle2" color="textSecondary">
+            Enter the OTP sent to your email and set a new password.
+          </Typography>
+
+          <TextField
+            label="OTP"
+            fullWidth
+            variant="outlined"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            required
+          />
+
+          <TextField
+            label="New Password"
+            fullWidth
+            variant="outlined"
+            type={showNewPassword ? "text" : "password"}
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            required
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowNewPassword(!showNewPassword)}>
+                    {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
-          >
-            Cancel
-          </Button>
-        </Box>
-      </Dialog>
-    
+          />
+
+          <TextField
+            label="Confirm Password"
+            fullWidth
+            variant="outlined"
+            type={showConfirmPassword ? "text" : "password"}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </>
+      )}
+
+      {forgotPasswordError && (
+        <Typography color="error" variant="body2">
+          {forgotPasswordError}
+        </Typography>
+      )}
+    </Box>
+  </DialogContent>
+
+  <DialogActions sx={{ px: 3, pb: 2 }}>
+    <Button onClick={handleCloseForgotPassword}  sx={{textTransform:'capitalize'}}>Cancel</Button>
+    <Button
+      onClick={otpSent ? handleResetPassword : handleSendOtp}
+      disabled={isResettingPassword}
+      variant="contained"
+      color="primary"
+      sx={{textTransform:'capitalize'}}
+    >
+      {isResettingPassword ? (
+        <CircularProgress size={24} color="inherit" />
+      ) : otpSent ? (
+        "Reset Password"
+      ) : (
+        "Send OTP"
+      )}
+    </Button>
+  </DialogActions>
+</Dialog>
     </div>
   );
 };

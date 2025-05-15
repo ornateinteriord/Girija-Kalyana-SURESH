@@ -72,6 +72,7 @@ export const useResetpassword = () => {
   return useMutation({
     mutationFn: async (data) => {
       return await post("/api/auth/reset-password", data);
+      
     },
     onSuccess: (response) => {
       if (response.success) {
@@ -85,20 +86,22 @@ export const useResetpassword = () => {
     }
   });
 };
-export const useRecoverpassword = () =>{
+
+
+export const useRecoverPassword = () => {
   return useMutation({
-    mutationFn:async()=>{
-      return await post("/auth/recover-password",data);
+    mutationFn: async (data) => {
+      return await post("/api/auth/recover-password", data);
     },
-    onSuccess:(response)=>{
-      if(response.success){
+    onSuccess: (response) => {
+      if (response.success) {
         toast.success(response.message);
-      }else{
-        console.error(response.message)
+      } else {
+        console.error(response.message);
       }
     },
-    onError:()=>{
-      toast.error(error.response.data.message)
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || 'Something went wrong');
     }
-  })
+  });
 }
