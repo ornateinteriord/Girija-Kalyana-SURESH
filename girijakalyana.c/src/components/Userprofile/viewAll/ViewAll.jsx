@@ -13,6 +13,7 @@ import {
 import { FaMapMarkerAlt, FaBriefcase } from "react-icons/fa";
 
 import {
+  useGetAcceptedInterests,
   useGetAllUsersProfiles,
 } from "../../api/User/useGetProfileDetails";
 import TokenService from "../../token/tokenService";
@@ -20,11 +21,15 @@ import { LoadingComponent } from "../../../App";
 import ProfileDialog from "../ProfileDialog/ProfileDialog";
 import GenderFilter from "../../../utils/Filters/GenderFilter";
 import { useVerifiedImage } from "../../hook/ImageVerification";
+
 import AboutPop from "./popupContent/abouPop/AboutPop";
 import FamilyPop from "./popupContent/familyPop/FamilyPop";
 import EducationPop from "./popupContent/educationPop/EducationPop";
 import LifeStylePop from "./popupContent/lifeStylePop/LifeStylePop";
 import PreferencePop from "./popupContent/preferencePop/PreferencePop";
+
+import { useConnectionStatus } from "../../hook/ConnectionStatus";
+
 
 
 
@@ -38,11 +43,11 @@ const ViewAll = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedStatus, setSelectedStatus] = useState("all");
   const {getVerifiedImage} = useVerifiedImage()
-  
-  
   const { data: users = [], isLoading } = useGetAllUsersProfiles();
   const loggedInUserId = TokenService.getRegistrationNo();
-
+  const loggedInUserRole = TokenService.getRole()
+   const { data: responseData } = useGetAcceptedInterests(loggedInUserId);
+   const { getConnectionStatus } = useConnectionStatus(responseData);
   
 
   const handleStatusChange = useCallback((value) => {
@@ -107,6 +112,9 @@ const ViewAll = () => {
   const renderUserCard = (user) => {
     const age = user.age || calculateAge(user.date_of_birth);
 
+     const connectionStatus = getConnectionStatus(user.registration_no);
+    const imageSrc = getVerifiedImage(user, loggedInUserRole, connectionStatus);
+
     return (
       <Card
         key={user._id}
@@ -167,7 +175,7 @@ const ViewAll = () => {
             }}
           >
             <Avatar
-              src={getVerifiedImage(user) }
+              src={imageSrc}
               alt="Profile"
               sx={{
                 width: "100%",

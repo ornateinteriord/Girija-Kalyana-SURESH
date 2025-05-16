@@ -200,7 +200,10 @@ const InterestCard = ({
   profile,
   handleOpenDialog,
   handleRequestCancelClick,
-}) =>{ const {getVerifiedImage} = useVerifiedImage()
+}) =>{
+   const {getVerifiedImage} = useVerifiedImage()
+    const loggedInUserRole = TokenService.getRole()
+
 return (
   <Card
     sx={{
@@ -248,7 +251,7 @@ return (
       }}
     >
       <Avatar
-        src={getVerifiedImage(profile)}
+        src={getVerifiedImage(profile,loggedInUserRole)}
         sx={{ width: "100%", height: "100%" }}
       />
     </Box>
