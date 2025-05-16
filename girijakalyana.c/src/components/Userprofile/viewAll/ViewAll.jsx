@@ -20,11 +20,11 @@ import { LoadingComponent } from "../../../App";
 import ProfileDialog from "../ProfileDialog/ProfileDialog";
 import GenderFilter from "../../../utils/Filters/GenderFilter";
 import { useVerifiedImage } from "../../hook/ImageVerification";
-import AboutPop from "./popupContent/abouPop/AboutPop";
 import FamilyPop from "./popupContent/familyPop/FamilyPop";
 import EducationPop from "./popupContent/educationPop/EducationPop";
 import LifeStylePop from "./popupContent/lifeStylePop/LifeStylePop";
 import PreferencePop from "./popupContent/preferencePop/PreferencePop";
+import AboutPop from "./popupContent/abouPop/AboutPop";
 
 
 
