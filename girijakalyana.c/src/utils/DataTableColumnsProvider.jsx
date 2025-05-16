@@ -87,58 +87,52 @@ export const getPendingandSuccessUserDataColumns = () => [
     },
   ];
 
-export const getImageVerificationColumns = () => [
+export const getImageVerificationColumns = (upgradeUserMutation,handleStatusUpdate) => [
     {
       name: "Registration No",
-      selector: () => "-",
+      selector: (row) => row.registration_no,
       sortable: false,
     },
     {
       name: "Name",
-      selector: (row) => row.name,
+      selector: (row) => row.first_name,
       sortable: true,
     },
     {
       name: "Email ID",
-      selector: (row) => row.email,
+      selector: (row) => row.username,
+      sortable: true,
     },
     {
       name: "Gender",
-      selector: () => "-",
+      selector: (row) =>row.gender ,
+      sortable: true,
     },
     {
       name: "User Type",
-      selector: () => "-",
+      selector: (row) =>row.user_role ,
+      sortable: true,
     },
     {
       name: "Image Status",
-      cell: () => (
-        <Button
-          style={{
-            backgroundColor: "#ffefcc",
-            borderRadius: "5px",
-            marginTop: "5px",
-            textTransform: "capitalize",
-          }}
-        >
-          Upload
-        </Button>
+      cell: row => (
+        <Typography color={row.image_verification === "active" ? "green" : "orange"}>
+          {row.image_verification}
+        </Typography>
       ),
+      sortable: true,
     },
     {
-      name: "Notify",
-      selector: () => "NA",
-    },
-    {
-      name: "Status",
+      name: "Action",
       cell: (row) => (
         <Button
-          variant="text"
-          color={row.isActive ? "success" : "error"}
+          variant="contained"
+          color={row.image_verification === "active" ? "warning" : "success"}
           size="small"
-          style={{ textTransform: "capitalize", fontSize: "16px" }}
+          onClick={() => handleStatusUpdate(row.registration_no, row.image_verification)}
+          disabled={upgradeUserMutation.isLoading }
         >
-          {row.isActive ? "Active" : "Pending"}
+          {row.image_verification === "active" ? "pending" : "active"}
         </Button>
       ),
     },

@@ -12,15 +12,16 @@ import {
   TextField,
 } from "@mui/material";
 import { FaMapMarkerAlt, FaBriefcase, FaSearch } from "react-icons/fa";
-import AboutPop from "../ViewAll/popupContent/abouPop/AboutPop";
-import EducationPop from "../ViewAll/popupContent/educationPop/EducationPop";
-import FamilyPop from "../ViewAll/popupContent/familyPop/FamilyPop";
-import LifeStylePop from "../ViewAll/popupContent/lifeStylePop/LifeStylePop";
-import PreferencePop from "../ViewAll/popupContent/preferencePop/PreferencePop";
-import { useGetAllUsersProfiles } from "../../api/User/useGetProfileDetails";
+import { useGetAcceptedInterests, useGetAllUsersProfiles } from "../../api/User/useGetProfileDetails";
 import TokenService from "../../token/tokenService";
 import { useVerifiedImage } from "../../hook/ImageVerification";
 import ProfileDialog from "../ProfileDialog/ProfileDialog";
+import AboutPop from "../viewAll/popupContent/abouPop/AboutPop";
+import FamilyPop from "../viewAll/popupContent/familyPop/FamilyPop";
+import EducationPop from "../viewAll/popupContent/educationPop/EducationPop";
+import LifeStylePop from "../viewAll/popupContent/lifeStylePop/LifeStylePop";
+import PreferencePop from "../viewAll/popupContent/preferencePop/PreferencePop";
+import { useConnectionStatus } from "../../hook/ConnectionStatus";
 
 const itemsPerPage = 8;
 
@@ -42,10 +43,12 @@ const Search = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-
   const { getVerifiedImage } = useVerifiedImage();
   const { data: users = [] } = useGetAllUsersProfiles();
   const loggedInUserId = TokenService.getRegistrationNo();
+  const { data: responseData } = useGetAcceptedInterests(loggedInUserId);
+  const { getConnectionStatus } = useConnectionStatus(responseData);
+   const loggedInUserRole = TokenService.getRole()
 
   // Update searchQuery when clicking Search button
   const handleSearch = () => {
@@ -114,6 +117,8 @@ const Search = () => {
 
   const renderUserCard = (user) => {
     const age = user.age || calculateAge(user.date_of_birth);
+    const connectionStatus = getConnectionStatus(user.registration_no);
+    const imageSrc = getVerifiedImage(user, loggedInUserRole, connectionStatus);
     return (
       <Card
         key={user._id}
@@ -166,7 +171,7 @@ const Search = () => {
             }}
           >
             <Avatar
-              src={getVerifiedImage(user)}
+              src={imageSrc}
               alt="Profile"
               sx={{ width: "100%", height: "100%" }}
             />

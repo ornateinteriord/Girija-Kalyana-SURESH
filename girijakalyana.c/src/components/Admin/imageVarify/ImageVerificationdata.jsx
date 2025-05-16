@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { Box, Typography, TextField, InputAdornment } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
@@ -6,81 +6,70 @@ import {
   customStyles,
   getImageVerificationColumns,
 } from "../../../utils/DataTableColumnsProvider";
+import { getAllUserProfiles, UpgradeUserStatus } from "../../api/Admin";
+import { LoadingComponent } from "../../../App";
 
-const dummyImageVerificationRecords = [
-  {
-    id: 1,
-    name: "Ravi Kumar",
-    email: "ravi.kumar@example.com",
-    isActive: true,
-  },
-  {
-    id: 2,
-    name: "Ayesha Singh",
-    email: "ayesha.singh@example.com",
-    isActive: false,
-  },
-  {
-    id: 3,
-    name: "Vikram Patel",
-    email: "vikram.patel@example.com",
-    isActive: true,
-  },
-  {
-    id: 4,
-    name: "Sneha Reddy",
-    email: "sneha.reddy@example.com",
-    isActive: false,
-  },
-  {
-    id: 5,
-    name: "Manoj Das",
-    email: "manoj.das@example.com",
-    isActive: true,
-  },
-  {
-    id: 6,
-    name: "Divya Iyer",
-    email: "divya.iyer@example.com",
-    isActive: false,
-  },
-  {
-    id: 7,
-    name: "Arun Mehta",
-    email: "arun.mehta@example.com",
-    isActive: true,
-  },
-  {
-    id: 8,
-    name: "Meera Joseph",
-    email: "meera.joseph@example.com",
-    isActive: false,
-  },
-];
+
 
 const ImageVerificationData = () => {
-  const [records, setRecords] = useState([]);
-  const [filteredRecords, setFilteredRecords] = useState([]);
+  const { data: users = [], isLoading, isError, error } = getAllUserProfiles();
+  const [localUsers, setLocalUsers] = useState(users);
   const [search, setSearch] = useState("");
+  const upgradeUserMutation = UpgradeUserStatus();
 
+
+   useEffect(() => {
+      if (users.length > 0) {
+        setLocalUsers(users);
+      }
+    }, [users]);
+
+    useEffect(() => {
+      if (isError) {
+        toast.error(error.message);
+      }
+    }, [isError, error]);
+
+const handleStatusUpdate = async(regno, currentStatus) => {
+  try{
+  const newStatus = currentStatus === "active" ? "pending" : "active";
+  await upgradeUserMutation.mutateAsync({ 
+    regno, 
+    image_verification: newStatus, 
+  },{
+     onSuccess:()=>{
+      setLocalUsers((prevUsers)=>
+        prevUsers.map((user) =>
+        user.registration_no === regno
+      ?{...user,image_verification: newStatus}
+      : user
+        )
+      )
+     },
+    onError: (error) => {
+            console.error(error.message);
+          }
+  });
+}
+catch (err) {
+      console.error(err.message);
+    }
+};
   // Handle Search
-  useEffect(() => {
-    const filtered = records.filter((data) =>
-      [
-        data.id.toString(),
-        data.name?.toLowerCase(),
-        data.username?.toLowerCase(),
-        data.email?.toLowerCase(),
-        data.phone?.toLowerCase(),
-        data.address?.city?.toLowerCase(),
-      ].some((field) => field?.includes(search.toLowerCase()))
-    );
-    setFilteredRecords(filtered);
-  }, [search, records]);
+ const filteredRows = localUsers.filter((data) => {
+    const isAdmin = data?.user_role?.toLowerCase() === "admin";
+    const matchesSearch = 
+      search === "" ||
+      data.registration_no?.toString().includes(search.toString()) ||
+      data.first_name?.toLowerCase().includes(search.toLowerCase()) ||
+      data.username?.toLowerCase().includes(search.toLowerCase()) ||
+      data.gender?.toLowerCase().includes(search.toLowerCase()) ||
+      data.user_role?.toLowerCase().includes(search.toLowerCase()) ||
+      data.image_verification?.toLowerCase().includes(search.toLowerCase()) 
+    return matchesSearch && !isAdmin;
+  });
 
-  useEffect(() => {
-    setRecords(dummyImageVerificationRecords);
-  }, []);
+
 
   return (
     <Box p={6} mt={6}>
@@ -116,9 +105,8 @@ const ImageVerificationData = () => {
 
       {/* Data Table */}
       <DataTable
-        columns={getImageVerificationColumns()}
-        data={filteredRecords}
-        progressPending={false}
+        columns={getImageVerificationColumns(upgradeUserMutation,handleStatusUpdate)}
+        data={filteredRows}
         pagination
         paginationPerPage={6}
         paginationRowsPerPageOptions={[6, 10, 15, 20]}
@@ -132,6 +120,8 @@ const ImageVerificationData = () => {
           </Typography>
         }
         customStyles={customStyles}
+        progressPending={isLoading}
+       progressComponent={<LoadingComponent />}
       />
     </Box>
   );

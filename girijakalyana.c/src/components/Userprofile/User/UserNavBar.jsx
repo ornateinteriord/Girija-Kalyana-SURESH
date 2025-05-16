@@ -236,15 +236,14 @@ const handleSubmitPasswordChange = () => {
                 {userProfile?.first_name}
               </Typography>
               <Avatar
-                src={imageUrl || profileImage}
-                alt={firstName}
+                src={userProfile?.image}
                 sx={{
                   color: "black",
                   fontWeight: "bold",
                   textTransform: "uppercase",
                 }}
               >
-                {!imageUrl && !profileImage && firstName?.[0]}
+                {userProfile?.first_name[0] || ""}
               </Avatar>
             </IconButton>
 

@@ -23,9 +23,10 @@ export const getAllUserProfiles = () => {
 export const UpgradeUserStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ regno, status }) => {
+    mutationFn: async ({ regno, status,image_verification }) => {
         const response = await put(`/api/admin/upgrade-user/${regno}`, {
-          status
+          status,
+          image_verification
         });
         return response;
     },
@@ -43,6 +44,7 @@ export const UpgradeUserStatus = () => {
     },
   });
 };
+
 export const UserResetPassword = () => {
   const queryClient = useQueryClient();
   return useMutation({
