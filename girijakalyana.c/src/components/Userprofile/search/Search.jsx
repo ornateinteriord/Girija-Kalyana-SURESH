@@ -1,270 +1,319 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   Box,
-  TextField,
-  InputAdornment,
-  Button,
   Typography,
-  CircularProgress,
   Card,
   CardContent,
-  CardMedia,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Button,
+  Pagination,
+  Chip,
+  Avatar,
+  Divider,
+  TextField,
 } from "@mui/material";
-import { FaSearch, FaHeart } from "react-icons/fa";
-import "./search.scss";
+import { FaMapMarkerAlt, FaBriefcase, FaSearch } from "react-icons/fa";
+import AboutPop from "../ViewAll/popupContent/abouPop/AboutPop";
+import EducationPop from "../ViewAll/popupContent/educationPop/EducationPop";
+import FamilyPop from "../ViewAll/popupContent/familyPop/FamilyPop";
+import LifeStylePop from "../ViewAll/popupContent/lifeStylePop/LifeStylePop";
+import PreferencePop from "../ViewAll/popupContent/preferencePop/PreferencePop";
 import { useGetAllUsersProfiles } from "../../api/User/useGetProfileDetails";
-import { LoadingComponent } from "../../../App";
-import { useVerifiedImage } from "../../hook/ImageVerification";
 import TokenService from "../../token/tokenService";
+import { useVerifiedImage } from "../../hook/ImageVerification";
+import ProfileDialog from "../ProfileDialog/ProfileDialog";
+
+const itemsPerPage = 8;
+
+const ProfileInfo = ({ label, value }) => (
+  <Box sx={{ textAlign: "center" }}>
+    <Typography variant="body2" fontWeight="bold">
+      {label}
+    </Typography>
+    <Typography variant="body2" color="text.secondary">
+      {value}
+    </Typography>
+  </Box>
+);
 
 const Search = () => {
-  const {data:users=[],isLoading,isError,error} = useGetAllUsersProfiles()
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [currentTab, setCurrentTab] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [profiles, setProfiles] = useState([]);
-  const [selectedProfile, setSelectedProfile] = useState(null);
-  const [isSearching, setIsSearching] = useState(false);
-  const {getVerifiedImage} = useVerifiedImage()
-  const loggedInUserId = TokenService.getRegistrationNo()
 
- useEffect(() => {
-      if (isError) {
-        toast.error(error.message);
-      }
-    }, [isError, error]);
-    
-  const handleLikeToggle = (id, index) => {
-    const updatedProfiles = [...profiles];
-    updatedProfiles[index].like = !updatedProfiles[index].like;
-    setProfiles(updatedProfiles);
-  };
- 
-  const handleViewMore = (profile) => {
-    setSelectedProfile(profile);
-  };
+  const { getVerifiedImage } = useVerifiedImage();
+  const { data: users = [] } = useGetAllUsersProfiles();
+  const loggedInUserId = TokenService.getRegistrationNo();
 
+  // Update searchQuery when clicking Search button
   const handleSearch = () => {
-    if (!searchQuery.trim()) {
-      setProfiles([]); 
-      return;
+    setSearchQuery(searchTerm.trim().toLowerCase());
+    setCurrentPage(1);
+  };
+
+  // Optionally, enable "Enter" key to trigger search
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
     }
-    setIsSearching(true);
-    const filteredProfiles = users.filter((profile) => {
-      if(profile.registration_no === loggedInUserId) return false
-      const query = searchQuery.toLowerCase();
+  };
+
+  // Filter users by searchQuery (name, email, or mobile number)
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery) return [];
+
+    return users.filter((user) => {
+      // Exclude logged-in user and admin users
+      if (user.registration_no === loggedInUserId || user.user_role === "Admin") return false;
+
+      const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+      const email = user.email_id?.toLowerCase() || "";
+      const number = user. mobile_no?.toLowerCase() || "";
+
+      // Check if searchQuery is in name, email, or number
       return (
-        profile?.first_name?.toString().toLowerCase().includes(query) ||
-        profile?.registration_no?.toString().toLowerCase().includes(query) ||
-        profile?.username?.toString().toLowerCase().includes(query) ||
-        profile?.mobile_no?.toString().toLowerCase().includes(query)
+        fullName.includes(searchQuery) ||
+        email.includes(searchQuery) ||
+        number.includes(searchQuery)
       );
     });
-    setProfiles(filteredProfiles);
-    setIsSearching(false);
+  }, [users, loggedInUserId, searchQuery]);
+
+  const paginatedUsers = useMemo(() => {
+    return filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  }, [filteredUsers, currentPage]);
+
+  const handleOpenDialog = useCallback((user) => {
+    setSelectedUser(user);
+    setOpenDialog(true);
+  }, []);
+
+  const renderDialogContent = () => {
+    if (!selectedUser) return null;
+    const contentMap = {
+      0: <AboutPop userDetails={selectedUser} />,
+      1: <FamilyPop userDetails={selectedUser} />,
+      2: <EducationPop userDetails={selectedUser} />,
+      3: <LifeStylePop userDetails={selectedUser} />,
+      4: <PreferencePop userDetails={selectedUser} />,
+    };
+    return contentMap[currentTab] || null;
+  };
+
+  const calculateAge = (dob) => {
+    if (!dob) return null;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+    return age;
+  };
+
+  const renderUserCard = (user) => {
+    const age = user.age || calculateAge(user.date_of_birth);
+    return (
+      <Card
+        key={user._id}
+        sx={{
+          width: { xs: 300, sm: 280, md: 260, lg: 280 },
+          borderRadius: 4,
+          boxShadow: 3,
+          overflow: "hidden",
+          transition: "transform 0.2s",
+          "&:hover": {
+            transform: "translateY(-4px)",
+            boxShadow: 6,
+          },
+          mx: "auto",
+          position: "relative",
+        }}
+      >
+        {user.user_role === "PremiumUser" && (
+          <Chip
+            label="PREMIUM"
+            size="small"
+            sx={{
+              background: "gold",
+              position: "absolute",
+              top: 12,
+              right: 12,
+              fontWeight: "bold",
+              fontSize: { xs: "0.6rem", sm: "0.7rem" },
+            }}
+          />
+        )}
+        <Box
+          sx={{
+            pt: 2,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              width: { xs: 100, sm: 120 },
+              height: { xs: 100, sm: 120 },
+              borderRadius: "50%",
+              border: "3px solid #87CEEB",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+              mb: 2,
+              background: "linear-gradient(45deg, #87CEEB, #E0F7FA)",
+              padding: "2px",
+            }}
+          >
+            <Avatar
+              src={getVerifiedImage(user)}
+              alt="Profile"
+              sx={{ width: "100%", height: "100%" }}
+            />
+          </Box>
+        </Box>
+
+        <CardContent
+          sx={{
+            px: { xs: 1, sm: 2 },
+            pt: 0,
+            pb: 2,
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Box sx={{ textAlign: "center", mb: 0.5 }}>
+            <Typography fontWeight="bold" fontSize="1rem">
+              {user.first_name} {user.last_name}
+            </Typography>
+            <Typography color="text.secondary">{age || "N/A"} yrs</Typography>
+          </Box>
+
+          <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+            <FaBriefcase size={14} color="#777" style={{ marginRight: 6 }} />
+            <Typography variant="body2" color="text.secondary">
+              {user.occupation || "Not specified"}
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+            <FaMapMarkerAlt size={14} color="#777" style={{ marginRight: 6 }} />
+            <Typography variant="body2">
+              {[user.city, user.state].filter(Boolean).join(", ") || "Location not specified"}
+            </Typography>
+          </Box>
+
+          <Divider sx={{ width: "80%", my: 0.5 }} />
+
+          <Box display="flex" justifyContent="space-around" my={2}>
+            <ProfileInfo label="Height" value={user.height || "N/A"} />
+            <ProfileInfo label="Religion" value={user.religion || "N/A"} />
+            <ProfileInfo label="Caste" value={user.caste || "N/A"} />
+          </Box>
+
+          <Box mt="auto">
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              onClick={() => handleOpenDialog(user)}
+              sx={{ borderRadius: 2, py: 1, fontWeight: "bold" ,textTransform:'capitalize'}}
+            >
+              View More
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+    );
   };
 
   return (
-    <div className="search-main-page">
-      <Box sx={{ padding: 3, textAlign: "center" }}>
-        <Typography variant="h4" fontWeight={700} sx={{ color: "#34495e", mb: 4 }}>
-          Search Profiles
+    <Box sx={{ p: { xs: 1, sm: 2 }, backgroundColor: "#f9f9f9" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-around",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: "center",
+          gap: 2,
+          mb: 3,
+        }}
+      >
+        <Typography variant="h4" fontWeight="bold" sx={{ color: "#1a4f72" }}>
+          Search Results
         </Typography>
 
-        <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
+        <Box display="flex" gap={1} width={{ xs: "100%", sm: "70%" }}>
           <TextField
+            size="medium"
             fullWidth
             variant="outlined"
-            placeholder="Search by Name, Email or Phone"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            sx={{ maxWidth: "400px" }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FaSearch />
-                </InputAdornment>
-              ),
-            }}
+            placeholder="Search by name, email, or number"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
           <Button
             variant="contained"
+            color="primary"
             onClick={handleSearch}
-            sx={{
-              height: "56px",
-              textTransform: "capitalize",
-              fontSize: "20px",
-              width: "130px",
-              backgroundColor: "#34495e",
-              ml: 2,
-            }}
+            sx={{ whiteSpace: "nowrap", textTransform: "capitalize", width: "150px", fontSize: "18px" }}
           >
+            <FaSearch style={{ marginRight: 6 }} />
             Search
           </Button>
         </Box>
-
-
-        {isSearching && <LoadingComponent />}
-
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 5, justifyContent: "flex-start", alignItems: "start", marginTop: 2 }}>
-          {profiles.map((profile, index) => (
-            <Card
-              key={index}
-              sx={{
-                width: "270px",
-                height: "420px",
-                borderRadius: 1,
-                boxShadow: 3,
-                textAlign: "center",
-                cursor: "pointer",
-                position: "relative",
-                background: "#fff",
-                color: "black",
-              }}
-            >
-              <CardMedia
-                component="img"
-                height="230px"
-                src={getVerifiedImage(profile)}
-                alt="Profile"
-                sx={{ borderRadius: "1%" }}
-              />
-
-              <CardContent>
-                <Box display="flex" justifyContent="space-between">
-                  <Typography variant="h6" fontWeight="bold" sx={{ color: "black" }}>
-                    {profile?.first_name} {profile.last_name}
-                  </Typography>
-                  <FaHeart
-                    size={28}
-                    style={{ cursor: "pointer", color: profile.like ? "red" : "black" }}
-                    onClick={() => handleLikeToggle(profile?.registration_no, index)}
-                  />
-                </Box>
-                <Typography fontWeight={550} sx={{ color: "black" }}>
-                  {profile?.address || "N/A"}
-                </Typography>
-                <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 1 }}>
-                  <Box>
-                    <Typography variant="body1" fontWeight="bold" sx={{ color: "black" }}>
-                      {profile?.to_age_preference || "N/A"}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: "black" }}>
-                      Age
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="body1" fontWeight="bold" sx={{ color: "black" }}>
-                      {profile?.to_height_preference || "N/A"}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: "black" }}>
-                      Height
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="body1" fontWeight="bold" sx={{ color: "black" }}>
-                      {index + 1}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: "black" }}>
-                      Reg No
-                    </Typography>
-                  </Box>
-                </Box>
-                <Box display="flex" mt={0} mb={2} alignItems="center" justifyContent="flex-end" >
-                  <Typography
-                    onClick={() => handleViewMore(profile)}
-                    sx={{ color: "aqua", fontWeight: "700", cursor: "pointer", }}
-                  >
-                    View More
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
-        </Box>
-        {isLoading && <LoadingComponent/>}
       </Box>
 
-      {/* POPUP DIALOG */}
-      <Dialog 
-  open={!!selectedProfile} 
-  onClose={() => setSelectedProfile(null)} 
-  maxWidth="sm" 
-  fullWidth
-
->
-  {selectedProfile && (
-    <>
-      {/* Dialog Title */}
-      <DialogTitle 
-        sx={{ textAlign: "center", fontWeight: "bold", fontSize: "1.8rem", backgroundColor: "#34495e", color: "#fff" }}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "repeat(2, 1fr)",
+            md: "repeat(3, 1fr)",
+            lg: "repeat(4, 1fr)",
+          },
+          gap: { xs: 2, sm: 3 },
+        }}
       >
-        {selectedProfile?.first_name} {selectedProfile?.last_name}
-      </DialogTitle>
+        {paginatedUsers.map(renderUserCard)}
+      </Box>
 
-      <DialogContent>
-        <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+      {selectedUser && (
+        <ProfileDialog
+          openDialog={openDialog}
+          setOpenDialog={setOpenDialog}
+          selectedUser={selectedUser}
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+          loggedInUserId={loggedInUserId}
+          isLoading={false}
+          renderDialogContent={renderDialogContent}
+        />
+      )}
 
-          {/* Profile Image */}
-          <Box sx={{ textAlign: "center" }}>
-            <img 
-              src={selectedProfile?.profileImg || "https://via.placeholder.com/150"} 
-              alt="Profile"
-              style={{
-                width: "160px",
-                height: "160px",
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: "4px solid #34495e",
-                padding: "5px",
-                boxShadow: "0px 4px 10px rgba(0,0,0,0.2)"
-              }}
-            />
-          </Box>
+     {filteredUsers.length > 0 && (
+  <Box display="flex" justifyContent="end" my={3}>
+    <Pagination
+      count={Math.ceil(filteredUsers.length / itemsPerPage)}
+      page={currentPage}
+      shape="rounded"
+      onChange={(e, page) => setCurrentPage(page)}
+      color="primary"
+    />
+  </Box>
+)}
 
-          {/* Profile Details */}
-          <Box sx={{alignItems:'center',display:'flex'}}>
-          <Box sx={{ textAlign: "start", width: "100%" }}>
-            <Typography variant="body1" sx={{ fontSize: "1.1rem", mb: 1 }}>
-              <strong> Address:</strong> {selectedProfile?.address || "N/A"}
-            </Typography>
-            <Typography variant="body1" sx={{ fontSize: "1.1rem", mb: 1 }}>
-              <strong> DOB:</strong> {selectedProfile?.dob || "N/A"}
-            </Typography>
-            <Typography variant="body1" sx={{ fontSize: "1.1rem", mb: 1 }}>
-              <strong> Gender:</strong> {selectedProfile?.gender || "N/A"}
-            </Typography>
-            <Typography variant="body1" sx={{ fontSize: "1.1rem", mb: 1 }}>
-              <strong> Height:</strong> {selectedProfile?.to_height_preference || "N/A"}
-            </Typography>
-            <Typography variant="body1" sx={{ fontSize: "1.1rem", mb: 1 }}>
-              <strong> Age:</strong> {selectedProfile?.to_age_preference || "N/A"}
-            </Typography>
-          </Box>
-          </Box>
-
-        </Box>
-      </DialogContent>
-
-      {/* Close Button */}
-      <DialogActions sx={{ justifyContent: "center", paddingBottom: "16px" }}>
-        <Button 
-          onClick={() => setSelectedProfile(null)} 
-          variant="contained" 
-          sx={{ backgroundColor: "#34495e", textTransform: "capitalize", fontSize: "1rem", padding: "8px 20px" }}
-        >
-          Close
-        </Button>
-      </DialogActions>
-    </>
+  {/* Show message if no results found */}
+  {searchQuery && filteredUsers.length === 0 && (
+    <Box mt={4} textAlign="center" color="text.secondary">
+      <Typography>No results found for "{searchQuery}"</Typography>
+    </Box>
   )}
-</Dialog>
-
-
-    </div>
-  );
+</Box>
+);
 };
 
 export default Search;
