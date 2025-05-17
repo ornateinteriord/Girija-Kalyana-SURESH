@@ -153,7 +153,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     setForgotPasswordError("");
     
     // Using the resetPassword mutation to send OTP
-    resetPassword({ email, action: "send_otp" }, {
+    resetPassword({ email }, {
       onSuccess: (response) => {
         if (response.success) {
           setOtpSent(true);
@@ -176,9 +176,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     resetPassword({ 
       email, 
       otp, 
-      newPassword, 
-      confirmPassword,
-      action: "reset_password"
+      password : newPassword, 
     }, {
     
     });
