@@ -1,5 +1,6 @@
 import React from "react";
 import { Button, Typography } from "@mui/material";
+import { ModeComment } from "@mui/icons-material";
 
 
 export const customStyles = {
@@ -578,47 +579,48 @@ export const getUserDataColumns = (upgradeUserMutation, handleUpgrade) => [
   ];
 
 
-  export const getOnlineTransactionColumns = (showActive) => [
-    {
-      name: "Date",
-      selector: () => "06-01-2025",
-      sortable: true,
-    },
-    {
-      name: "UserName",
-      selector: (row) => row.username,
-      sortable: true,
-    },
-    {
-      name: "Registration No",
-      selector: (row) => row.id,
-      sortable: true,
-    },
-    {
-      name: "Bank Reference Number",
-      selector: (row) => row.phone,
-      sortable: true,
-    },
-    {
-      name: "Mode Of Payment",
-      selector: () => "-",
-      sortable: false,
-    },
-    {
-      name: "Amount",
-      selector: () => "Rs.2300",
-      sortable: true,
-    },
-    {
-      name: "Status",
-      cell: (row) => (
-        <Typography color={showActive ? "success.main" : "warning.main"}>
-          {showActive ? "TXN_Success" : "TXN_Pending"}
-        </Typography>
-      ),
-      sortable: true,
-    },
-  ];
+export const getOnlineTransactionColumns = (showActive) => [
+  {
+    name: "Date",
+    selector: (row) => new Date(row.date).toLocaleDateString(),
+    sortable: true,
+  },
+  {
+    name: "User Type",
+    selector: (row) => row.usertype || "-",
+    sortable: true,
+  },
+  {
+    name: "Registration No",
+    selector: (row) => row.registration_no,
+    sortable: true,
+  },
+  {
+    name: "Bank Reference Number",
+    selector: (row) => row.bank_ref_num,
+    sortable: true,
+  },
+  {
+    name: "Mode Of Payment",
+    selector: (row) => row.mode || "-",
+    sortable: false,
+  },
+  {
+    name: "Amount",
+    selector: (row) => `Rs.${row.amount}`,
+    sortable: true,
+  },
+  {
+    name: "Status",
+    cell: (row) => (
+      <Typography color={row.status === "TXN_SUCCESS" ? "success.main" : "warning.main"}>
+        {row.status}
+      </Typography>
+    ),
+    sortable: true,
+  },
+];
+
 
   export const getAssistanceOnlineTransactionDataColumns = () => [
     {

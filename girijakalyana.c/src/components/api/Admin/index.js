@@ -82,3 +82,22 @@ export const getAllAssistanceTransactions =()=>{
     },
   });
 }
+export const useOnlineTransactions = () => {
+  return useQuery({
+    queryKey: ['online-transactions'],
+    queryFn: async () => {
+      const response = await get('/api/admin/online-transactions');
+
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to fetch online transactions');
+      }
+
+      console.log("API response:", response);
+      return response.data; // This should be your array of transactions
+    },
+  });
+};
+
+
+
+
