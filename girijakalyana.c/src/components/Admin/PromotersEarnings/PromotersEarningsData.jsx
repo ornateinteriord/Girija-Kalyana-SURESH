@@ -1,53 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
   TextField,
   InputAdornment,
 } from "@mui/material";
-import axios from "axios";
 import { FaSearch } from "react-icons/fa";
 import DataTable from "react-data-table-component";
-import { customStyles, getPromotersEarningsColumns } from "../../../utils/DataTableColumnsProvider";
+
+import {
+  customStyles,
+  getPromotersEarningsColumns,
+} from "../../../utils/DataTableColumnsProvider";
 import { LoadingComponent } from "../../../App";
+import { usePromotersEarnings } from "../../api/Admin";
 
 const PromotersEarningsData = () => {
-  const [records, setRecords] = useState([]);
   const [search, setSearch] = useState("");
 
+  // ✅ Use the custom hook
+  const {
+    data: records = [],
+    isLoading,
+    isError,
+    error,
+  } = usePromotersEarnings();
 
-  // Filter rows based on search
+  // 🔍 Filter records based on search input
   const filteredRows = records.filter((data) => {
+    const searchTerm = search.toLowerCase();
     return (
       search === "" ||
-      data.name.toLowerCase().includes(search.toLowerCase()) ||
-      data.username.toLowerCase().includes(search.toLowerCase()) ||
-      data.email.toLowerCase().includes(search.toLowerCase()) ||
-      data.phone.toLowerCase().includes(search.toLowerCase()) ||
-      data.address.city.toLowerCase().includes(search.toLowerCase())
+      data?.referal_by?.toLowerCase().includes(searchTerm) ||
+      data?.emailid?.toLowerCase().includes(searchTerm) ||
+      data?.mobile?.toLowerCase().includes(searchTerm) ||
+      data?.transaction_no?.toLowerCase().includes(searchTerm) ||
+      data?.ref_no?.toLowerCase().includes(searchTerm)
     );
   });
-
-
-  // Fetch data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "https://jsonplaceholder.typicode.com/users"
-        );
-        setRecords(response.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchData();
-  }, []);
-
-  // Event handlers
-
-
-
 
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
@@ -55,36 +45,32 @@ const PromotersEarningsData = () => {
 
   return (
     <Box sx={{ padding: 4, paddingTop: "80px" }}>
-      {/* Header */}
-
       <Typography
-            variant="h4"
-            fontWeight={600}
-            color="#34495e"
-            fontFamily={"Outfit sans-serif"}
-            sx={{textAlign:{xs:"center",sm:"left"},mb:"20px"}}
-          >
-            Promoters Earning
-          </Typography>
+        variant="h4"
+        fontWeight={600}
+        color="#34495e"
+        fontFamily={"Outfit sans-serif"}
+        sx={{ textAlign: { xs: "center", sm: "left" }, mb: "20px" }}
+      >
+        Promoters Earning
+      </Typography>
 
-        <TextField
-          label="search"
-          variant="outlined"
-          placeholder="Search"
-          value={search}
-          onChange={handleSearchChange}
-          sx={{ width: { xs: '100%',sm:"auto", md: 'auto' },mb:"20px" }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start" style={{ marginRight: "8px" }}>
-                <FaSearch />
-              </InputAdornment>
-            ),
-          }}
-        />
-     
+      <TextField
+        label="Search"
+        variant="outlined"
+        placeholder="Search by email, mobile, referral ID"
+        value={search}
+        onChange={handleSearchChange}
+        sx={{ width: { xs: "100%", sm: "auto", md: "auto" }, mb: "20px" }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <FaSearch />
+            </InputAdornment>
+          ),
+        }}
+      />
 
-      {/* Table */}
       <DataTable
         columns={getPromotersEarningsColumns()}
         data={filteredRows}
@@ -97,11 +83,11 @@ const PromotersEarningsData = () => {
         }}
         noDataComponent={
           <Typography padding={3} textAlign="center">
-            No records found
+            {isError ? error.message : "No records found"}
           </Typography>
         }
         customStyles={customStyles}
-        progressPending={false}
+        progressPending={isLoading}
         progressComponent={<LoadingComponent />}
       />
     </Box>
