@@ -269,55 +269,54 @@ export const getResetPasswordColumns = (handleOpenDialog) =>  [
     },
   ];
 
-
-  export const getPromotersDataColumns = (handleStatusChange) => [
-    {
-      name: "Promoter Name",
-      selector: (row) => row.name,
-      sortable: true,
-    },
-    {
-      name: "Promoter Code",
-      selector: () => "-",
-      sortable: false,
-    },
-    {
-      name: "Mobile",
-      selector: (row) => row.phone,
-      sortable: true,
-    },
-    {
-      name: "Email ID",
-      selector: (row) => row.email,
-      sortable: true,
-    },
-    {
-      name: "Promoter Type",
-      selector: () => "-",
-      sortable: false,
-    },
-    {
-      name: "Status",
-      cell: (row) => (
-        <Typography color={row.status === "active" ? "green" : "orange"}>
-          {row.status === "active" ? "Active" : "Pending"}
-        </Typography>
-      ),
-      sortable: true,
-    },
-    {
-      name: "Change Status",
-      cell: (row) => (
-        <Button
-          variant="outlined"
-          color={row.status === "active" ? "error" : "success"}
-          onClick={() => handleStatusChange(row)}
-        >
-          {row.status === "active" ? "Inactive" : "Active"}
-        </Button>
-      ),
-    },
-  ];
+export const getPromotersDataColumns = (handleStatusChange) => [
+  {
+    name: "Promoter Name",
+    selector: (row) => row.promoter_name || "-",
+    sortable: true,
+  },
+  {
+    name: "Promoter ID",
+    selector: (row) => row.promoter_id || "-",
+    sortable: true,
+  },
+  {
+    name: "Mobile",
+    selector: (row) => row.mobile || "-",
+    sortable: true,
+  },
+  {
+    name: "Email ID",
+    selector: (row) => row.email || "-",
+    sortable: true,
+  },
+  {
+    name: "Membership",
+    selector: (row) => row.membership_type || "-",
+    sortable: true,
+  },
+  {
+    name: "Status",
+    cell: (row) => (
+      <Typography color={row.status === "active" ? "green" : "orange"}>
+        {row.status === "active" ? "Active" : "Pending"}
+      </Typography>
+    ),
+    sortable: true,
+  },
+   {
+    name: "Change Status",
+    cell: (row) => (
+      <Button
+        variant="outlined"
+        color={row.status === "active" ? "error" : "success"}
+        onClick={() => handleStatusChange(row)}
+      >
+        {row.status === "active" ? "Inactive" : "Active"}
+      </Button>
+    ),
+  },
+];
 
 export const getUserTableColumns = (formatUserRole) =>  [
     {
@@ -436,45 +435,43 @@ export const getPromotersEarningsColumns = (handlePayNow) => [
   },
 ];
 
-  export const getPromoterPaymentColumns = (handlePayNow) => [
-    {
-      name: "Promoter Name",
-      selector: (row) => row.name,
-      sortable: true,
-    },
-    {
-      name: "Promoter Code",
-      selector: () => "-",
-      sortable: false,
-    },
-    {
-      name: "Total Earnings",
-      selector: () => "Rs. 50,000",
-      sortable: true,
-    },
-    {
-      name: "Paid",
-      selector: () => "Rs. 30,000",
-      sortable: false,
-    },
-    {
-      name: "Payable",
-      selector: () => "Rs. 20,000",
-      sortable: false,
-    },
-    {
-      name: "Action",
-      cell: (row) => (
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => handlePayNow(row)}
-        >
-          Pay Now
-        </Button>
-      ),
-    },
-  ];
+ export const getPromotersTransactionsColumns = () => [
+  {
+    name: "Promo Code",
+    selector: (row) => row.promocode || "-",
+    sortable: true,
+  },
+  {
+    name: "Transaction ID",
+    selector: (row) => row.transaction_no || "-",
+    sortable: true,
+  },
+  {
+    name: "Transaction Date",
+    selector: (row) => row.transaction_date || "-",
+    sortable: true,
+  },
+  {
+    name: "Amount",
+    selector: (row) => `₹${row.amount || "0"}`,
+    sortable: true,
+  },
+  {
+    name: "Payment Mode",
+    selector: (row) => row.mode_of_payment || "-",
+    sortable: true,
+  },
+  {
+    name: "Status",
+    selector: (row) => row.status,
+    cell: (row) => (
+      <Typography color={row.status === "active" ? "green" : "red"}>
+        {row.status}
+      </Typography>
+    ),
+    sortable: true,
+  },
+];
 
 export const getUserDataColumns = (upgradeUserMutation, handleUpgrade) => [
     {

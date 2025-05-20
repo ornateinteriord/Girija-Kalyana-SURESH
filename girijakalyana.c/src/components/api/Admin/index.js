@@ -111,6 +111,54 @@ export const usePromotersEarnings = () => {
   });
 };
 
+export const usePromotersTransactions = () => {
+  return useQuery({
+    queryKey: ['promoters-transactions'],
+    queryFn: async () => {
+      const response = await get('/api/admin/all-promoters-transactions');
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to fetch promoter transactions');
+      }
+      return response.Transactions;
+    },
+  });
+};
+
+export const usePromoters = () => {
+  return useQuery({
+    queryKey: ['promoters'],
+    queryFn: async () => {
+      const response = await get('/api/admin/all-promoters');
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to fetch promoters');
+      }
+      return response.Promoters; 
+    },
+  });
+};
+
+
+export const useUpdatePromoterStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, status }) => {
+      const response = await put(`/api/admin/promoters/${id}/status`, { status });
+      return response;
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success(data.message || "Status updated successfully");
+        queryClient.invalidateQueries({ queryKey: ["promoters"] });
+      } else {
+        toast.error(data.message || "Failed to update status");
+      }
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Error updating status");
+    },
+  });
+};
 
 export const getAllNews = () => {
   return useQuery({
