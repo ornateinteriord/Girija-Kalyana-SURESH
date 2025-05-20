@@ -98,6 +98,17 @@ export const useOnlineTransactions = () => {
   });
 };
 
-
+export const usePromotersEarnings = () => {
+  return useQuery({
+    queryKey: ['promoters-earnings'],
+    queryFn: async () => {
+      const response = await get('/api/admin/all-promoters-earnings'); // <-- Match your backend route
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to fetch promoter earnings');
+      }
+      return response.Earnings;
+    },
+  });
+};
 
 

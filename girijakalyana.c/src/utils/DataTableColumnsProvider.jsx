@@ -372,45 +372,69 @@ export const getUserTableColumns = (formatUserRole) =>  [
     },
   ];
 
-  export const getPromotersEarningsColumns = (handlePayNow) => [
-    {
-      name: "Promoter Name",
-      selector: (row) => row.name,
-      sortable: true,
-    },
-    {
-      name: "Promoter Code",
-      selector: () => "-",
-      sortable: false,
-    },
-    {
-      name: "Total Earnings",
-      selector: () => "Rs. 50,000",
-      sortable: true,
-    },
-    {
-      name: "Paid",
-      selector: () => "Rs.",
-      sortable: false,
-    },
-    {
-      name: "Payable",
-      selector: () => "Rs.",
-      sortable: false,
-    },
-    {
-      name: "Action",
-      cell: (row) => (
+export const getPromotersEarningsColumns = (handlePayNow) => [
+  {
+    name: "Promoter Code",
+    selector: (row) => row.referal_by || "N/A",
+    sortable: true,
+  },
+  {
+    name: "Reference No",
+    selector: (row) => row.ref_no ||  "N/A",
+    sortable: true,
+  },
+  {
+    name: "Email",
+    selector: (row) => row.emailid ||  "N/A",
+    sortable: true,
+  },
+  {
+    name: "Mobile",
+    selector: (row) => row.mobile || "N/A",
+    sortable: true,
+  },
+  {
+    name: "Total Earnings",
+    selector: (row) => `₹${row.amount_earned || 0}`,
+    sortable: true,
+  },
+  {
+    name: "Transaction ID",
+    selector: (row) => row.transaction_no || "N/A",
+    sortable: false,
+  },
+  {
+    name: "Txn Date",
+    selector: (row) => row.transaction_date || "N/A",
+    sortable: false,
+  },
+  {
+    name: "Status",
+    selector: (row) => row.status,
+    sortable: true,
+    cell: (row) => (
+      <span style={{ color: row.status === "pending" ? "red" : "green" }}>
+        {row.status}
+      </span>
+    ),
+  },
+  {
+    name: "Action",
+    cell: (row) =>
+      row.status === "pending" ? (
         <Button
           variant="contained"
+          color="primary"
           size="small"
           onClick={() => handlePayNow(row)}
         >
           Pay Now
         </Button>
+      ) : (
+        "N/A"
       ),
-    },
-  ];
+  },
+];
 
   export const getPromoterPaymentColumns = (handlePayNow) => [
     {
