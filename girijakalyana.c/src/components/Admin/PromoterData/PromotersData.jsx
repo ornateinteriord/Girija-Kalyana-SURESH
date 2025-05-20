@@ -3,102 +3,105 @@ import {
   Box,
   TextField,
   Typography,
-  Radio,
+  InputAdornment,
   RadioGroup,
   FormControlLabel,
-  InputAdornment,
+  Radio,
 } from "@mui/material";
-import axios from "axios";
 import { FaSearch } from "react-icons/fa";
+import { toast } from "react-toastify";
 import DataTable from "react-data-table-component";
-import {
-  customStyles,
-  getPromotersDataColumns,
-} from "../../../utils/DataTableColumnsProvider";
+import { customStyles, getPromotersDataColumns } from "../../../utils/DataTableColumnsProvider";
 import { LoadingComponent } from "../../../App";
+import { usePromoters, useUpdatePromoterStatus } from "../../api/Admin";
+
 
 const PromotersData = () => {
-  const [records, setRecords] = useState([]);
+  const { data = [], isLoading, isError, error } = usePromoters();
+  const updateStatusMutation = useUpdatePromoterStatus(); 
+
   const [search, setSearch] = useState("");
-  const [showActive, setShowActive] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "https://jsonplaceholder.typicode.com/users"
-        );
-        setRecords(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, []);
+    if (isError) {
+      toast.error(error?.message);
+    }
+  }, [isError, error]);
 
-  const handleSearchChange = (event) => {
-    setSearch(event.target.value);
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
   };
 
-  const filteredRecords = records.filter((data) => {
-    return (
-      search === "" ||
-      data.id.toString().includes(search) ||
-      data.name.toLowerCase().includes(search.toLowerCase()) ||
-      data.username.toLowerCase().includes(search.toLowerCase()) ||
-      data.email.toLowerCase().includes(search.toLowerCase()) ||
-      data.phone.toLowerCase().includes(search.toLowerCase()) ||
-      data.address.city.toLowerCase().includes(search.toLowerCase())
+  const handleStatusChange = (e) => {
+    setStatusFilter(e.target.value);
+  };
+
+  // Updated to call the mutation:
+  const handleStatusToggle = (row) => {
+    const newStatus = row.status === "active" ? "inactive" : "active";
+
+    updateStatusMutation.mutate({ id: row._id, status: newStatus });
+  };
+
+  const filteredData = data
+    .filter((item) => {
+      if (statusFilter === "all") return true;
+      return item.status?.toLowerCase() === statusFilter.toLowerCase();
+    })
+    .filter((item) =>
+      [item.promoter_name, item.mobile, item.email]
+        .map((field) => field?.toString().toLowerCase())
+        .some((val) => val?.includes(search.toLowerCase()))
     );
-  });
 
   return (
-    <Box padding={4} marginTop={7} >
+    <Box sx={{ padding: 4, paddingTop: "85px" }}>
       <Typography
         variant="h4"
-        fontWeight={600}
+        gutterBottom
         color="#34495e"
-        sx={{ textAlign: { xs: "center", sm: "left" }, mb: "10px" }}
-        fontFamily={"Outfit sans-serif"}
+        fontWeight={600}
+        fontFamily={"Outfit, sans-serif"}
+        sx={{ textAlign: { xs: "center", sm: "left" }, mb: "20px" }}
       >
         Promoters
       </Typography>
-    <Box display="flex" alignItems="center" gap={2}>
-      <TextField
-        label="search"
-        variant="outlined"
-        placeholder="Search"
-        value={search}
-        onChange={handleSearchChange}
-        sx={{ width: { xs: "100%", sm: "auto", md: "auto" } }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start" style={{ marginRight: "8px" }}>
-              <FaSearch />
-            </InputAdornment>
-          ),
-        }}
-      />
+
+      <Box
+        display="flex"
+        flexDirection={{ xs: "column", sm: "row" }}
+        gap={2}
+        alignItems="center"
+        mb={2}
+      >
+        <TextField
+          placeholder="Search"
+          label="Search"
+          variant="outlined"
+          value={search}
+          onChange={handleSearch}
+          sx={{ width: { xs: "100%", sm: "auto" } }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <FaSearch />
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <RadioGroup row value={statusFilter} onChange={handleStatusChange}>
+          <FormControlLabel value="all" control={<Radio />} label="All" />
+          <FormControlLabel value="active" control={<Radio />} label="Active" />
+          <FormControlLabel value="inactive" control={<Radio />} label="Inactive" />
+          <FormControlLabel value="pending" control={<Radio />} label="Pending" />
+        </RadioGroup>
       </Box>
 
-      <RadioGroup
-        row
-        defaultValue="all"
-        onChange={(e) => setShowActive(e.target.value === "active")}
-      >
-        <FormControlLabel value="all" control={<Radio />} label="All" />
-        <FormControlLabel value="active" control={<Radio />} label="Active" />
-        <FormControlLabel
-          value="inactive"
-          control={<Radio />}
-          label="Inactive"
-        />
-        <FormControlLabel value="pending" control={<Radio />} label="Pending" />
-      </RadioGroup>
-
       <DataTable
-        columns={getPromotersDataColumns()}
-        data={filteredRecords}
+        columns={getPromotersDataColumns(handleStatusToggle)}
+        data={filteredData}
         pagination
         paginationPerPage={6}
         paginationRowsPerPageOptions={[6, 10, 15, 20]}
@@ -106,14 +109,14 @@ const PromotersData = () => {
           rowsPerPageText: "Rows per page:",
           rangeSeparatorText: "of",
         }}
+        customStyles={customStyles}
+        progressPending={isLoading || updateStatusMutation.isLoading}
+        progressComponent={<LoadingComponent />}
         noDataComponent={
           <Typography padding={3} textAlign="center">
             No records found
           </Typography>
         }
-        customStyles={customStyles}
-        progressPending={false}
-        progressComponent={<LoadingComponent />}
       />
     </Box>
   );
