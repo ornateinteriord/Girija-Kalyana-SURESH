@@ -1,10 +1,8 @@
 // hooks/useUserProfileQuery.js
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { get, put } from "../authHooks";
+import { get, post, put } from "../authHooks";
 import { toast } from "react-toastify";
-
-
 
 export const getAllUserProfiles = () => {
   return useQuery({
@@ -23,15 +21,15 @@ export const getAllUserProfiles = () => {
 export const UpgradeUserStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ regno, status,image_verification }) => {
-        const response = await put(`/api/admin/upgrade-user/${regno}`, {
-          status,
-          image_verification
-        });
-        return response;
+    mutationFn: async ({ regno, status, image_verification }) => {
+      const response = await put(`/api/admin/upgrade-user/${regno}`, {
+        status,
+        image_verification,
+      });
+      return response;
     },
     onSuccess: (response) => {
-      if(response?.success){
+      if (response?.success) {
         toast.success(response.message);
         queryClient.invalidateQueries({ queryKey: ["profiles"] });
       } else {
@@ -49,13 +47,13 @@ export const UserResetPassword = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ regno, password }) => {
-        const response = await put(`/api/admin/reset-password/${regno}`, {
-          password
-        });
-        return response;
+      const response = await put(`/api/admin/reset-password/${regno}`, {
+        password,
+      });
+      return response;
     },
     onSuccess: (response) => {
-      if(response?.success){
+      if (response?.success) {
         toast.success(response.message);
         queryClient.invalidateQueries({ queryKey: ["profiles"] });
       } else {
@@ -69,7 +67,7 @@ export const UserResetPassword = () => {
   });
 };
 
-export const getAllAssistanceTransactions =()=>{
+export const getAllAssistanceTransactions = () => {
   return useQuery({
     queryKey: ["transactions"],
     queryFn: async () => {
@@ -81,15 +79,17 @@ export const getAllAssistanceTransactions =()=>{
       }
     },
   });
-}
+};
 export const useOnlineTransactions = () => {
   return useQuery({
-    queryKey: ['online-transactions'],
+    queryKey: ["online-transactions"],
     queryFn: async () => {
-      const response = await get('/api/admin/online-transactions');
+      const response = await get("/api/admin/online-transactions");
 
       if (!response.success) {
-        throw new Error(response.message || 'Failed to fetch online transactions');
+        throw new Error(
+          response.message || "Failed to fetch online transactions"
+        );
       }
 
       console.log("API response:", response);
@@ -98,6 +98,39 @@ export const useOnlineTransactions = () => {
   });
 };
 
+export const getAllNews = () => {
+  return useQuery({
+    queryKey: ["news"],
+    queryFn: async () => {
+      const response = await get("/api/admin/all-news");
+      if (response.success) {
+        return response.data;
+      } else {
+        throw new Error(response.message);
+      }
+    },
+  });
+};
 
 
-
+export const useAddNews = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (formData) => {
+      const response = await post("/api/admin/add-news",formData);
+      return response;
+    },
+    onSuccess: (response) => {
+      if (response?.success) {
+        toast.success(response.message);
+        queryClient.invalidateQueries({ queryKey: ["news"] });
+      } else {
+        toast.error(response?.message);
+      }
+    },
+    onError: (err) => {
+      const errorMessage = err.response?.data?.message;
+      toast.error(errorMessage);
+    },
+  });
+};

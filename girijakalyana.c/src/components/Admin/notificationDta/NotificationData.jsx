@@ -3,68 +3,105 @@ import {
   Box,
   Button,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Select,
   MenuItem,
   Modal,
-  Pagination,
   InputAdornment,
+  FormControl,
+  InputLabel,
+  FormHelperText,
 } from "@mui/material";
 
-import axios from "axios";
-import { FaAd, FaSearch } from "react-icons/fa";
-import { FaBandage } from "react-icons/fa6";
+import { FaSearch } from "react-icons/fa";
 import DataTable from "react-data-table-component";
 import {
   customStyles,
   getNotificationDataColumns,
 } from "../../../utils/DataTableColumnsProvider";
 import { LoadingComponent } from "../../../App";
+import { getAllNews, useAddNews } from "../../api/Admin";
+import { toast } from "react-toastify";
 
 const NotificationData = () => {
-  const [records, setRecords] = useState([]);
+  const { data: records = [], isLoading, isError, error } = getAllNews();
   const [search, setSearch] = useState("");
   const [showAddNews, setShowAddNews] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({
+    news_details: false,
+    from_date: false,
+    to_date: false,
+    news_type: false,
+  });
 
-  // Fetch data
+  const addNewsMutation = useAddNews();
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "https://jsonplaceholder.typicode.com/users"
-        );
-        setRecords(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, []);
+    if (isError) {
+      toast.error(error.message);
+    }
+  }, [isError, error]);
 
-  // Handle Search
   const filterCurrentRowData = records.filter(
     (data) =>
       search === null ||
-      data.id.toString().includes(search.toString()) ||
-      data.name.toLowerCase().includes(search.toLowerCase()) ||
-      data.username.toLowerCase().includes(search.toLowerCase()) ||
-      data.email.toLowerCase().includes(search.toLowerCase()) ||
-      data.phone.toLowerCase().includes(search.toLowerCase())
+      data.news_id?.toString().includes(search.toString()) ||
+      data.news_details?.toLowerCase().includes(search.toLowerCase()) ||
+      data.from_date.toLowerCase().includes(search.toLowerCase()) ||
+      data.to_date.toLowerCase().includes(search.toLowerCase()) ||
+      data.news_type.toLowerCase().includes(search.toLowerCase()) ||
+      data.status.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
   };
 
-  // Popup Handlers
   const handleClosePopup = () => setShowAddNews(false);
   const handleShowPopup = () => setShowAddNews(true);
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = () => {
+    const newErrors = {
+      news_details: !formData.news_details,
+      from_date: !formData.from_date,
+      to_date: !formData.to_date,
+      news_type: !formData.news_type,
+    };
+
+    setErrors(newErrors);
+    if (Object.values(newErrors).some((error) => error)) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+    if (new Date(formData.to_date) < new Date(formData.from_date)) {
+      toast.error("To Date must be after From Date");
+      return;
+    }
+    addNewsMutation.mutate(formData, {
+      onSuccess: () => {
+        handleClosePopup();
+        setFormData({
+          news_details: "",
+          from_date: "",
+          to_date: "",
+          news_type: "",
+          status: "active",
+        });
+      },
+      onError: (error) => {
+        toast.error(`Error: ${error.message}`);
+      },
+    });
+  };
 
   return (
     <Box
@@ -74,15 +111,23 @@ const NotificationData = () => {
         marginTop: "70px",
       }}
     >
-      <Typography  variant="h4"
-          color="#34495e"
-          fontFamily={"Outfit sans-serif"}
-          sx={{ textAlign: { xs: "center", sm: "left" },mb:"20px"}}>
+      <Typography
+        variant="h4"
+        color="#34495e"
+        fontFamily={"Outfit sans-serif"}
+        sx={{ textAlign: { xs: "center", sm: "left" }, mb: "20px" }}
+      >
         Notification Data
       </Typography>
-      
 
-      <Box sx={{display:"flex",justifyContent:"space-between",flexDirection:{xs:"column",sm:"row"},  mb:"20px"}}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          flexDirection: { xs: "column", sm: "row" },
+          mb: "20px",
+        }}
+      >
         <TextField
           label="search"
           variant="outlined"
@@ -99,17 +144,17 @@ const NotificationData = () => {
           }}
         />
         <Button
-        variant="contained"
-        onClick={handleShowPopup}
-        style={{
-          width: "100px",
-          height: "50px",
-          background: "#34495e",
-          color: "#fff",
-        }}
-      >
-        Add
-      </Button>
+          variant="contained"
+          onClick={handleShowPopup}
+          style={{
+            width: "100px",
+            height: "50px",
+            background: "#34495e",
+            color: "#fff",
+          }}
+        >
+          Add
+        </Button>
       </Box>
 
       <DataTable
@@ -128,11 +173,10 @@ const NotificationData = () => {
           </Typography>
         }
         customStyles={customStyles}
-        progressPending={false}
+        progressPending={isLoading}
         progressComponent={<LoadingComponent />}
       />
 
-      {/* Add News Modal */}
       <Modal open={showAddNews} onClose={handleClosePopup}>
         <Box
           sx={{
@@ -157,6 +201,11 @@ const NotificationData = () => {
               rows={4}
               fullWidth
               variant="outlined"
+              name="news_details"
+              value={formData.news_details}
+              onChange={handleInputChange}
+              error={errors.news_details}
+              helperText={errors.news_details ? "This field is required" : ""}
             />
           </Box>
           <Box display="flex" gap={2} mb={2}>
@@ -165,30 +214,52 @@ const NotificationData = () => {
               type="date"
               fullWidth
               InputLabelProps={{ shrink: true }}
+              name="from_date"
+              value={formData.from_date}
+              onChange={handleInputChange}
+              error={errors.from_date}
+              helperText={errors.from_date ? "This field is required" : ""}
             />
             <TextField
               label="To Date"
               type="date"
               fullWidth
               InputLabelProps={{ shrink: true }}
+              name="to_date"
+              value={formData.to_date}
+              onChange={handleInputChange}
+              error={errors.to_date}
+              helperText={errors.to_date ? "This field is required" : ""}
             />
           </Box>
           <Box mb={2}>
-            <Select fullWidth defaultValue="" displayEmpty>
-              <MenuItem value="" disabled>
-                Select News Type
-              </MenuItem>
-              <MenuItem value="Premium">Premium</MenuItem>
-              <MenuItem value="Free">Free</MenuItem>
-              <MenuItem value="Promoter">Promoter</MenuItem>
-            </Select>
+            <FormControl fullWidth error={errors.news_type}>
+              <Select
+                labelId="news-type-label"
+                name="news_type"
+                value={formData.news_type}
+                onChange={handleInputChange}
+                displayEmpty
+                renderValue={(selected) =>
+                  selected || (
+                    <span style={{ opacity: 0.7 }}>Select News Type</span>
+                  )
+                }
+              >
+                <MenuItem value="" disabled>
+                  Select News Type
+                </MenuItem>
+                <MenuItem value="Premium">Premium</MenuItem>
+                <MenuItem value="Free">Free</MenuItem>
+                <MenuItem value="Promoter">Promoter</MenuItem>
+              </Select>
+              {errors.news_type && (
+                <FormHelperText>Please select a news type</FormHelperText>
+              )}
+            </FormControl>
           </Box>
           <Box display="flex" justifyContent="space-between">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleClosePopup}
-            >
+            <Button variant="contained" color="primary" onClick={handleSubmit}>
               Submit
             </Button>
             <Button

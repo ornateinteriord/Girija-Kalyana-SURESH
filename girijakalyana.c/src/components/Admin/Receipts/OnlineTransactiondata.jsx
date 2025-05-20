@@ -1,19 +1,29 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, TextField, Typography, InputAdornment } from "@mui/material";
 import { FaSearch } from "react-icons/fa";
 import DataTable from "react-data-table-component";
-import { customStyles, getOnlineTransactionColumns } from "../../../utils/DataTableColumnsProvider";
+import {
+  customStyles,
+  getOnlineTransactionColumns,
+} from "../../../utils/DataTableColumnsProvider";
 import { LoadingComponent } from "../../../App";
 import { useOnlineTransactions } from "../../api/Admin";
-
-
+import { toast } from "react-toastify";
 
 const OnlineTransactionData = () => {
   const [search, setSearch] = useState("");
 
-
-  const { data: records = [], isLoading, isError, error } = useOnlineTransactions(); 
-
+  const {
+    data: records = [],
+    isLoading,
+    isError,
+    error,
+  } = useOnlineTransactions();
+  useEffect(() => {
+    if (isError) {
+      toast.error(error.message);
+    }
+  }, [isError, error]);
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
@@ -22,22 +32,12 @@ const OnlineTransactionData = () => {
   const filteredRows = records.filter((data) => {
     return (
       search === "" ||
-      (data.registration_no && data.registration_no.toLowerCase().includes(search.toLowerCase())) ||
-      (data.usertype && data.usertype.toLowerCase().includes(search.toLowerCase()))
+      (data.registration_no &&
+        data.registration_no.toLowerCase().includes(search.toLowerCase())) ||
+      (data.usertype &&
+        data.usertype.toLowerCase().includes(search.toLowerCase()))
     );
   });
-
-  if (isLoading) {
-    return <LoadingComponent />;
-  }
-
-  if (isError) {
-    return (
-      <Typography color="error" padding={3} textAlign="center">
-        Error loading transactions: {error.message}
-      </Typography>
-    );
-  }
 
   return (
     <Box p={2} marginTop={8}>
@@ -51,7 +51,12 @@ const OnlineTransactionData = () => {
       >
         Online Transactions
       </Typography>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
         <TextField
           label="Search"
           variant="outlined"

@@ -61,7 +61,6 @@ export const useLoginMutation = () => {
     onError: (err) => {
       const message =
         err?.response?.data?.message || "Login failed. Please try again.";
-      // console.error("Login error:", message);
       toast.error(message);
     },
   });
@@ -86,22 +85,3 @@ export const useResetpassword = () => {
     }
   });
 };
-
-
-export const useRecoverPassword = () => {
-  return useMutation({
-    mutationFn: async (data) => {
-      return await post("/api/auth/recover-password", data);
-    },
-    onSuccess: (response) => {
-      if (response.success) {
-        toast.success(response.message);
-      } else {
-        console.error(response.message);
-      }
-    },
-    onError: (error) => {
-      toast.error(error?.response?.data?.message || 'Something went wrong');
-    }
-  });
-}

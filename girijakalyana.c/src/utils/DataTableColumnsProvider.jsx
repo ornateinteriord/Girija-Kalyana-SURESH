@@ -814,37 +814,34 @@ export const getOnlineTransactionColumns = (showActive) => [
   export const getNotificationDataColumns = () => [
     {
       name: "News ID",
-      selector: (row) => row.id,
+      selector: (row) => row.news_id,
       sortable: true,
     },
     {
       name: "News Details",
-      selector: () => "-",
+      selector: (row) => row.news_details,
       sortable: false,
     },
     {
       name: "From Date",
-      selector: () => "12-01-2025",
+      selector: (row) => row.from_date,
       sortable: true,
     },
     {
       name: "To Date",
-      selector: () => "12-02-2025",
+      selector: (row) => row.to_date,
       sortable: true,
     },
     {
       name: "Type Of News",
-      selector: () => "-",
+      selector: (row) => row.news_type,
       sortable: false,
     },
     {
       name: "Status",
-      cell: (row, index) => (
-        <Typography
-          variant="body2"
-          color={index % 2 === 0 ? "green" : "orange"}
-        >
-          {index % 2 === 0 ? "Active" : "Pending"}
+      cell: (row) => (
+        <Typography color={row.status === "active" ? "green" : "red"}>
+          {row.status}
         </Typography>
       ),
       sortable: true,
