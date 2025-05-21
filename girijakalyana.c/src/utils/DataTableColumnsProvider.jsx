@@ -296,14 +296,14 @@ export const getPromotersDataColumns = (handleStatusChange) => [
     sortable: true,
   },
   {
-    name: "Status",
-    cell: (row) => (
-      <Typography color={row.status === "active" ? "green" : "orange"}>
-        {row.status === "active" ? "Active" : "Pending"}
-      </Typography>
-    ),
-    sortable: true,
-  },
+  name: "Status",
+  cell: (row) => (
+    <Typography color={row.status === "active" ? "green" : row.status === "inactive" ? "red" : "orange"}>
+      {row.status === "active" ? "Active" : row.status === "inactive" ? "Inactive" : "Pending"}
+    </Typography>
+  ),
+  sortable: true,
+},
    {
     name: "Change Status",
     cell: (row) => (
