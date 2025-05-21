@@ -40,27 +40,7 @@ api.interceptors.request.use(
 
 );
  
-// api.interceptors.response.use(
 
-//   (response) => response,
-
-//   (error) => {
-
-//     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-
-//       localStorage.removeItem("token"); // Remove token
-
-//       window.location.href = "/login"; // Redirect to login
-
-//     }
-
-//     return Promise.reject(error);
-
-//   }
-
-// );
- 
-// HTTP methods
 
 export const post = async (path, data) => {
 
