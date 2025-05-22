@@ -39,6 +39,22 @@ api.interceptors.request.use(
   }
 
 );
+
+
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    const originalRequest = error.config;
+    if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
+      originalRequest._retry = true;
+      TokenService.removeToken();
+      window.location.href = '/'; 
+    }
+    return Promise.reject(error);
+  }
+);
  
 
 
