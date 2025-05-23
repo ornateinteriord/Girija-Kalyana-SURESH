@@ -43,6 +43,7 @@ const Photos = () => {
               ...prev,
               image: data.secure_url,
               previewImage: data.secure_url,
+              image_verification: "pending" 
             }));
             toast.success("Image uploaded to Cloudinary");
           } else {
@@ -71,6 +72,7 @@ const Photos = () => {
       {
         registerNo,
         image: formData.image,
+        image_verification: "pending"
       },
       {
         onSuccess: () => {

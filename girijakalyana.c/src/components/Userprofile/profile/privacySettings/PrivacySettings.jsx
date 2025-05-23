@@ -1,22 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, useMediaQuery, useTheme, Switch, FormControlLabel } from "@mui/material";
+import {
+  Box,
+  Typography,
+  useMediaQuery,
+  useTheme,
+  Switch,
+  FormControlLabel,
+} from "@mui/material";
 import { FaRegImage } from "react-icons/fa";
-import { useGetMemberDetails, useUpdateProfile } from "../../../api/User/useGetProfileDetails";
+import {
+  useGetMemberDetails,
+  useUpdateProfile,
+} from "../../../api/User/useGetProfileDetails";
 import TokenService from "../../../token/tokenService";
 
 const privacyOptions = [
-  { label: "Display Photo", value: "enable", description: "Show your photo to all users" },
-  { label: "Display Only to Paid Users", value: "Premiumuser", description: "Only visible to premium members" },
-  { label: "Display Photo on Request", value: "requestuser", description: "Users must request to view your photo" },
+  {
+    label: "Display Photo",
+    value: "enable",
+    description: "Show your photo to all users",
+  },
+  {
+    label: "Display Only to Paid Users",
+    value: "Premiumuser",
+    description: "Only visible to premium members",
+  },
+  {
+    label: "Display Photo on Request",
+    value: "requestuser",
+    description: "Users must request to view your photo",
+  },
 ];
 
 const PrivacySettings = () => {
   const theme = useTheme();
-  const registerNo = TokenService.getRegistrationNo()
+  const registerNo = TokenService.getRegistrationNo();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { data: userProfile, isLoading } = useGetMemberDetails(registerNo);
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
-  
+
   // Initialize state based on userProfile
   const [settings, setSettings] = useState({
     enable: false,
@@ -28,9 +50,9 @@ const PrivacySettings = () => {
   useEffect(() => {
     if (userProfile) {
       setSettings({
-        enable: userProfile.secure_image === 'enable',
-        Premiumuser: userProfile.secure_image === 'Premiumuser',
-        requestuser: userProfile.secure_image === 'requestuser',
+        enable: userProfile.secure_image === "enable",
+        Premiumuser: userProfile.secure_image === "Premiumuser",
+        requestuser: userProfile.secure_image === "requestuser",
       });
     }
   }, [userProfile]);
@@ -41,16 +63,16 @@ const PrivacySettings = () => {
       Premiumuser: false,
       requestuser: false,
     };
-    
+
     // Only allow one option to be selected at a time (radio button behavior)
     newSettings[option.value] = !settings[option.value];
-    
+
     setSettings(newSettings);
-    
+
     // Update the profile with the new secure_image value
     updateProfile({
       registration_no: registerNo,
-      secure_image: newSettings[option.value] ? option.value : 'disable'
+      secure_image: newSettings[option.value] ? option.value : "disable",
     });
   };
 
@@ -83,9 +105,11 @@ const PrivacySettings = () => {
       </Typography>
 
       <Typography variant="body1" sx={{ mb: 3, color: "#555" }}>
-        {userProfile?.image_verification === 'active' 
-          ? "Your photo is verified. Choose who can see it:" 
-          : "Please verify your photo to access privacy settings."}
+        {userProfile?.image_verification === "active"
+          ? "Your photo is verified. Choose who can see it:"
+          : userProfile?.image
+          ? "Please verify your photo to access privacy settings."
+          : "Please upload a profile photo to access privacy settings."}
       </Typography>
 
       <Box
@@ -104,7 +128,7 @@ const PrivacySettings = () => {
           <Box
             key={index}
             sx={{
-              maxWidth: '550px',
+              maxWidth: "550px",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
@@ -114,8 +138,9 @@ const PrivacySettings = () => {
               backgroundColor: "#fff",
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
               transition: "0.3s",
-              opacity: userProfile?.image_verification === 'active' ? 1 : 0.6,
-              pointerEvents: userProfile?.image_verification === 'active' ? 'auto' : 'none',
+              opacity: userProfile?.image_verification === "active" ? 1 : 0.6,
+              pointerEvents:
+                userProfile?.image_verification === "active" ? "auto" : "none",
               "&:hover": {
                 backgroundColor: "#f0f0f0",
               },
@@ -127,7 +152,7 @@ const PrivacySettings = () => {
                 <Typography
                   variant="h6"
                   sx={{
-                    fontSize: { xs: '16px', md: '18px' },
+                    fontSize: { xs: "16px", md: "18px" },
                     color: "#555",
                     fontWeight: 500,
                   }}
@@ -145,13 +170,15 @@ const PrivacySettings = () => {
                 </Typography>
               </Box>
             </Box>
-            
+
             <Switch
               checked={settings[option.value]}
               onChange={() => handleToggle(option)}
               color="primary"
-              inputProps={{ 'aria-label': option.label }}
-              disabled={userProfile?.image_verification !== 'active' || isUpdating}
+              inputProps={{ "aria-label": option.label }}
+              disabled={
+                userProfile?.image_verification !== "active" || isUpdating
+              }
             />
           </Box>
         ))}
