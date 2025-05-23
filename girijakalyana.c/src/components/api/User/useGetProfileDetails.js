@@ -65,13 +65,13 @@ export const useExpressInterest = () => {
 
   return useMutation({
     mutationFn: async ({
-      senderRegistrationNo,
-      recipientRegistrationNo,
+      sender,
+      recipient,
       message,
     }) => {
       const { data } = await post("/api/user/interest", {
-        senderRegistrationNo,
-        recipientRegistrationNo,
+        sender,
+        recipient,
         message,
       });
       return data;
@@ -92,28 +92,28 @@ export const useExpressInterest = () => {
   });
 };
 
-export const useGetReceivedInterests = (recipientRegistrationNo) => {
+export const useGetReceivedInterests = (recipient) => {
   return useQuery({
-    queryKey: ["receivedInterests", recipientRegistrationNo],
+    queryKey: ["receivedInterests", recipient],
     queryFn: async () => {
       const response = await get(
-        `/api/user/interest/received/${recipientRegistrationNo}`
+        `/api/user/interest/received/${recipient}`
       );
 
       return response;
     },
-    enabled: !!recipientRegistrationNo,
+    enabled: !!recipient,
     staleTime: 1000 * 60 * 5,
   });
 };
 
 // Get interest status query
 // api/User/useGetProfileDetails.js
-export const useGetSentInterests = (senderRegistrationNo) => {
+export const useGetSentInterests = (sender) => {
   return useSuspenseQuery({
-    queryKey: ["sentInterests", senderRegistrationNo],
+    queryKey: ["sentInterests", sender],
     queryFn: async () => {
-      const data = await get(`/api/user/interest/sent/${senderRegistrationNo}`);
+      const data = await get(`/api/user/interest/sent/${sender}`);
       return data || { data: [], totalPages: 0 };
     },
   });
@@ -124,12 +124,12 @@ export const useUpdateInterestStatus = () => {
 
   return useMutation({
     mutationFn: async ({
-      senderRegistrationNo,
-      recipientRegistrationNo,
+      sender,
+      recipient,
       status,
     }) => {
-      const { data } = await put(`/api/user/interest/${senderRegistrationNo}`, {
-        recipientRegistrationNo,
+      const { data } = await put(`/api/user/interest/${sender}`, {
+        recipient,
         status,
       });
       return data;
@@ -145,14 +145,14 @@ export const useUpdateInterestStatus = () => {
   });
 };
 
-export const useGetAcceptedInterests = (recipientRegistrationNo) => {
+export const useGetAcceptedInterests = (recipient) => {
   return useQuery({
-    queryKey: ["acceptedInterests", recipientRegistrationNo],
+    queryKey: ["acceptedInterests", recipient],
     queryFn: async () => {
-      const response = await get(`/api/user/interest/accepted/${recipientRegistrationNo}`);
+      const response = await get(`/api/user/interest/accepted/${recipient}`);
       return response;
     },
-    enabled: !!recipientRegistrationNo,
+    enabled: !!recipient,
     staleTime: 1000 * 60 * 5,
     onError: (error) => {
       toast.error(error?.message || "Failed to fetch accepted interests.");
@@ -163,11 +163,11 @@ export const useGetAcceptedInterests = (recipientRegistrationNo) => {
 
 export const useCancelSentInterest = () => {
   return useMutation({
-    mutationFn: ({ senderRegistrationNo, recipientRegistrationNo }) => {
+    mutationFn: ({ sender, recipient }) => {
       return del("/api/user/cancel", {
         data: {
-          senderRegistrationNo,
-          recipientRegistrationNo,
+          sender,
+          recipient,
         },
       });
     },

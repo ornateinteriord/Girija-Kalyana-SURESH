@@ -156,9 +156,9 @@ const ProfileDialog = ({
   const handleSendInterest = () => {
     expressInterestMutation.mutate(
       {
-        senderRegistrationNo: loggedInUserId,
-        recipientRegistrationNo: selectedUser.registration_no,
-        message: "I'd like to connect with you!",
+        sender: loggedInUserId,
+        recipient: selectedUser.registration_no,
+        message: "Expressed interest in you",
       },
       {
         onSuccess: () => {
