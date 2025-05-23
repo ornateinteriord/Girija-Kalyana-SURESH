@@ -61,7 +61,7 @@ const MyInterest = () => {
   };
 
   return (
-    <Box sx={{ padding: 2, backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
+    <Box sx={{ padding: 0, backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
       {/* Header */}
       <Box sx={{ marginBottom: 2 }}>
         <Typography variant="h5" fontWeight={900} color="#34495e">
@@ -84,7 +84,7 @@ const MyInterest = () => {
       </Tabs>
 
       {/* Content Section */}
-      <Box sx={{ padding: 2, backgroundColor: "#fff", borderRadius: 2, boxShadow: 1, color: "black" }}>
+      <Box sx={{ padding: 0, backgroundColor: "#fff", borderRadius: 2, boxShadow: 1, color: "black" }}>
         {renderContents()}
       </Box>
     </Box>

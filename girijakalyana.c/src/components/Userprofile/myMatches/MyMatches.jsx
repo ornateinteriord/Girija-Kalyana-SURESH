@@ -192,19 +192,23 @@ const MyMatches = () => {
           No matches found based on your preferences.
         </Typography>
       ) : (
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: "1fr",
-              sm: "repeat(2, 1fr)",
-              md: "repeat(3, 1fr)",
-              lg: "repeat(4, 1fr)",
-            },
-            gap: { xs: 2, sm: 3 },
-            justifyContent: "center",
-          }}
-        >
+       <Box
+  sx={{
+    display: {
+      xs: "flex", 
+      sm: "grid",
+    },
+    flexDirection: "column",
+    alignItems: "center",
+    gridTemplateColumns: {
+      sm: "repeat(2, 1fr)",
+      md: "repeat(3, 1fr)",
+      lg: "repeat(4, 1fr)",
+    },
+    gap: { xs: 2, sm: 3 },
+  }}
+>
+
           {userCard.map((user) => {
             const connectionStatus = getConnectionStatus(user.registration_no);
     const imageSrc = getVerifiedImage(user, loggedInUserRole, connectionStatus);

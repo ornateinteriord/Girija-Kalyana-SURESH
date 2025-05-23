@@ -40,6 +40,9 @@ import TokenService from "../../token/tokenService";
 import { useChangePassword, useGetMemberDetails } from "../../api/User/useGetProfileDetails";
 import { toast } from "react-toastify";
 import { LoadingComponent } from "../../../App";
+import SidebarMenu from "../../../utils/sidebar/SidebarMenu";
+
+
 
 
 const drawerWidth = 240;
@@ -56,6 +59,8 @@ const UserNavBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [openChangePasswordDialog, setOpenChangePasswordDialog] = useState(false);
+  const [selectedItem, setSelectedItem] = useState("Dashboard");
+
   const [passwordData, setPasswordData] = useState({
     oldPassword: '',
     newPassword: '',
@@ -272,92 +277,36 @@ const handleSubmitPasswordChange = () => {
           </Toolbar>
         </AppBar>
 
-        <Drawer
-          variant="persistent"
-          open={isSidebarOpen}
-          sx={{
-            width: isSidebarOpen ? drawerWidth : 0,
-            flexShrink: 0,
-            [`& .MuiDrawer-paper`]: {
-              width: isSidebarOpen ? drawerWidth : 0,
-              boxSizing: "border-box",
-              background: "#1a4f72",
-              color: "#fff",
-              transition: "width 0.6s ease, opacity 0.6s ease",
-              opacity: isSidebarOpen ? 1 : 0,
-            },
-          }}
-        >
-          <Toolbar />
-          <Box sx={{ overflow: "auto" }}>
-            <List>
-              <ListItem>
-                <Box sx={{ textAlign: "center", py: 0 }}>
-                  <Typography variant="h5" marginLeft={2} textTransform={"capitalize"}>
-                    {userProfile?.first_name}
-                  </Typography>
-                </Box>
-              </ListItem>
-              {[
-                {
-                  text: "Dashboard",
-                  icon: <FaDashcube />,
-                  onClick: handleDashboardClick,
-                },
-                {
-                  text: "Profile",
-                  icon: <FaUser />,
-                  onClick: handleProfileClick,
-                },
-                {
-                  text: "My Matches",
-                  icon: <FaUsers />,
-                  onClick: handleMatchesClick,
-                },
-                {
-                  text: "My Interest",
-                  icon: <FaHeart />,
-                  onClick: handleInterestClick,
-                },
-                {
-                  text: "View All",
-                  icon: <FaUsersViewfinder />,
-                  onClick: handleViewAllClick,
-                },
-                {
-                  text: "Search",
-                  icon: <FaSearch />,
-                  onClick: handleSearchClick,
-                },
-                {
-                  text: "Logout",
-                  icon: <FaSignOutAlt />,
-                  onClick: handleOpenLogoutDialog,
-                },
-              ].map((item, index) => (
-                <ListItem button key={index} onClick={item.onClick}>
-                  <Button
-                    variant="text"
-                    startIcon={item.icon}
-                    sx={{
-                      color: "#fff",
-                      fontSize: "1.2rem",
-                      textTransform: "capitalize",
-                      marginLeft: "10px",
-                      gap: "10px",
-                      "&:hover": {
-                        backgroundColor: "transparent",
-                        color: "#fff",
-                      },
-                    }}
-                  >
-                    {item.text}
-                  </Button>
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-        </Drawer>
+       <Drawer
+  variant="persistent"
+  open={isSidebarOpen}
+  sx={{
+    width: isSidebarOpen ? drawerWidth : 0,
+    flexShrink: 0,
+    [`& .MuiDrawer-paper`]: {
+      width: isSidebarOpen ? drawerWidth : 0,
+      boxSizing: "border-box",
+      background: "#1a4f72",
+      color: "#fff",
+      transition: "width 0.6s ease, opacity 0.6s ease",
+      opacity: isSidebarOpen ? 1 : 0,
+    },
+  }}
+>
+  <Toolbar />
+  <SidebarMenu
+    selectedItem={selectedItem}
+    setSelectedItem={setSelectedItem}
+    handleDashboardClick={handleDashboardClick}
+    handleProfileClick={handleProfileClick}
+    handleMatchesClick={handleMatchesClick}
+    handleInterestClick={handleInterestClick}
+    handleViewAllClick={handleViewAllClick}
+    handleSearchClick={handleSearchClick}
+    handleOpenLogoutDialog={handleOpenLogoutDialog}
+    userProfile={userProfile}
+  />
+</Drawer>
 
         <Box
           component="main"

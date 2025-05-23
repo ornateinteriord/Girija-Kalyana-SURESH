@@ -1,10 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import './AdminDashboard.css';
 import { FaHome, FaUser, FaUsers, FaServer, FaReceipt, FaBars, FaChevronDown, FaChevronUp, FaDashcube, FaIdBadge } from 'react-icons/fa';
 import { TbMessageReportFilled } from 'react-icons/tb';
 import { IoIosNotifications } from 'react-icons/io';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { Collapse, List, ListItem, ListItemText, IconButton, Typography, Menu, MenuItem, Avatar, Badge, Dialog, DialogTitle, DialogContent, TextField, Button, DialogActions } from '@mui/material';
 import { IoMdNotifications } from "react-icons/io";
@@ -18,6 +17,7 @@ const AdminDashboard = () => {
   const [openPromoterReceipts, setOpenPromoterReceipts] = useState(false);
   const [openPromoterReports, setOpenPromoterReports] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [userProfile, setUserProfile] = useState({
     name: "Admin",
@@ -25,20 +25,21 @@ const AdminDashboard = () => {
     phone: "123-456-7890",
     profilePicture: null,
   });
-
-
+  const [activePath, setActivePath] = useState('');
+  const location = useLocation();
 
   const navigate = useNavigate();
   const adminName = "Admin";
   
-
   useEffect(() => {
     const token = localStorage.getItem('token'); 
     if (!token) {
       navigate('/admin'); 
     }
-  }, []);
-  
+    // Set active path based on current location
+    setActivePath(location.pathname);
+  }, [location.pathname]);
+
   // Toggle Sidebar
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -63,99 +64,82 @@ const AdminDashboard = () => {
     setOpenPromoterReports(!openPromoterReports);
   };
   
-
   const navigateUserTable = () => {
     navigate('/admin/user-table');
-    setOpenUserManagement(false)
   };
   const handleDashboard=()=>{
     navigate('/admin/dashboard');
-    setOpenUserManagement(false)
   }
   const navigateUserUpgrade=()=>{
     navigate('/admin/userData');
-    setOpenUserManagement(false)
   }
   
   const navigateRenewals=()=>{
     navigate('/admin/renewals');
-    setOpenUserManagement(false)
   }
   const navigateresetpass=()=>{
     navigate('/admin/resetpass');
-    setOpenUserManagement(false)
   }
   const navigateImageVerify=()=>{
     navigate('/admin/imageverify');
-    setOpenUserManagement(false)
   }
   const navigatePendingdata=()=>{
     navigate('/admin/pendingdata');
-    setOpenAssistanceService(false)
   }
   const navigateSuccessdata=()=>{
     navigate('/admin/successdata');
-    setOpenAssistanceService(false)
   }
   const navigatePromoterdata=()=>{
     navigate('/admin/promotersdata');
-    setOpenAssistanceService(false)
   }
   const navigatePaytopromoters=()=>{
     navigate('/admin/paytopromoters');
-    setOpenPromoterManagement(false)
   }
   const navigatePromotersEarn=()=>{
     navigate('/admin/promoterearn');
-    setOpenPromoterManagement(false)
   }
   const navigatePromotersData=()=>{
     navigate('/admin/promoters');
-    setOpenPromoterManagement(false)
   }
   const navigatePromotersUsers=()=>{
     navigate('/admin/promotersusers');
-    setOpenPromoterManagement(false)
   }
   const navigateOnlineTransaction=()=>{
     navigate('/admin/onlinetransaction');
-    setOpenPromoterReceipts(false)
   }
   const navigateAssistanceData=()=>{
     navigate('/admin/assistance');
-    setOpenPromoterReceipts(false)
   }
   const navigateReceiptsvocher=()=>{
     navigate('/admin/receiptsvocher');
-    setOpenPromoterReceipts(false)
   }
 
   const navigateUserReports=()=>{
     navigate('/admin/userreports');
-    setOpenPromoterReports(false)
   }
   const navigateRenewalReports=()=>{
     navigate('/admin/renewalreports');
-    setOpenPromoterReports(false)
   }
   const navigateReceiptsReportsdata=()=>{
     navigate('/admin/receiptsreports');
-    setOpenPromoterReports(false)
   }
   const navigateNotification=()=>{
     navigate('/admin/notification');
   }
   
-  
-  
- // Profile dialog handlers
- const handleProfileDialogOpen = () => {
-  setProfileDialogOpen(true);
-};
+  // Check if a path is active
+  const isActive = (path) => {
+    return activePath === path;
+  };
 
-const handleProfileDialogClose = () => {
-  setProfileDialogOpen(false);
-};
+  // Profile dialog handlers
+  const handleProfileDialogOpen = () => {
+    setProfileDialogOpen(true);
+  };
+
+  const handleProfileDialogClose = () => {
+    setProfileDialogOpen(false);
+  };
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -164,11 +148,20 @@ const handleProfileDialogClose = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+const handleLogoutDialogOpen = () => {
+  setLogoutDialogOpen(true);
+  handleMenuClose(); // Close the profile menu
+};
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/');
-  };
+const handleLogoutDialogClose = () => {
+  setLogoutDialogOpen(false);
+};
+
+const handleConfirmLogout = () => {
+  localStorage.removeItem('token');
+  navigate('/');
+  setLogoutDialogOpen(false);
+};
   const handleProfileChange = (event) => {
     const { name, value } = event.target;
     setUserProfile((prevProfile) => ({
@@ -210,7 +203,7 @@ const handleProfileDialogClose = () => {
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+      <MenuItem onClick={handleLogoutDialogOpen}>Logout</MenuItem>
           </Menu>
           <Typography style={{ color: '#fff', marginRight: '10px',fontSize:'22px',fontWeight:'bold',fontFamily:'Outfit sans-serif' }}>
             {adminName}
@@ -220,126 +213,440 @@ const handleProfileDialogClose = () => {
       </nav>
     </div>
         {/* Sidebar */}
-        <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-          <List>
+        <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`} style={{
+          overflowY: 'auto',
+          scrollbarWidth: 'none', 
+          msOverflowStyle: 'none', 
+          '&::-webkit-scrollbar': {
+            display: 'none', 
+          }
+        }}>
+          <List sx={{ width: '100%' }}>
           <ListItem
             onClick={handleProfileDialogOpen}
-            style={{  cursor: "pointer", }}
+            sx={{ 
+              cursor: 'pointer',
+              padding: '10px',
+              backgroundColor: isActive('/admin/profile') ? '#1976d2' : 'transparent',
+              '&:hover': {
+                backgroundColor: isActive('/admin/profile') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+              }
+            }}
           >
             <CgProfile /> Profile
           </ListItem>
 
-            <ListItem onClick={handleDashboard} 
-            style={{ cursor: 'pointer'}}
+            <ListItem 
+              onClick={handleDashboard} 
+              sx={{ 
+                cursor: 'pointer',
+                padding: '14px',
+                    borderRadius:'2px',
+                backgroundColor: isActive('/admin/dashboard') ? '#1976d2' : 'transparent',
+                '&:hover': {
+                  backgroundColor: isActive('/admin/dashboard') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                }
+              }}
             >
-              < FaDashcube/> Dashboard
+              <FaDashcube/> Dashboard
             </ListItem>
 
             {/* User Management Dropdown */}
-            <ListItem button onClick={toggleUserManagement}  >
+            <ListItem 
+              button 
+              onClick={toggleUserManagement}
+              sx={{ 
+                cursor: 'pointer',
+                padding: '10px',
+              
+              }}
+            >
               <FaUser />
               <ListItemText primary="User Management" />
-              {openUserManagement ? <FaChevronUp /> : <FaChevronDown />} {/* Arrow Icon */}
+              {openUserManagement ? <FaChevronUp /> : <FaChevronDown />}
             </ListItem>
-            <Collapse in={openUserManagement} timeout="auto" unmountOnExit >
-              <List component="div" disablePadding sx={{paddingLeft:'20px',cursor:'pointer'}} >
-
-                 <ListItemText primary="User"   onClick={navigateUserTable}  sx={{marginBottom:'15px'}}/>
+            <Collapse in={openUserManagement} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding sx={{ width: '100%' }}>
+                <ListItem 
+                  button 
+                  onClick={navigateUserTable}
+                  sx={{
+                  padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/user-table') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/user-table') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+ 
+                  }}
+                >
+                  <ListItemText primary="User" />
+                </ListItem>
           
-                  <ListItemText primary="User Upgrade"  onClick={navigateUserUpgrade} sx={{marginBottom:'15px'}}/>
+                <ListItem 
+                  button 
+                  onClick={navigateUserUpgrade}
+                  sx={{
+                 padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/userData') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/userData') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="User Upgrade" />
+                </ListItem>
      
-                  <ListItemText primary="Renewal" onClick={navigateRenewals}  sx={{marginBottom:'15px'}}/>             
+                <ListItem 
+                  button 
+                  onClick={navigateRenewals}
+                  sx={{
+                  padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/renewals') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/renewals') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Renewal" />
+                </ListItem>             
           
-                  <ListItemText primary="Password" onClick={navigateresetpass} sx={{marginBottom:'15px'}}/>
+                <ListItem 
+                  button 
+                  onClick={navigateresetpass}
+                  sx={{
+                padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/resetpass') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/resetpass') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Password" />
+                </ListItem>
           
-                  <ListItemText primary="Image Verification" onClick={navigateImageVerify} sx={{marginBottom:'15px'}}/>
-                 
+                <ListItem 
+                  button 
+                  onClick={navigateImageVerify}
+                  sx={{
+                   padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/imageverify') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/imageverify') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Image Verification" />
+                </ListItem>
               </List>
             </Collapse>
 
             {/* Assistance Service Dropdown */}
-            <ListItem button onClick={toggleAssistanceService}>
+            <ListItem 
+              button 
+              onClick={toggleAssistanceService}
+              sx={{ 
+                cursor: 'pointer',
+                padding: '10px',
+               
+              }}
+            >
               <FaServer />
               <ListItemText primary="Assistance Service" />
-              {openAssistanceService ? <FaChevronUp /> : <FaChevronDown />} {/* Arrow Icon */}
+              {openAssistanceService ? <FaChevronUp /> : <FaChevronDown />}
            </ListItem>
             <Collapse in={openAssistanceService} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding sx={{paddingLeft:'20px',cursor:'pointer'}}>
-      
-                  <ListItemText primary="Pending" onClick={navigatePendingdata} sx={{marginBottom:'15px'}}/>
+              <List component="div" disablePadding sx={{ width: '100%' }}>
+                <ListItem 
+                  button 
+                  onClick={navigatePendingdata}
+                  sx={{
+                   padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/pendingdata') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/pendingdata') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Pending" />
+                </ListItem>
           
-                  <ListItemText primary="Success"  onClick={navigateSuccessdata} sx={{marginBottom:'15px'}}/>
+                <ListItem 
+                  button 
+                  onClick={navigateSuccessdata}
+                  sx={{
+                  padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/successdata') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/successdata') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Success" />
+                </ListItem>
            
-                  <ListItemText primary="Promoter User" onClick={navigatePromoterdata} sx={{marginBottom:'15px'}}/>
-             
+                <ListItem 
+                  button 
+                  onClick={navigatePromoterdata}
+                  sx={{
+                    padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/promotersdata') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/promotersdata') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Promoter User" />
+                </ListItem>
               </List>
             </Collapse>
 
             {/* Promoter Management Dropdown */}
-            <ListItem button onClick={togglePromoterManagement}>
+            <ListItem 
+              button 
+              onClick={togglePromoterManagement}
+              sx={{ 
+                cursor: 'pointer',
+                padding: '10px',
+              
+              }}
+            >
               <FaUsers />
               <ListItemText primary="Promoter Management" />
-              {openPromoterManagement ? <FaChevronUp /> : <FaChevronDown />} {/* Arrow Icon */}
+              {openPromoterManagement ? <FaChevronUp /> : <FaChevronDown />}
             </ListItem>
             <Collapse in={openPromoterManagement} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding sx={{paddingLeft:'20px',cursor:'pointer'}}>
-               
-                  <ListItemText primary="Promoters"   onClick={navigatePromotersData} sx={{marginBottom:'15px'}}/>
+              <List component="div" disablePadding sx={{ width: '100%' }}>
+                <ListItem 
+                  button 
+                  onClick={navigatePromotersData}
+                  sx={{
+                   padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/promoters') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/promoters') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Promoters" />
+                </ListItem>
              
-                  <ListItemText primary="Promoter Users" onClick={navigatePromotersUsers} sx={{marginBottom:'15px'}}/>
+                <ListItem 
+                  button 
+                  onClick={navigatePromotersUsers}
+                  sx={{
+               padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/promotersusers') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/promotersusers') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Promoter Users" />
+                </ListItem>
               
-                
-                  <ListItemText primary="Promoter Earnings" onClick={navigatePromotersEarn} sx={{marginBottom:'15px'}}/>
+                <ListItem 
+                  button 
+                  onClick={navigatePromotersEarn}
+                  sx={{
+                padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/promoterearn') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/promoterearn') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Promoter Earnings" />
+                </ListItem>
       
-                  <ListItemText primary="Pay to Promoters"onClick={navigatePaytopromoters} sx={{marginBottom:'15px'}}/>
-      
+                <ListItem 
+                  button 
+                  onClick={navigatePaytopromoters}
+                  sx={{
+                 padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/paytopromoters') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/paytopromoters') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Pay to Promoters" />
+                </ListItem>
               </List>
             </Collapse>
            
              {/* Promoter Receipts Dropdown */}
-            <ListItem button onClick={toggleReceiptsManagement}>
+            <ListItem 
+              button 
+              onClick={toggleReceiptsManagement}
+              sx={{ 
+                cursor: 'pointer',
+                padding: '10px',
+               
+              }}
+            >
               <FaReceipt />
               <ListItemText primary="Receipts" />
               {openPromoterReceipts ? <FaChevronUp /> : <FaChevronDown />}
             </ListItem>
             <Collapse in={openPromoterReceipts} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding sx={{paddingLeft:'20px',cursor:'pointer'}}>
-              
-                  <ListItemText primary="Online Transaction" onClick={navigateOnlineTransaction} sx={{marginBottom:'15px'}}/>
+              <List component="div" disablePadding sx={{ width: '100%' }}>
+                <ListItem 
+                  button 
+                  onClick={navigateOnlineTransaction}
+                  sx={{
+                  padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/onlinetransaction') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/onlinetransaction') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Online Transaction" />
+                </ListItem>
        
-         
-                  <ListItemText primary="Assistance Online Transaction" onClick={navigateAssistanceData} sx={{marginBottom:'15px'}}/>
+                <ListItem 
+                  button 
+                  onClick={navigateAssistanceData}
+                  sx={{
+                   padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/assistance') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/assistance') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Assistance Online Transaction" />
+                </ListItem>
                
-                  <ListItemText primary="Receipt Voucher" onClick={navigateReceiptsvocher} sx={{marginBottom:'15px'}}/>
-  
+                <ListItem 
+                  button 
+                  onClick={navigateReceiptsvocher}
+                  sx={{
+                padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/receiptsvocher') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/receiptsvocher') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Receipt Voucher" />
+                </ListItem>
               </List>
             </Collapse>
 
-               {/* Promoter Receipts Dropdown */}
-             <ListItem button onClick={toggleReportManagement}>
+               {/* Reports Dropdown */}
+             <ListItem 
+               button 
+               onClick={toggleReportManagement}
+               sx={{ 
+                 cursor: 'pointer',
+                 padding: '10px',
+               }}
+             >
                <TbMessageReportFilled /> 
               <ListItemText primary="Reports" />
               {openPromoterReports ? <FaChevronUp /> : <FaChevronDown />}
             </ListItem>
             <Collapse in={openPromoterReports} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding sx={{paddingLeft:'20px',cursor:'pointer'}}>
-                
-                  <ListItemText primary="Users" onClick={navigateUserReports} sx={{marginBottom:'15px'}}/>
+              <List component="div" disablePadding sx={{ width: '100%' }}>
+                <ListItem 
+                  button 
+                  onClick={navigateUserReports}
+                  sx={{
+                    padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/userreports') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/userreports') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Users" />
+                </ListItem>
                
-                  <ListItemText primary="Renewals" onClick={navigateRenewalReports} sx={{marginBottom:'15px'}}/>
+                <ListItem 
+                  button 
+                  onClick={navigateRenewalReports}
+                  sx={{
+                  padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/renewalreports') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/renewalreports') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Renewals" />
+                </ListItem>
               
-                  <ListItemText primary="Receipts" onClick={navigateReceiptsReportsdata} sx={{marginBottom:'15px'}}/>
-             
-               
+                <ListItem 
+                  button 
+                  onClick={navigateReceiptsReportsdata}
+                  sx={{
+                padding: '7px 10px',
+                  borderRadius:'2px',
+                    backgroundColor: isActive('/admin/receiptsreports') ? '#1976d2' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: isActive('/admin/receiptsreports') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  <ListItemText primary="Receipts" />
+                </ListItem>
               </List>
             </Collapse>
             {/* notification */}
-            <ListItem button onClick={navigateNotification}>
+            <ListItem 
+              button 
+              onClick={navigateNotification}
+              sx={{ 
+                cursor: 'pointer',
+                padding: '10px',
+                borderRadius:'2px',
+                backgroundColor: isActive('/admin/notification') ? '#1976d2' : 'transparent',
+                '&:hover': {
+                  backgroundColor: isActive('/admin/notification') ? '#1976d2' : 'rgba(0, 0, 0, 0.04)'
+                }
+              }}
+            >
               <IoIosNotifications />
               <ListItemText primary="Notifications" />
             </ListItem>
           </List>
         </aside>
+
+        {/* Logout Confirmation Dialog */}
+<Dialog open={logoutDialogOpen} onClose={handleLogoutDialogClose}>
+  <DialogTitle>Confirm Logout</DialogTitle>
+  <DialogContent>
+    <Typography>
+    Are you sure you want to logout from your account?
+    </Typography>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleLogoutDialogClose} color="primary">
+      Cancel
+    </Button>
+    <Button onClick={handleConfirmLogout} color="error" variant="contained">
+      Logout
+    </Button>
+  </DialogActions>
+</Dialog>
 
          {/* Profile Dialog */}
       <Dialog open={profileDialogOpen} onClose={handleProfileDialogClose}>
