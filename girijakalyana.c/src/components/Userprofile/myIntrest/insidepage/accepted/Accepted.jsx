@@ -42,6 +42,7 @@ const Accepted = () => {
   const [currentTab, setCurrentTab] = useState(0);
   const {getVerifiedImage} = useVerifiedImage()
   const { getConnectionStatus } = useConnectionStatus(responseData);
+  console.log(responseData,"as")
 
   const allAccepted = Array.isArray(responseData)
     ? responseData.filter(item => item?.status === "accepted")

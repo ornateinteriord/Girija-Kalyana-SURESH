@@ -13,7 +13,7 @@ const Requests = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
 
-  const recipientRegistrationNo = TokenService.getRegistrationNo();
+  const recipient = TokenService.getRegistrationNo();
 
   const {
     data: receivedInterests = [],
@@ -21,7 +21,7 @@ const Requests = () => {
     isError,
     error,
     refetch,
-  } = useGetReceivedInterests(recipientRegistrationNo);
+  } = useGetReceivedInterests(recipient);
 
   const { mutate: updateInterest } = useUpdateInterestStatus();
 
@@ -34,8 +34,8 @@ const Requests = () => {
   const handleInterestResponse = (senderRefNo, recipientRefNo, isAccepted) => {
     updateInterest(
       {
-        senderRegistrationNo: senderRefNo,
-        recipientRegistrationNo,
+        sender: senderRefNo,
+        recipient,
         status: isAccepted ? "accepted" : "rejected",
       },
       {
@@ -89,8 +89,8 @@ const Requests = () => {
           currentUsers?.map((user) => (
             <InterestCard
               key={user._id}
-              senderRefNo={user.senderRegistrationNo}
-              recipientRefNo={recipientRegistrationNo}
+              senderRefNo={user.sender}
+              recipientRefNo={recipient}
               handleResponse={handleInterestResponse}
             />
           ))

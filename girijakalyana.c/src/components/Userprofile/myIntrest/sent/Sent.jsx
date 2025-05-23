@@ -47,6 +47,7 @@ const Sent = () => {
     error,
   } = useGetSentInterests(currentUserRegistrationNo);
 
+
   useEffect(() => {
     if (isError) {
       toast.error(error.message || "Failed to load sent interests");
@@ -82,8 +83,8 @@ const Sent = () => {
 
     cancelInterest(
       {
-        senderRegistrationNo: currentUserRegistrationNo,
-        recipientRegistrationNo: interestToCancel.recipient.registration_no,
+        sender: currentUserRegistrationNo,
+        recipient: interestToCancel.recipientdata.registration_no,
       },
       {
         onSuccess: () => {
@@ -136,7 +137,7 @@ const Sent = () => {
               <InterestCard
                 key={interest._id}
                 interestId={interest._id}
-                profile={interest.recipient}
+                profile={interest.recipientdata}
                 interestDate={interest.createdAt}
                 status={interest.status}
                 handleOpenDialog={handleOpenDialog}

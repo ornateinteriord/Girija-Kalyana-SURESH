@@ -6,8 +6,8 @@ export const useConnectionStatus = (responseData) => {
     const connections = {};
     if (Array.isArray(responseData)) {
       responseData.forEach(item => {
-        if (item?.status === "accepted" && item?.senderRegistrationNo) {
-          connections[item?.senderRegistrationNo] = true;
+        if (item?.status === "accepted" && item?.sender) {
+          connections[item?.sender] = true;
         }
       });
     }
