@@ -290,7 +290,7 @@ return (
         </Typography>
       </Box>
 
-      <Divider sx={{ width: "80%", my: 1 }} />
+      <Divider sx={{ width:'100%', my: 1 }} />
 
       <Box display="flex" justifyContent="space-around" width="100%" my={2}>
         <ProfileInfo  label="Height" value={profile.height || "N/A"} />

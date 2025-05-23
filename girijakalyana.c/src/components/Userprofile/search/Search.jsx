@@ -195,21 +195,21 @@ const Search = () => {
             <Typography color="text.secondary">{age || "N/A"} yrs</Typography>
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center",justifyContent:'center', mb: 0.5 }}>
             <FaBriefcase size={14} color="#777" style={{ marginRight: 6 }} />
             <Typography variant="body2" color="text.secondary">
               {user.occupation || "Not specified"}
             </Typography>
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center",justifyContent:'center', mb: 1 }}>
             <FaMapMarkerAlt size={14} color="#777" style={{ marginRight: 6 }} />
             <Typography variant="body2">
               {[user.city, user.state].filter(Boolean).join(", ") || "Location not specified"}
             </Typography>
           </Box>
 
-          <Divider sx={{ width: "80%", my: 0.5 }} />
+          <Divider sx={{ my: 1}} />
 
           <Box display="flex" justifyContent="space-around" my={2}>
             <ProfileInfo label="Height" value={user.height || "N/A"} />

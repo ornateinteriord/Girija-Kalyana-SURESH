@@ -217,6 +217,7 @@ const ViewAll = () => {
             sx={{
               display: "flex",
               alignItems: "center",
+                justifyContent:"center",
               mb: 0.5,
               fontSize: { xs: "0.8rem", sm: "0.9rem" },
             }}
@@ -232,19 +233,20 @@ const ViewAll = () => {
             sx={{
               display: "flex",
               alignItems: "center",
+               justifyContent:"center",
               mb: 1,
               fontSize: { xs: "0.8rem", sm: "0.9rem" },
             }}
           >
             <FaMapMarkerAlt size={14} color="#777" style={{ marginRight: 6 }} />
-            <Typography variant="body2">
+            <Typography variant="body2" >
               {[user.city, user.state, user.country]
                 .filter(Boolean)
                 .join(", ") || "Location not specified"}
             </Typography>
           </Box>
 
-          <Divider sx={{ width: "80%", my: 0.5 }} />
+          <Divider sx={{  my: 1 }} />
 
           {/* Details row */}
           <Box display="flex" justifyContent="space-around" width="100%" my={2}>

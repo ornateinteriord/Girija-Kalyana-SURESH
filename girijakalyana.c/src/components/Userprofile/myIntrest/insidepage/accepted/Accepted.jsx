@@ -155,7 +155,7 @@ const Accepted = () => {
                       </Typography>
 
                       <Box
-                        sx={{ display: "flex", justifyContent: "center", gap: 1, mt: 1 }}
+                        sx={{ display: "flex",alignItems:'center', justifyContent: "center", gap: 1, mt: 1 }}
                       >
                         <FaBriefcase size={14} color="#777" />
                         <Typography variant="body2" color="text.secondary">
@@ -164,7 +164,7 @@ const Accepted = () => {
                       </Box>
 
                       <Box
-                        sx={{ display: "flex", justifyContent: "center", gap: 1, mt: 1 }}
+                        sx={{ display: "flex",alignItems:'center', justifyContent: "center", gap: 1, mt: 1 }}
                       >
                         <FaMapMarkerAlt size={14} color="#777" />
                         <Typography variant="body2">
@@ -174,7 +174,7 @@ const Accepted = () => {
                         </Typography>
                       </Box>
 
-                      <Divider sx={{ my: 2 }} />
+                      <Divider sx={{ my: 1}} />
 
                       <Box display="flex" justifyContent="space-around" mb={2}>
                         <ProfileInfo label="Height" value={profile.height || "N/A"} />

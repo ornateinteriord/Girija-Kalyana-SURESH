@@ -56,6 +56,8 @@ const UserNavBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [openChangePasswordDialog, setOpenChangePasswordDialog] = useState(false);
+  const [selectedItem, setSelectedItem] = useState("Dashboard");
+
   const [passwordData, setPasswordData] = useState({
     oldPassword: '',
     newPassword: '',
@@ -298,63 +300,81 @@ const handleSubmitPasswordChange = () => {
                   </Typography>
                 </Box>
               </ListItem>
-              {[
-                {
-                  text: "Dashboard",
-                  icon: <FaDashcube />,
-                  onClick: handleDashboardClick,
-                },
-                {
-                  text: "Profile",
-                  icon: <FaUser />,
-                  onClick: handleProfileClick,
-                },
-                {
-                  text: "My Matches",
-                  icon: <FaUsers />,
-                  onClick: handleMatchesClick,
-                },
-                {
-                  text: "My Interest",
-                  icon: <FaHeart />,
-                  onClick: handleInterestClick,
-                },
-                {
-                  text: "View All",
-                  icon: <FaUsersViewfinder />,
-                  onClick: handleViewAllClick,
-                },
-                {
-                  text: "Search",
-                  icon: <FaSearch />,
-                  onClick: handleSearchClick,
-                },
-                {
-                  text: "Logout",
-                  icon: <FaSignOutAlt />,
-                  onClick: handleOpenLogoutDialog,
-                },
-              ].map((item, index) => (
-                <ListItem button key={index} onClick={item.onClick}>
-                  <Button
-                    variant="text"
-                    startIcon={item.icon}
-                    sx={{
-                      color: "#fff",
-                      fontSize: "1.2rem",
-                      textTransform: "capitalize",
-                      marginLeft: "10px",
-                      gap: "10px",
-                      "&:hover": {
-                        backgroundColor: "transparent",
-                        color: "#fff",
-                      },
-                    }}
-                  >
-                    {item.text}
-                  </Button>
-                </ListItem>
-              ))}
+ {[
+  {
+    text: "Dashboard",
+    icon: <FaDashcube />,
+    onClick: handleDashboardClick,
+  },
+  {
+    text: "Profile",
+    icon: <FaUser />,
+    onClick: handleProfileClick,
+  },
+  {
+    text: "My Matches",
+    icon: <FaUsers />,
+    onClick: handleMatchesClick,
+  },
+  {
+    text: "My Interest",
+    icon: <FaHeart />,
+    onClick: handleInterestClick,
+  },
+  {
+    text: "View All",
+    icon: <FaUsersViewfinder />,
+    onClick: handleViewAllClick,
+  },
+  {
+    text: "Search",
+    icon: <FaSearch />,
+    onClick: handleSearchClick,
+  },
+  {
+    text: "Logout",
+    icon: <FaSignOutAlt />,
+    onClick: handleOpenLogoutDialog,
+  },
+].map((item, index) => (
+  <ListItem
+    key={index}
+    disablePadding
+    onClick={() => {
+      item.onClick();
+      setSelectedItem(item.text);
+    }}
+    sx={{
+      backgroundColor: selectedItem === item.text ? "#1976d2" : "transparent",
+      "&:hover": {
+        backgroundColor: selectedItem === item.text ? "#1976d2" : "transparent",
+      },
+      borderRadius: "2px",
+      mx: 0,
+      my: 2,
+    }}
+  >
+    <Button
+      variant="text"
+      startIcon={item.icon}
+      sx={{
+        color: "#fff",
+        fontSize: "1.2rem",
+        textTransform: "capitalize",
+        marginLeft: "10px",
+        width: "100%",
+        justifyContent: "flex-start",
+        "&:hover": {
+          backgroundColor: "rgba(255,255,255,0.1)",
+        },
+      }}
+    >
+      {item.text}
+    </Button>
+  </ListItem>
+))}
+
+
             </List>
           </Box>
         </Drawer>

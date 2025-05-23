@@ -129,6 +129,7 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
           sx={{
             display: "flex",
             alignItems: "center",
+            justifyContent:'center',
             mb: 0.5,
             fontSize: { xs: "0.8rem", sm: "0.9rem" },
           }}
@@ -143,6 +144,7 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
           sx={{
             display: "flex",
             alignItems: "center",
+             justifyContent:'center',
             mb: 1,
             fontSize: { xs: "0.8rem", sm: "0.9rem" },
           }}
@@ -155,7 +157,7 @@ const InterestCard = ({ senderRefNo, recipientRefNo, handleResponse }) => {
           </Typography>
         </Box>
 
-        <Divider sx={{ width: "80%", my: 1 }} />
+        <Divider sx={{ my: 1 }} />
 
         <Box display="flex" justifyContent="space-around" width="100%" my={2}>
           <ProfileInfo label="Height" value={profile?.height || "N/A"} />
